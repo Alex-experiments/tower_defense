@@ -1,0 +1,64 @@
+spike_10 : 60x48 a 0, 1729
+spike_9 : 60x48 a 434, 1288
+spike_8 : 60x48 a 515, 1222
+spike_7 : 50x48 a 1140, 986
+spike_6 : 52x48 a 967, 1183
+spike_5 : 46x48 a 1290, 1185
+spike_4 : 31x47 a 1842, 1093
+spike_3 : 32x32 a 1134, 1810
+spike_2 : 28x33 a 1834, 1235
+spike_1 : 14x28 a 583, 1777
+
+hot spike_10 : 59x46 a 534, 1166
+hot spike_9 : 59x46 a 72, 1644
+hot spike_8 : 59x46 a 359, 1368
+hot spike_7 : 59x46 a 666, 1468
+hot spike_6 : 52x46 a 1084, 1063
+hot spike_5 : 45x46 a 806, 507
+hot spike_4 : 31x46 a 1731, 1205
+hot spike_3 : 32x32 a 1890, 860
+hot spike_2 : 29x31 a 1224, 1658
+hot spike_1 : 15x30 a 583, 1745
+
+spike mine_10 : 55x56 a 433, 1656
+spike mine_9 : 55x56 a 709, 312
+spike mine_8 : 54x56 a 652, 1517
+spike mine_7 : 54x55 a 1140, 1035
+spike mine_6 : 54x55 a 1195, 986
+spike mine_5 : 54x55 a 477, 1712
+spike mine_4 : 45x55 a 1448, 1030
+spike mine_3 : 46x48 a 1346, 1132
+spike mine_2 : 45x43 a 851, 1643
+spike mine_1 : 45x34 a 898, 1594
+
+
+dart : 14x40 a 1471, 330
+dart ball : 28x28 a 1582, 1553
+huge dart ball : 72x72 a 461, 1021
+
+tack : 11x23 a 1128, 988
+
+fireball : 26x44 a 1564, 1638
+fireball_autre : 26x43 a 1639, 1558
+fireball_autre_2 : 26x44 a 1768, 1426
+fireball_autre_3 : 26x43 a 1802, 1400
+
+purple ball : 20x20 a 1472, 1785
+huge purple ball : 46x50 a 533, 1748
+flame : 25x59 a 1675, 1529
+
+napalm flame_1 : 16x21 a 1707, 1789
+napalm flame_2 : 16x21 a 1777, 1718
+napalm flame_3 : 16x21 a 1798, 1693
+napalm flame_4 : 16x21 a 1868, 1629
+
+
+red_glaive : 53x55 a 1138, 1091
+yellow_glaive : 53x55 a 651, 1573
+
+shuriken : 27x27 a 1739, 1447
+rocket : 23x33 a 1810, 1496
+rocket_droite : 22x37 a 1231, 745
+
+blade : 38x38 a 1332, 1428
+
