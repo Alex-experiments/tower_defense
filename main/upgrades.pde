@@ -22,12 +22,7 @@ class Upgrades{
       tour.attack_speed_list.set(i, as);
     }
   }
-  
-  void add_pierce(Tower tour, int add){
-    for(int i=0; i<tour.projectile_pierce_list.size(); i++){
-      tour.projectile_pierce_list.set(i, tour.projectile_pierce_list.get(i) + add);
-    }
-  }
+ 
   
   void change_shooting_type(Tower tour, String new_type){
     for(int i=0; i<tour.shoots_list.size(); i++){
@@ -55,15 +50,13 @@ class Upgrades{
             tour.detects_camo=true;
             break;
           case 2:
-            add_pierce(tour, 17);
             change_shooting_type(tour, "dart ball");
             set_attack_speed(tour,  0.63);
             break;
           case 3:
             tour.range = int(tour.range*1.15);
             change_shooting_type(tour, "huge dart ball");
-            add_pierce(tour, 82);
-            
+           
                                //il faut implémenter le fait que ca fasse 5 dmg aux céramics
             break;          
         }
@@ -71,21 +64,18 @@ class Upgrades{
       if(path_to_upgrade==2){
         switch(tour.path_2_progression){
           case 0:
-            add_pierce(tour, 1);
+            change_shooting_type(tour, "sharp dart");
             break;
           case 1:
-            add_pierce(tour, 2);
+            change_shooting_type(tour, "razor sharp dart");
             break;
           case 2:
             tour.deviation_list.append(-0.216);
             tour.deviation_list.append(0.216);
             for(int i=0; i<2; i++){
-              tour.shoots_list.append("dart");
-              tour.projectile_damage_list.append(1);
-              tour.projectile_pierce_list.append(tour.projectile_pierce_list.get(0));
+              tour.shoots_list.append("razor sharp dart");
               tour.time_before_next_attack_list.append(tour.time_before_next_attack_list.get(0));
               tour.attack_speed_list.append(tour.attack_speed_list.get(0));
-              tour.projectile_hit_exceptions.add(new StringList());
             }
             
             break;
@@ -128,17 +118,13 @@ class Upgrades{
             tour.deviation_list=new FloatList();
             tour.attack_speed_list = new FloatList();
             tour.time_before_next_attack_list = new FloatList();
-            tour.projectile_damage_list = new IntList();
-            tour.projectile_pierce_list = new IntList();
+
             
             for(int i=0; i<16; i++){
               tour.shoots_list.append("tack");
               tour.deviation_list.append(i*PI/8);
               tour.attack_speed_list.append(as);
-              tour.projectile_damage_list.append(1);
-              tour.projectile_pierce_list.append(1);
               tour.time_before_next_attack_list.append(timer);
-              tour.projectile_hit_exceptions.add(new StringList());
             }
             break;
           case 3:
@@ -158,7 +144,6 @@ class Upgrades{
             tour.range = int(tour.range * 1.15);
             break;
           case 2:
-            add_pierce(tour, 1);  //DANS BTD6, on a aussi un changement d'as de +18%
             change_shooting_type(tour, "blade");
             break;
           case 3:
@@ -172,15 +157,13 @@ class Upgrades{
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
-            tour.projectile_damage_list.set(0, 4);
-            tour.projectile_hit_exceptions.get(0).append("lead");
-            tour.projectile_hit_exceptions.get(0).append("frozen");
+            change_shooting_type(tour, "full metal bullet");
             break;
           case 1:
-            tour.projectile_damage_list.set(0, 7);
+            change_shooting_type(tour, "point five bullet");
             break;
           case 2:
-            tour.projectile_damage_list.set(0, 18);
+            change_shooting_type(tour, "deadly bullet");
             break;
           case 3:
                                                                     //IMMOBILISE LES CLASSES MOAB
@@ -210,24 +193,29 @@ class Upgrades{
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
-            add_pierce(tour, 3);
+            if(tour.shoots_list.get(0).equals("sonic boomerang"))  change_shooting_type(tour, "sonic multi target boomerang");
+            else if (tour.shoots_list.get(0).equals("red hot boomerang"))  change_shooting_type(tour, "red hot multi target boomerang");
+            else change_shooting_type(tour, "multi target boomerang");
             break;
           case 1:
-            add_pierce(tour, 6);
+            if(tour.shoots_list.get(0).equals("sonic boomerang"))  change_shooting_type(tour, "sonic glaive boomerang");
+            else if (tour.shoots_list.get(0).equals("red hot boomerang"))  change_shooting_type(tour, "red hot glaive boomerang");
+            else change_shooting_type(tour, "glaive boomerang");
             change_attack_speed(tour, 1.064);
             break;
           case 2:
-            tour.projectile_can_bounce=true;
-            tour.projectile_max_bounce_distance = 130;
-            tour.projectile_speed=16;
-            add_pierce(tour, 88);
-            change_shooting_type(tour, "glaive");
+            if(tour.shoots_list.get(0).equals("sonic boomerang"))  change_shooting_type(tour, "sonic glaive ricochet boomerang");
+            else if (tour.shoots_list.get(0).equals("red hot boomerang"))  change_shooting_type(tour, "red hot glaive ricochet boomerang");
+            else change_shooting_type(tour, "glaive ricochet boomerang");
             break;
           case 3:
             tour.detects_camo=true;        
             Boomerang temp;
             for(int i=0; i<2; i++){
-              temp = new Boomerang(tour, tour.x, tour.y, 65, 5, 1, 1, tour.projectile_hit_exceptions.get(0));    //Les 2 nouveaux boomerangs doivent pop les memes choses que les autres : FAUT LES UPDATE SI JAMAIS UP LE PATH2 APRES CA
+              temp = new Boomerang(tour, tour.x, tour.y, 65.);    //Les 2 nouveaux boomerangs doivent pop les memes choses que les autres : FAUT LES UPDATE SI JAMAIS UP LE PATH2 APRES CA
+              temp.speed = 5.;
+              temp.boomerang_type =  tour.shoots_list.get(0);    //il va falloir changer leur taille mais bon
+              temp.damage_type = get_damage_type(temp.boomerang_type);
               temp.orbiting=true;   // également : il faut qu'ils aient l'apparence de glaives
               if(i==1)  temp.angle_dep=PI;
               temp.deplacement();  //pour éviter qu'il y ait un prev_x sur la tour et déclancer des collisions qui ne doivent pas avoir lieu
@@ -238,27 +226,44 @@ class Upgrades{
         }
       }
       if(path_to_upgrade==2){
+        String temp_shooting_type;
         switch(tour.path_2_progression){
           case 0:
-            tour.projectile_hit_exceptions.get(0).append("frozen");
+            temp_shooting_type = "sonic boomerang";
+            if(tour.shoots_list.get(0).equals("glaive boomerang"))  temp_shooting_type = "sonic glaive boomerang";
+            change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les frozen
             for(Boomerang boomer : boomerangs){
-              if(boomer.orbiting)  boomer.hit_exceptions.append("frozen");
+              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.damage_type = temp_shooting_type;    //pas bien du tout
             }
             break;
           case 1:
-            tour.projectile_hit_exceptions.get(0).append("lead");
+            temp_shooting_type = "red hot boomerang";
+            if(tour.shoots_list.get(0).equals("glaive boomerang"))  temp_shooting_type = "red hot glaive boomerang";
+            change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les lead
             for(Boomerang boomer : boomerangs){
-              if(boomer.orbiting)  boomer.hit_exceptions.append("lead");
+              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.damage_type = temp_shooting_type;
             }
             break;
           case 2:
             change_attack_speed(tour, 3.2);   
             break;
           case 3:
-            //implémenter les abilities
-            //Turbo Charge Ability: Increases attack speed to hypersonic for 10 seconds.
+            boolean already_have_one = false;
+            for(Ability abi : abilities){
+              if(abi instanceof Turbo_charge){
+                already_have_one = true;
+                abi.towers_having_this_ability.add(tour);
+                abi.add_one_use(true);
+                tour.linked_ability = abi;
+                break;
+              }
+            }
+            if( !already_have_one){
+              abilities.add(new Turbo_charge(tour, 45., 10.));
+              tour.linked_ability = abilities.get(abilities.size()-1);
+            }
             break;          
         }
       }
@@ -266,6 +271,7 @@ class Upgrades{
     
     
     if(tour.type == "dartling gun"){
+      String temp_shooting_type;
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
@@ -276,36 +282,31 @@ class Upgrades{
             break;
           case 2:
             change_attack_speed(tour, 1.15);
-            add_pierce(tour, 12);
-            tour.projectile_hit_exceptions.get(0).append("frozen");
-            //changer en beam
+            temp_shooting_type = "laser cannon";
+            if(tour.shoots_list.get(0).equals("bloontonium dart"))  temp_shooting_type = "bloontonium laser cannon";
+            change_shooting_type(tour, temp_shooting_type);
             break;
           case 3:
-            add_pierce(tour, 87);
             for(int i=0; i<tour.attack_speed_list.size(); i++){
               tour.attack_speed_list.set(i, 60.);    //1 attaque par image
             }
-            //changer en rayon
-            tour.projectile_hit_exceptions.get(0).append("lead");
+             change_shooting_type(tour, "ray of doom");
             break;          
         }
       }
       if(path_to_upgrade==2){
         switch(tour.path_2_progression){
           case 0:
-            add_pierce(tour, 2);
-            tour.projectile_speed = int(tour.projectile_speed * 1.5);
+            change_shooting_type(tour, "powerful dart");
             break;
           case 1:
-            tour.projectile_hit_exceptions.get(0).append("frozen");    //change le type de dart
-            tour.projectile_hit_exceptions.get(0).append("lead");
+            temp_shooting_type = "bloontonium dart";
+            if(tour.shoots_list.get(0).equals("laser cannon"))  temp_shooting_type = "bloontonium laser cannon";
+            change_shooting_type(tour, temp_shooting_type);
             break;
           case 2:
             for(int i=0; i<tour.shoots_list.size(); i++){      //peut tj tout pop attention
-              tour.shoots_list.set(i, "rocket");  
-              tour.projectile_pierce_list.set(i, 40);
-              tour.projectile_hit_exceptions.get(i).append("black");
-              tour.projectile_hit_exceptions.get(i).append("zebra");
+              tour.shoots_list.set(i, "hydra rocket");  
             }
             
             break;
@@ -314,12 +315,9 @@ class Upgrades{
             tour.deviation_list.append(-0.22);
             tour.deviation_list.append(0.22);
             for(int i=0; i<2; i++){
-              tour.shoots_list.append("rocket");
-              tour.projectile_damage_list.append(1);
-              tour.projectile_pierce_list.append(tour.projectile_pierce_list.get(0));
+              tour.shoots_list.append("hydra rocket");
               tour.time_before_next_attack_list.append(tour.time_before_next_attack_list.get(0));
               tour.attack_speed_list.append(tour.attack_speed_list.get(0));
-              tour.projectile_hit_exceptions.add(tour.projectile_hit_exceptions.get(0));
             }
             break;          
         }
@@ -332,16 +330,12 @@ class Upgrades{
         switch(tour.path_1_progression){
           case 0:
             change_shooting_type(tour, "huge purple ball");
-            add_pierce(tour, 5);
             break;
           case 1:
             tour.shoots_list.append("laser");
             tour.deviation_list.append(0);
             tour.attack_speed_list.append(0.43);
-            tour.projectile_damage_list.append(1);
-            tour.projectile_pierce_list.append(25);
             tour.time_before_next_attack_list.append(0);
-            tour.projectile_hit_exceptions.add(new StringList());
             break;
           case 2:
             //Whirlwinds and Tornadoes cannot blow away Lead Bloons but the Tornadoes from Tempest Tornado Monkey Apprentices can pop Lead Bloons.
@@ -372,12 +366,7 @@ class Upgrades{
             tour.shoots_list.append("fireball");
             tour.deviation_list.append(0);
             tour.attack_speed_list.append(0.47);
-            tour.projectile_damage_list.append(1);
-            tour.projectile_pierce_list.append(40);
             tour.time_before_next_attack_list.append(0);
-            tour.projectile_hit_exceptions.add(new StringList());
-            tour.projectile_hit_exceptions.get(tour.projectile_hit_exceptions.size()-1).append("black");
-            tour.projectile_hit_exceptions.get(tour.projectile_hit_exceptions.size()-1).append("zebra");
             break;
           case 1:
             tour.detects_camo=true;
@@ -387,11 +376,7 @@ class Upgrades{
             tour.shoots_list.append("flame");      //si on change ce nom, il faut aussi le changer dans 'tower' car on rajoute une max range
             tour.deviation_list.append(0);         //change  r la vitesse du projectile -> doit etre bien plus rapide
             tour.attack_speed_list.append(10);
-            tour.projectile_damage_list.append(2);
-            tour.projectile_pierce_list.append(1);
-            tour.time_before_next_attack_list.append(0);
-            tour.projectile_hit_exceptions.add(new StringList());
-            
+            tour.time_before_next_attack_list.append(0);            
             break;
           case 3:
             //implémenter abilites
@@ -404,34 +389,31 @@ class Upgrades{
     
     if(tour.type == "ninja monkey"){
       if(path_to_upgrade==1){
+        String temp_shooting_type;
         switch(tour.path_1_progression){
           case 0:
             change_attack_speed(tour, 1.2);
             tour.range = int(tour.range * 1.16);
             break;
           case 1:
-            add_pierce(tour, 2);
+            change_shooting_type(tour, "sharp shuriken");
             break;
           case 2:
-            tour.shoots_list.append("shuriken");
+            temp_shooting_type = tour.shoots_list.get(0);
+            tour.shoots_list.append(temp_shooting_type);
             tour.deviation_list.append(0.1);
             tour.attack_speed_list.append(tour.attack_speed_list.get(0));
-            tour.projectile_damage_list.append(1);
-            tour.projectile_pierce_list.append(tour.projectile_pierce_list.get(0));
             tour.time_before_next_attack_list.append(tour.time_before_next_attack_list.get(0));
-            tour.projectile_hit_exceptions.add(new StringList());
             break;
           case 3:
             tour.deviation_list.append(0.2);
             tour.deviation_list.append(-0.1);
             tour.deviation_list.append(-0.2);
+            temp_shooting_type = tour.shoots_list.get(0);
             for(int i=0; i<3; i++){
-              tour.shoots_list.append("shuriken");
+              tour.shoots_list.append(temp_shooting_type);
               tour.attack_speed_list.append(tour.attack_speed_list.get(0));
-              tour.projectile_damage_list.append(1);
-              tour.projectile_pierce_list.append(tour.projectile_pierce_list.get(0));
               tour.time_before_next_attack_list.append(tour.time_before_next_attack_list.get(0));
-              tour.projectile_hit_exceptions.add(new StringList());
             }
             break;          
         }
@@ -439,8 +421,8 @@ class Upgrades{
       if(path_to_upgrade==2){
         switch(tour.path_2_progression){
           case 0:
-            tour.projectile_can_bounce=true;
-            tour.projectile_max_bounce_distance = 130;      //change to do on seeking shuriken ?
+                                //change to do on seeking shuriken ?
+            change_shooting_type(tour, "seeking shuriken");
             break;
           case 1:
             //implémenter la distraction -> fonctionne exactement comme la tornade
@@ -450,13 +432,8 @@ class Upgrades{
             tour.deviation_list.append(0);
             if(tour.path_1_progression>0)  tour.attack_speed_list.append(0.504);
             else tour.attack_speed_list.append(0.42);
-            tour.projectile_damage_list.append(1);
-            if(tour.path_1_progression>0)  tour.projectile_pierce_list.append(62);
-            else tour.projectile_pierce_list.append(60);
             tour.time_before_next_attack_list.append(0);
-            tour.projectile_hit_exceptions.add(new StringList());
-            tour.projectile_hit_exceptions.get(tour.projectile_hit_exceptions.size()-1).append("black");
-            tour.projectile_hit_exceptions.get(tour.projectile_hit_exceptions.size()-1).append("zebra");
+
             //explosion de range environ 165pix (diametre 330)
             
             break;
@@ -471,13 +448,12 @@ class Upgrades{
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
-            add_pierce(tour, 5);
+            change_shooting_type(tour, "stack spike");
             break;
           case 1:
             change_shooting_type(tour, "hot spike");
             break;
           case 2:
-            add_pierce(tour, 6);
             change_shooting_type(tour, "spike ball");    //ajouter le fait que ca fasse 3* les degats aux ceramics
             break;
           case 3:
@@ -496,6 +472,7 @@ class Upgrades{
             break;
           case 2:
             change_attack_speed(tour, 1.62);    //ajouter le fait que ca fasse 4* les dégats (donc +3) aux moabs
+            //change_shooting_type(tour, "moab spike");
             break;
           case 3:
             //implementer les abilities Lays a thick carpet of spikes over the whole track. Spikes last 5 seconds unless reacted upon, in which the spikes will get an extra 5 seconds to pop a bloon.

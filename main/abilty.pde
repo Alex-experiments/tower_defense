@@ -8,20 +8,41 @@ class Ability{
   int uses_available=1, max_uses_available=1;
   Button bouton;
   
-  Ability(float cooldown_duration, float duration){
+  Ability(Tower enabled_by_tower, float cooldown_duration, float duration){
     this.cooldown_duration = cooldown_duration;
     this.duration = duration;
     this.show_slot = abilities.size();    //l'instance est crée juste avant d'etre ajoutée à la liste abilities
+    this.towers_having_this_ability.add(enabled_by_tower);
   }
   
   void core(){
-    if(this.bouton.is_cliqued())   this.use();
+    if(this.bouton.is_cliqued()){
+      Tower tour_used = get_tour_to_use();
+      this.use(tour_used);  //le bouton sera non cliquable si aucune tour n'est utilisable (uses_available==0)
+      tour_used.ability_use_time = FAKE_TIME_ELAPSED;
+      towers_in_cd.add(tour_used);
+      this.uses_available--;
+    }
     update();
     show();
   }
   
+  Tower get_tour_to_use(){
+    //on doit d'abord déterminer de quelle tour l'effet part :
+    Tower tour_used=null;
+    for(Tower tour : towers_having_this_ability){
+      if( !towers_in_cd.contains(tour)){
+        tour_used = tour;
+        break;
+      }
+    }
+    return tour_used;
+  }
+  
+  
+  
   //function to be over rided
-  void use(){}
+  void use(Tower tour_used){}
   void end_effect(Tower tour){}
   
   void update(){    
@@ -82,24 +103,11 @@ class Super_monkey_fan_club extends Ability{
   ArrayList<Tower> closest_dart_monkeys = new ArrayList<Tower>();  
   
   Super_monkey_fan_club(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(cooldown_duration, duration);
-    this.towers_having_this_ability.add(enabled_by_tower);
+    super(enabled_by_tower, cooldown_duration, duration);
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
   }
 
-  void use(){
-    
-    //on doit d'abord déterminer de quelle tour l'effet part :
-    Tower tour_used=null;
-    float x=0,y=0;
-    for(Tower tour : towers_having_this_ability){
-      if( !towers_in_cd.contains(tour)){
-        x=tour.x;
-        y=tour.y;
-        tour_used = tour;
-        break;
-      }
-    }
+  void use(Tower tour_used){
     
     float dist_min=Float.POSITIVE_INFINITY;
     
@@ -112,7 +120,7 @@ class Super_monkey_fan_club extends Ability{
             
       if(tour.type.equals("dart monkey")){
         
-        float dist = distance(new float[] {x, y}, new float[] {tour.x, tour.y});
+        float dist = distance(new float[] {tour_used.x, tour_used.y}, new float[] {tour.x, tour.y});
         
         if(closest_dart_monkeys.size()<10){    //si on a pas encore récup 10 tours, on ajoute
           closest_dart_monkeys.add(tour);
@@ -127,7 +135,7 @@ class Super_monkey_fan_club extends Ability{
           
           dist_tower_to_replace=-1.;            //il faut maintenant re parcourir notre liste pour savoir laquelle est la nouvelle plus loin
           for(Tower t : closest_dart_monkeys){
-            dist = distance(new float[] {x, y}, new float[] {t.x, t.y});
+            dist = distance(new float[] {tour_used.x, tour_used.y}, new float[] {t.x, t.y});
             if(dist>dist_tower_to_replace){
               dist_tower_to_replace = dist;
               tower_to_replace = t;
@@ -143,13 +151,7 @@ class Super_monkey_fan_club extends Ability{
         tour.attack_speed_list.set(i, tour.attack_speed_list.get(i) * 10);    //en attendant le super monkey
       }
       tour_used.towers_affected_by_ability.add(tour);
-    }
-    
-    
-    tour_used.ability_use_time = FAKE_TIME_ELAPSED;
-    towers_in_cd.add(tour_used);
-    this.uses_available--;
-    
+    }    
   }  
   
   void end_effect(Tower tour){
@@ -162,6 +164,51 @@ class Super_monkey_fan_club extends Ability{
       }
     }
     tour.towers_affected_by_ability = new ArrayList<Tower>();  //comme ca si on supprime la tour on ne re débuff pas les tours impactées.
+    tour.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
+  }
+
+}
+
+class Blade_maelstrom extends Ability{
+  //Blade Maelstrom rapidly shoots two streams of blades, which spiral outwards.
+  //Each of the blades have unlimited pierce
+  
+  Blade_maelstrom(Tower enabled_by_tower, float cooldown_duration, float duration){
+    super(enabled_by_tower, cooldown_duration, duration);
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+  }
+  
+  void use(Tower tour_used){
+    for(int i=0; i<64; i++){
+      //projectiles.add(new Projectile(tour_used, tour_used.x, tour_used.y, tour_used.projectile_speed, i*PI/64, tour_used.projectile_damage_list.get(0), int(Float.POSITIVE_INFINITY), false, "maelstrom blade"));
+    }
+  }
+  
+  
+  
+}
+
+class Turbo_charge extends Ability{
+  //increases the firing speed of the tower by 5x (hypersonic) for 10 seconds.
+    
+  Turbo_charge(Tower enabled_by_tower, float cooldown_duration, float duration){
+    super(enabled_by_tower, cooldown_duration, duration);
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+  }
+
+  void use(Tower tour_used){
+
+    for(int i=0; i<tour_used.attack_speed_list.size(); i++){
+      tour_used.attack_speed_list.set(i, tour_used.attack_speed_list.get(i) * 5);    //en attendant le super monkey
+    }
+  
+  }  
+  
+  void end_effect(Tower tour){
+    for(int i=0; i<tour.attack_speed_list.size(); i++){
+      tour.attack_speed_list.set(i, tour.attack_speed_list.get(i) / 5);    //en attendant le super monkey
+    }
+    
     tour.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
   }
 

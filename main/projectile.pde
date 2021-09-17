@@ -1,13 +1,10 @@
 class Projectile{
-  float x;
-  float y;
-  float speed;
+  float x, y;
+  float speed, size;
   float direction;
-  float size;
 
   float dmg_done_this_frame;
-  float prev_x;
-  float prev_y;
+  float prev_x, prev_y;
   
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   
@@ -20,40 +17,21 @@ class Projectile{
   int pierce;            //  pierce correspond au nombre d'ennemis maximum touchable : indépendant du fait qu'on puisse rebondir ou pas
                          // Si on veut rebondir un maximum de 2 fois, il faut mettre can_bounce=true et pierce = 2
                          
-  String projectile_type;
-  StringList hit_exceptions;
+  String damage_type, projectile_type;
   boolean explose = false;
   int explosion_diameter;
   color couleur;  
   boolean rotate=false;
-  float rotation_angle=0;
-  float rotation_speed;
+  float rotation_angle=0, rotation_speed;
   
   Tower fired_from_tower;
    
   
-  Projectile(Tower fired_from_tower, float x_dep, float y_dep, float speed, float direction, int damage, int pierce, boolean can_bounce, String projectile_type, StringList hit_exceptions){
+  Projectile(Tower fired_from_tower, float x_dep, float y_dep, float direction){
     x=x_dep;
     y=y_dep;
-    this.speed=speed;
     this.direction=direction;
-    this.damage=damage;
-    this.pierce=pierce;
-    this.can_bounce=can_bounce;
-    this.hit_exceptions=hit_exceptions;
-    
-    if(can_bounce)  max_bounce_distance=fired_from_tower.projectile_max_bounce_distance;
-    
-    this.projectile_type=projectile_type;          //ca servira pour plus tard
-    
     this.fired_from_tower=fired_from_tower;
-    
-    set_size();
-    if(projectile_type.equals("rocket") || projectile_type.equals("fireball") || projectile_type.equals("flash bomb")){
-      explose=true;
-      explosion_diameter=60;
-      if(projectile_type.equals("flash bomb"))  explosion_diameter=330;
-    }
   }
   
   void core(int i, int nb_proj){
@@ -64,6 +42,11 @@ class Projectile{
       return;
     }
     if(nb_proj - i<500) this.show();   //on affiche que les 300 derniers crées pour éviter tout lag
+  }
+    
+  void verif_damage_type(){
+    if(damage_type.equals(get_damage_type(projectile_type)))  return;
+    println("NOT GOOD ! Projectile :", projectile_type, "gives", damage_type, "and", get_damage_type(projectile_type));
   }
   
   void show(){
@@ -86,65 +69,6 @@ class Projectile{
     translate(x, y);
     rotate(-direction-PI/2-rotation_angle);
     translate(-x, -y);
-  }
-  
-  void set_size(){
-        
-    switch(projectile_type){
-      case "dart":
-        size=6;
-        couleur=color(0);
-        break;
-      case "blade":
-        size=38;
-        couleur=color(144);
-        rotate=true;
-        rotation_speed=PI/16;
-        break;
-      case "boomerang":
-        //jamais detecté
-        size=10;
-        couleur=color(255, 242, 0);
-        break;
-      case "glaive":
-        size=38;
-        couleur=color(144);
-        break;
-      case "tack":
-        size=5;
-        couleur=color(0);
-        break;
-      case "huge spike ball":
-        size=20;
-        couleur=color(50);
-        break;
-      case "spike ball":
-        size=15;
-        couleur=color(50);
-        break;
-      case "purple ball":
-        size=9;
-        couleur=color(0, 155, 213);
-        break;
-      case "huge purple ball":
-        size=14;
-        couleur=color(255, 0, 255);
-        break;
-      case "flame":
-        size = 15;
-        couleur=color(255, 0, 0);
-        break;
-      case "shuriken":
-        size=7;
-        couleur=color(100);
-        rotate=true;
-        rotation_speed=PI/16;
-        break;
-      default:
-        size=6;
-        couleur=color(0);
-        break;
-    }
   }
   
   void deplacement(){
@@ -184,7 +108,7 @@ class Projectile{
       Mob mob = enemis.get(i);
       if(can_detect(mob, fired_from_tower.detects_camo) && pierce>0 && collision(new float[] {mob.x, mob.y}, mob.size) && !already_dmged_mobs.contains(mob)){
         if(explose){
-          explosions.add(new Explosion(fired_from_tower, mob.x, mob.y, explosion_diameter, damage, pierce, hit_exceptions));
+          explosions.add(new Explosion(fired_from_tower, mob.x, mob.y, explosion_diameter, damage, pierce, damage_type));
           pierce=0;
           return;
         }
@@ -226,7 +150,7 @@ class Projectile{
   
   
   void hit(Mob mob){
-    int layers_popped=mob.pop_layers(damage, true, projectile_type, hit_exceptions);      //on tappe le mob
+    int layers_popped=mob.pop_layers(damage, true, damage_type);      //on tappe le mob
     dmg_done_this_frame+=layers_popped;
     
     for(Mob dmged_mob : mob.bloons_dmged()){
@@ -237,4 +161,284 @@ class Projectile{
     if(mob.layers<=0)  enemis.remove(mob);
   }
   
+}
+
+
+class Dart extends Projectile{
+  static final float speed = 20., size=14.;
+  static final int damage = 1, pierce = 1;
+  static final String damage_type = "sharp", projectile_type = "dart";
+  
+  Dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Dart_ball extends Projectile{
+  static final float speed = 20., size=28;
+  static final int damage = 1, pierce = 18;
+  static final String damage_type = "shatter", projectile_type = "dart ball";
+  
+  Dart_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Huge_dart_ball extends Projectile{    //il faut implémenter le fait que ca fasse 5 dmg aux céramics
+  static final float speed = 20., size=72;
+  static final int damage = 1, pierce = 100;
+  static final String damage_type = "normal", projectile_type = "huge dart ball";
+  
+  Huge_dart_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Sharp_dart extends Projectile{
+  static final float speed = 20., size=14.;
+  static final int damage = 1, pierce = 2;
+  static final String damage_type = "sharp", projectile_type = "sharp dart";
+  
+  Sharp_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+class Powerful_dart extends Projectile{
+  static final float speed = 30., size=14.;
+  static final int damage = 1, pierce = 3;
+  static final String damage_type = "sharp", projectile_type = "powerful dart";
+  
+  Powerful_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Razor_sharp_dart extends Projectile{
+  static final float speed = 20., size=14.;
+  static final int damage = 1, pierce = 4;
+  static final String damage_type = "sharp", projectile_type = "razor sharp dart";
+  
+  Razor_sharp_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Tack extends Projectile{
+  static final float speed = 10., size=11.;
+  static final int damage = 1, pierce = 1;
+  static final String damage_type = "sharp", projectile_type = "tack";
+  
+  Tack(Tower fired_from_tower, float x_dep, float y_dep, float direction, float max_range){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.has_max_range = true;
+    this.max_range = max_range;
+  } 
+}
+
+class Blade extends Projectile{
+  static final float speed = 10., size=38.;
+  static final int damage = 1, pierce = 2;
+  static final String damage_type = "sharp", projectile_type = "blade";
+  
+  Blade(Tower fired_from_tower, float x_dep, float y_dep, float direction, float max_range){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.has_max_range = true;
+    this.max_range = max_range;
+  } 
+}
+
+class Blade_maelstrom_proj extends Projectile{
+  static final float speed = 10., size=38.;
+  static final int damage = 1;
+  int pierce = int(Float.POSITIVE_INFINITY);
+  static final String damage_type = "sharp", projectile_type = "blade maelstrom";
+  
+  Blade_maelstrom_proj(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Glaive_ricochet extends Projectile{
+  
+  static final float speed = 15., size=50.;
+  static final int damage = 1, pierce = 100;
+  static final String damage_type = "sharp", projectile_type = "glaive ricochet" ;
+  
+  Glaive_ricochet(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.can_bounce = true;
+    this.max_bounce_distance = 130.;
+  } 
+  
+}
+
+class Sonic_glaive_ricochet extends Projectile{
+  
+  static final float speed = 15., size=50.;
+  static final int damage = 1, pierce = 100;
+  static final String damage_type = "shatter", projectile_type = "sonic glaive ricochet";
+  
+  Sonic_glaive_ricochet(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.can_bounce = true;
+    this.max_bounce_distance = 130.;
+  } 
+  
+}
+
+class Red_hot_glaive_ricochet extends Projectile{
+  
+  static final float speed = 15., size=50.;
+  static final int damage = 1, pierce = 100;
+  static final String damage_type = "normal", projectile_type = "red hot glaive ricochet";
+  
+  Red_hot_glaive_ricochet(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.can_bounce = true;
+    this.max_bounce_distance = 130.;
+  } 
+  
+}
+
+class Laser_cannon extends Projectile{
+  
+  static final float speed = 20., size=14.;
+  static final int damage = 1, pierce = 13;
+  static final String damage_type = "shatter", projectile_type = "laser cannon";
+  
+  Laser_cannon(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Bloontonium_laser_cannon extends Projectile{
+  
+  static final float speed = 20., size=14.;
+  static final int damage = 1, pierce = 13;
+  static final String damage_type = "normal", projectile_type = "bloontonium laser cannon";
+  
+  Bloontonium_laser_cannon(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Ray_of_doom extends Projectile{            // AAAATTENTION : a enlever des projectiles en vrai c'est pas comme ca que ca fonctionne
+  
+  static final float speed = 20., size=14.;
+  static final int damage = 1, pierce = 100;
+  static final String damage_type = "normal", projectile_type = "ray of doom";
+  
+  Ray_of_doom(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Bloontonium_dart extends Projectile{
+  static final float speed = 30., size=14.;
+  static final int damage = 1, pierce = 3;
+  static final String damage_type = "normal", projectile_type = "bloontonium dart";
+  
+  Bloontonium_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Hydra_rocket extends Projectile{
+  static final float speed = 30., size=23.;
+  static final int damage = 1, pierce = 3;
+  static final String damage_type = "normal", projectile_type = "hydra rocket";
+  
+  Hydra_rocket(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.explose = true;
+    this.explosion_diameter = 60;
+  } 
+}
+
+class Purple_ball extends Projectile{
+  static final float speed = 10., size=20.;
+  static final int damage = 1, pierce = 2;
+  static final String damage_type = "normal", projectile_type = "purple ball";
+  
+  Purple_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Huge_purple_ball extends Projectile{
+  static final float speed = 10., size=46.;
+  static final int damage = 1, pierce = 7;
+  static final String damage_type = "normal", projectile_type = "huge purple ball";
+  
+  Huge_purple_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Fireball extends Projectile{
+  static final float speed = 20., size=26.;
+  static final int damage = 1, pierce = 40;
+  static final String damage_type = "normal", projectile_type = "fireball";
+  
+  Fireball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.explose = true;
+    this.explosion_diameter = 60;
+  } 
+}
+
+class Flame extends Projectile{
+  static final float speed = 40., size=26.;
+  static final int damage = 2, pierce = 1;
+  static final String damage_type = "normal", projectile_type = "flame";
+  
+  Flame(Tower fired_from_tower, float x_dep, float y_dep, float direction, float max_range){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    this.has_max_range = true;
+    this.max_range = max_range;
+  } 
+}
+
+class Shuriken extends Projectile{
+  static final float speed = 20., size=27.;
+  static final int damage = 1, pierce = 2;
+  static final String damage_type = "sharp", projectile_type = "shuriken";
+  
+  Shuriken(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Sharp_shuriken extends Projectile{
+  static final float speed = 20., size=27.;
+  static final int damage = 1, pierce = 4;
+  static final String damage_type = "sharp", projectile_type = "sharp shuriken";
+  
+  Sharp_shuriken(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+  } 
+}
+
+class Seeking_shuriken extends Projectile{
+  static final float speed = 20., size=27.;
+  static final int damage = 1, pierce = 4;
+  static final String damage_type = "sharp", projectile_type = "seeking shuriken";
+  
+  Seeking_shuriken(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    can_bounce=true;
+    max_bounce_distance = 130;
+  } 
+}
+
+class Flash_bomb extends Projectile{
+  static final float speed = 20., size=27.;
+  static final int damage = 1, pierce = 60;
+  static final String damage_type = "normal", projectile_type = "flash bomb";
+  
+  Flash_bomb(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+    super(fired_from_tower, x_dep, y_dep, direction);
+    explose=true;
+    explosion_diameter = 330;
+  } 
 }

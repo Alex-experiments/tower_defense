@@ -141,6 +141,7 @@ void draw(){
   
   background(255);    //fond blanc
   image(background, 875/2, 650/2);  
+  //map.show();
   
   if(god_mode){
     joueur.vies=100;
@@ -151,7 +152,6 @@ void draw(){
   }
   
   
-  //map.show();
   
   round.update();
   round.spawn();
@@ -184,6 +184,7 @@ void draw(){
   //On update tous les projectiles tirés
   int nb_proj = projectiles.size();
   for (int i = nb_proj - 1; i >= 0; i--){
+    println(projectiles.get(i).damage_type);
     projectiles.get(i).core(i, nb_proj);
   }
   
@@ -208,6 +209,7 @@ void draw(){
     pop_animations.get(i).core();
   }
   
+  textAlign(CENTER, CENTER);
   for(Ability abi : abilities){
     abi.core();
   }

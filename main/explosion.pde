@@ -10,12 +10,12 @@ class Explosion{
   int damage;
   int pierce;
   int dmg_done_this_frame;
-  StringList hit_exceptions;
   Tower fired_from_tower;
+  String damage_type;
   
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
 
-  Explosion(Tower fired_from_tower, float x, float y, float diametre, int damage, int pierce, StringList hit_exceptions){
+  Explosion(Tower fired_from_tower, float x, float y, float diametre, int damage, int pierce, String damage_type){
     this.fired_from_tower=fired_from_tower;
     this.x=x;
     this.y=y;
@@ -23,7 +23,7 @@ class Explosion{
     this.diametre=diametre;
     this.damage=damage;
     this.pierce=pierce;
-    this.hit_exceptions=hit_exceptions;
+    this.damage_type=damage_type;
     explosion_time = FAKE_TIME_ELAPSED;
     
     kill();
@@ -67,7 +67,7 @@ class Explosion{
   }
   
   void hit(Mob mob){
-    int layers_popped=mob.pop_layers(damage, true, "explosion", hit_exceptions);      //on tappe le mob
+    int layers_popped=mob.pop_layers(damage, true, damage_type);      //on tappe le mob
     dmg_done_this_frame+=layers_popped;
     
     for(Mob dmged_mob : mob.bloons_dmged()){

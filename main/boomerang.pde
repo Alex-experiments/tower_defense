@@ -1,53 +1,45 @@
 class Boomerang{
-  float x;
-  float y;
-  float prev_x;
-  float prev_y;
+  float x, y, prev_x, prev_y;
   
   float angle_dep;
-  
   float size=10;
   
   int avancement=0;
   
-  float centre_x;
-  float centre_y;
-  float rayon_cercle;
+  float centre_x, centre_y, rayon_cercle;
   Tower fired_from_tower;
   float speed;
   int dmg_done_this_frame;
   
-  int pierce;
-  int damage;
+  int pierce, damage;
   
   boolean orbiting=false;
   
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   
-  StringList hit_exceptions;
+  String boomerang_type, damage_type;
 
   
-  Boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle, float speed, int damage, int pierce, StringList hit_exceptions){
+  Boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
     this.centre_x=centre_x;
     this.centre_y=centre_y;
     this.rayon_cercle=rayon_cercle;
     this.fired_from_tower = fired_from_tower;
-    this.speed=speed;
-    this.damage=damage;
-    this.pierce=pierce;
-    this.hit_exceptions = hit_exceptions;
     angle_dep = atan2(fired_from_tower.y - centre_y, fired_from_tower.x - centre_x); 
     
     x=fired_from_tower.x;  //sinon ca chie avec collision() car sachant que prev_x n'a pas de valeur par défault ca sera 0...
     y=fired_from_tower.y;
-    
-    if(fired_from_tower.path_1_progression>=2)  size = 15;  //les projectiles sont des glaives
   }
   
   void core(){
     update();
     if(!orbiting && (ended_circle() || pierce<=0))  boomerangs.remove(this);
     else  show();
+  }
+  
+  void verif_damage_type(){
+    if(damage_type.equals(get_damage_type(boomerang_type)))  return;
+    println("NOT GOOD ! Projectile :", boomerang_type, "gives", damage_type, "and", get_damage_type(boomerang_type));
   }
   
   void update(){
@@ -115,7 +107,7 @@ class Boomerang{
   
   
   void hit(Mob mob){
-    int layers_popped=mob.pop_layers(damage, true, "boomerang", hit_exceptions);      //on tappe le mob
+    int layers_popped=mob.pop_layers(damage, true, damage_type);      //on tappe le mob
     dmg_done_this_frame+=layers_popped;
     
     for(Mob dmged_mob : mob.bloons_dmged()){
@@ -127,4 +119,87 @@ class Boomerang{
   }
 
 
+}
+
+class Basic_boomerang extends Boomerang{
+  
+  static final float speed = 15., size=10.;
+  static final int damage = 1, pierce = 3;
+  static final String damage_type = "sharp", boomerang_type = "basic boomerang";
+  
+  Basic_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
+  } 
+  
+}
+
+class Multi_target_boomerang extends Boomerang{
+  
+  static final float speed = 15., size=10.;
+  static final int damage = 1, pierce = 7;
+  static final String damage_type = "sharp", boomerang_type = "multi target boomerang";
+  
+  Multi_target_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
+  } 
+  
+}
+
+class Sonic_multi_target_boomerang extends Boomerang{
+  
+  static final float speed = 15., size=10.;
+  static final int damage = 1, pierce = 7;
+  static final String damage_type = "shatter", boomerang_type = "sonic multi target boomerang";
+  
+  Sonic_multi_target_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
+  } 
+  
+}
+
+class Red_hot_multi_target_boomerang extends Boomerang{
+  
+  static final float speed = 15., size=10.;
+  static final int damage = 1, pierce = 7;
+  static final String damage_type = "normal", boomerang_type = "red hot multi target boomerang";
+  
+  Red_hot_multi_target_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
+  } 
+  
+}
+
+class Glaive_boomerang extends Boomerang{
+  
+  static final float speed = 15., size=38.;
+  static final int damage = 1, pierce = 12;
+  static final String damage_type = "sharp", boomerang_type = "glaive boomerang";
+  
+  Glaive_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
+  } 
+  
+}
+
+class Sonic_glaive_boomerang extends Boomerang{
+  
+  static final float speed = 15., size=38.;
+  static final int damage = 1, pierce = 12;
+  static final String damage_type = "shatter", boomerang_type = "sonic glaive boomerang";
+  
+  Sonic_glaive_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
+  } 
+  
+}
+class Red_hot_glaive_boomerang extends Boomerang{
+  
+  static final float speed = 15., size=38.;
+  static final int damage = 1, pierce = 12;
+  static final String damage_type = "normal", boomerang_type = "red hot glaive boomerang";
+  
+  Red_hot_glaive_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
+  } 
+  
 }

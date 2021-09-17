@@ -2,25 +2,22 @@ class Laser{
   ArrayList<float[]> laser_path=new ArrayList<float[]>();
   float fired_time;
   static final float DURATION = 0.5;
+  static final int max_targets = 25, damage = 1;
   int bounces_left;
-  int dmg;
   float dmg_done_this_frame;
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   ArrayList<Mob> enemis_before_pops;
   Mob initial_target;
   
   Tower fired_from_tower;
-  StringList hit_exceptions;
   
   
   
-  Laser(Tower fired_from_tower, float x_dep, float y_dep, int damage, int max_targets, Mob target, StringList hit_exceptions){
+  Laser(Tower fired_from_tower, float x_dep, float y_dep, Mob target){
     laser_path.add(new float[] {x_dep, y_dep});
     bounces_left=max_targets;
-    dmg=damage;
     initial_target=target;
     this.fired_from_tower=fired_from_tower;
-    this.hit_exceptions=hit_exceptions;
 
     fired_time = FAKE_TIME_ELAPSED;
     
@@ -96,7 +93,7 @@ class Laser{
   
   void hit(Mob mob){
     bounces_left--;
-    dmg_done_this_frame+=mob.pop_layers(dmg, true, "laser", hit_exceptions);
+    dmg_done_this_frame+=mob.pop_layers(damage, true, "laser");
     
     for(Mob dmged_mob : mob.bloons_dmged()){
       already_dmged_mobs.add(dmged_mob);

@@ -2,19 +2,15 @@ class Spikes{
   
   //a optimiser grandement
 
-  float rayon = 20; //si on le modifie, le modifier aussi dans joueur -> place tower
-  float x;
-  float y;
-  float destination_x;
-  float destination_y;
-  int damage, pierce, initial_pierce;
-  String type;
-  StringList hit_exceptions;
+  float x, y;
+  float destination_x, destination_y;
+  int damage, pierce;
+  static final float initial_speed = 10., rayon=20.;  //si on le modifie, le modifier aussi dans joueur -> place tower
+  float speed;
+  String type, damage_type;
   float fired_time;       
   static final float DURATION = 70.;    //ca vit 70s
   Tower fired_from_tower;
-  float speed;
-  float initial_speed;
   float total_distance;
   boolean deplacement_fini=false;
   
@@ -22,18 +18,12 @@ class Spikes{
   float angle_decalage;
 
   
-  Spikes(Tower fired_from_tower, float destination_x, float destination_y, int damage, int pierce, String type, StringList hit_exceptions, float initial_speed){
+  Spikes(Tower fired_from_tower, float destination_x, float destination_y){
     this.fired_from_tower=fired_from_tower;
     this.x=fired_from_tower.x;
     this.y=fired_from_tower.y;
     this.destination_x=destination_x;
     this.destination_y=destination_y;
-    this.damage=damage;
-    this.pierce=pierce;
-    this.initial_pierce=pierce;
-    this.type=type;
-    this.hit_exceptions=hit_exceptions;
-    this.initial_speed=initial_speed;
     this.speed=initial_speed;
     this.total_distance = distance(new float[] {x, y}, new float[] {destination_x, destination_y});
     
@@ -49,6 +39,11 @@ class Spikes{
       return;
     }
     else if(nb_spikes-i<1200)  show();    //on affiche que les 1200 derniers crées pour éviter tout lag
+  }
+  
+  void verif_damage_type(){
+    if(damage_type.equals(get_damage_type(type)))  return;
+    println("NOT GOOD ! Spike :", type, "gives", damage_type, "and", get_damage_type(type));
   }
   
   void show(){
@@ -93,7 +88,7 @@ class Spikes{
         pierce--;
         if(pierce<=0){
           if(type.equals("spike mine")){
-            explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, hit_exceptions));
+            explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, type));      //A CHANGER POUR LE TYPE d'EXPLOSION
           }
           break;
         }
@@ -105,9 +100,54 @@ class Spikes{
   }
   
   void hit(Mob mob){
-    int layers_popped=mob.pop_layers(damage, true, type, hit_exceptions);      //on tappe le mob
+    int layers_popped=mob.pop_layers(damage, true, damage_type);      //on tappe le mob
     dmg_done_this_frame+=layers_popped;
     
     if(mob.layers<=0)  enemis.remove(mob);
+  }
+}
+
+class Spike extends Spikes{
+  
+  static final int damage = 1, pierce = 5;
+  static final String damage_type = "sharp", type = "spike";
+  Spike(Tower fired_from_tower, float destination_x, float destination_y){
+    super(fired_from_tower, destination_x, destination_y);
+  }
+}
+
+class Stack_spike extends Spikes{
+  
+  static final int damage = 1, pierce = 10;
+  static final String damage_type = "sharp", type = "stack spike";
+  Stack_spike(Tower fired_from_tower, float destination_x, float destination_y){
+    super(fired_from_tower, destination_x, destination_y);
+  }
+}
+
+class Hot_spike extends Spikes{
+  
+  static final int damage = 1, pierce = 10;
+  static final String damage_type = "normal", type = "hot spike";
+  Hot_spike(Tower fired_from_tower, float destination_x, float destination_y){
+    super(fired_from_tower, destination_x, destination_y);
+  }
+}
+
+class Spike_ball extends Spikes{    //ajouter le fait que ca fasse 3* les degats aux ceramics
+  
+  static final int damage = 1, pierce = 16;
+  static final String damage_type = "normal", type = "spike ball";
+  Spike_ball(Tower fired_from_tower, float destination_x, float destination_y){
+    super(fired_from_tower, destination_x, destination_y);
+  }
+}
+
+class Spike_mine extends Spikes{    //ajouter le fait que ca fasse 3* les degats aux ceramics et //explosion donne un effet napalm  The napalm pops bloons every 2 seconds for 6 seconds. The explosions pop 4 layers
+  
+  static final int damage = 1, pierce = 16;
+  static final String damage_type = "normal", type = "spike mine";
+  Spike_mine(Tower fired_from_tower, float destination_x, float destination_y){
+    super(fired_from_tower, destination_x, destination_y);
   }
 }

@@ -57,7 +57,7 @@ red_glaive : 53x55 a 1138, 1091
 yellow_glaive : 53x55 a 651, 1573
 
 shuriken : 27x27 a 1739, 1447
-rocket : 23x33 a 1810, 1496
+hydra rocket : 23x33 a 1810, 1496
 rocket_droite : 22x37 a 1231, 745
 
 blade : 38x38 a 1332, 1428

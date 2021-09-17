@@ -276,19 +276,19 @@ class Mob{
     
   }
   
-  int pop_layers(int nb_layers_to_pop, boolean initial_hit, String attack_type, StringList hit_exceptions){
+  int pop_layers(int nb_layers_to_pop, boolean initial_hit, String damage_type){
     // Retourne le nb de layers détruites
         
     if(nb_layers_to_pop<=0)  return 0;
     
     
     if(initial_hit){
-      if(can_hit(this, attack_type, hit_exceptions))  pop_animations.add(new Pop_animation(x, y, size));
+      if(can_damage(this, damage_type))  pop_animations.add(new Pop_animation(x, y, size));
       list_of_bloons_dmged=new ArrayList<Mob>();
       list_of_bloons_dmged.add(this);  //on ajoute meme les mobs qu'on ne peut pas tapper pour éviter de gaspiller tout son pierce dessus en cas de rebonds possibles
     }
     
-    if(!can_hit(this, attack_type, hit_exceptions))  return 0;
+    if(!can_damage(this, damage_type))  return 0;
     //pas besoin de check si il détecte les camos vu que si il y a eu pop_layers, il y a eu can_detect()
     
     if(nb_layers_to_pop<layers){
@@ -326,8 +326,8 @@ class Mob{
             bounces_left-=fils.get_bounces_made();
             nb_layers_to_pop-=layers_popped;
           }*/
-          if( !attack_type.equals("laser")){    //un laser ne peut tuer les enfants d'un ballon
-            int temp=fils.pop_layers(nb_layers_to_pop, false, attack_type, hit_exceptions);    //pas besoin de créer de nouvelles explosions car on l'a deja fait
+          if( !damage_type.equals("laser")){    //un laser ne peut tuer les enfants d'un ballon
+            int temp=fils.pop_layers(nb_layers_to_pop, false, damage_type);    //pas besoin de créer de nouvelles explosions car on l'a deja fait
             layers_popped+=temp;
             nb_layers_to_pop -= temp;
           }
