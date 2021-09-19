@@ -7,12 +7,27 @@ class dart_monkey extends Tower{
   void set_param_tower(){
     couleur=color(0, 0, 255);
     price=200;
-    size=base_size;
+    //size=base_size;
+    size=59;
     range=128;
     
     shoots_list.append("dart");
     deviation_list.append(0);
     attack_speed_list.append(1.03);        
+  }
+  
+  void set_sprites(){
+    sprites_names = new StringList();
+    if(path_2_progression == 4)  sprites_names.append("super monkey fan club");
+    else if(path_1_progression<3 && path_2_progression<4)  sprites_names.append("dart monkey");
+    else sprites_names.append("dart monkey");
+        
+    if(max(path_1_progression, path_2_progression)==1)  sprites_names.append("bandana vert");
+    else if(max(path_1_progression, path_2_progression)==2)  sprites_names.append("bandana rouge");
+    else if(path_2_progression == 3)  sprites_names.append("triple dart bandana");
+    
+    
+    sprites_pos = get_sprites_pos(sprites_names);
   }
 }
 
@@ -34,6 +49,26 @@ class tack_shooter extends Tower{
       attack_speed_list.append(0.6);
     }
   }
+  
+  void set_sprites(){
+    sprites_names = new StringList();
+    
+    if(max(path_1_progression, path_2_progression)==0)  sprites_names.append("tack shooter sorties");
+    else if(max(path_1_progression, path_2_progression)<=2)  sprites_names.append("tack shooter sorties big");
+    else if(path_2_progression >= 3)  sprites_names.append("blade shooter sorties");
+    else if(path_1_progression == 3)  sprites_names.append("tack sprayer sorties");
+    
+    if(path_2_progression == 3)  sprites_names.append("blade shooter body");
+    else if(path_2_progression == 4)  sprites_names.append("blade maelstrom body");
+    else if(path_1_progression == 4)  sprites_names.append("ring of fire");
+    else sprites_names.append("tack shooter body");
+    
+    if(max(path_1_progression, path_2_progression)<=1)  sprites_names.append("two tacks");
+    else if(path_1_progression <= 3 && path_2_progression<=2)  sprites_names.append("three tacks");
+    
+    sprites_pos = get_sprites_pos(sprites_names);
+  }
+  
 }
 
 class sniper extends Tower{
@@ -123,7 +158,7 @@ class dartling_gun extends Tower{
         else{
           direction=directions_list.get(compteur_dir);
         }
-        instantiate_new_proj(shoot_type, direction+deviation);
+        projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));
         
         time_before_next_attack += 1 / attack_speed;      //affecter la valeur reste utile pour le while (sinon il faut remplacer par un _list.get(i)<=0 )
         time_before_next_attack_list.set(i, time_before_next_attack);
@@ -202,7 +237,7 @@ class spike_factory extends Tower{
         if(on_track_pos.size()==0)  return;
         int index = int(random(on_track_pos.size()));
         
-        instantiate_new_spike(shoot_type, on_track_pos.get(index)[0], on_track_pos.get(index)[1]);
+        spikes.add(new Spikes(this, on_track_pos.get(index)[0], on_track_pos.get(index)[1], shoot_type));
         
         time_before_next_attack += 1 / attack_speed;      //affecter la valeur reste utile pour le while (sinon il faut remplacer par un _list.get(i)<=0 )
         time_before_next_attack_list.set(i, time_before_next_attack);
@@ -243,6 +278,10 @@ class Tower{
   float ability_use_time, ability_cooldown_timer;
   Ability linked_ability;
   
+  StringList sprites_names = new StringList();
+  ArrayList<int[]> sprites_pos = new ArrayList<int[]>();
+  float orientation;
+  
   
   Tower(String type, float x, float y){
     this.x=x;
@@ -251,15 +290,38 @@ class Tower{
     init_param_tower();
     set_param_tower();
     init_time_before_next_attack_list();
+    set_sprites();
   }
   
   //subclasses func
   void set_param_tower(){}
+  void set_sprites(){};
   
   void show(){
-    fill(couleur);
-    noStroke();
-    ellipse(x, y, size, size);
+    if(sprites_names.size()==0){
+      fill(couleur);
+      noStroke();
+      ellipse(x, y, size, size);
+    }
+    else{
+      pushMatrix();
+      translate(x, y);
+      rotate(orientation);
+      for(int[] pos_aff : sprites_pos){
+        if(pos_aff[7]==1){
+          image(all_sprites, pos_aff[4]-pos_aff[2]/2, pos_aff[5]-pos_aff[3]/2, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+          image(all_sprites, pos_aff[4]+pos_aff[2]/2, pos_aff[5]-pos_aff[3]/2, pos_aff[2], pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1], pos_aff[0], pos_aff[1]+pos_aff[3]);
+          image(all_sprites, pos_aff[4]+pos_aff[2]/2, pos_aff[5]+pos_aff[3]/2, pos_aff[2], pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3], pos_aff[0], pos_aff[1]);
+          image(all_sprites, pos_aff[4]-pos_aff[2]/2, pos_aff[5]+pos_aff[3]/2, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1]+pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1]);
+        }
+        else if(pos_aff[6]==1){
+          image(all_sprites, pos_aff[4]-pos_aff[2]/2, pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+          image(all_sprites, pos_aff[4]+pos_aff[2]/2, pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1], pos_aff[0], pos_aff[1]+pos_aff[3]);
+        }
+        else  image(all_sprites, pos_aff[4], pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+      }
+      popMatrix();
+    }
     if(highlight)  show_range(true);
   }
   
@@ -379,7 +441,8 @@ class Tower{
           shoot_boomerang(target, shoot_type);
         }
         else if(this.type.equals("sniper")){
-          instantiate_new_bullet(shoot_type, target);
+          Instant_projectile bullet = new Instant_projectile(this, target, shoot_type);    //bullet take action instantly, no need to add them to an ArrayList
+          
           if(target.layers<=0){
             detected_mobs = get_enemis_in_range();
             if(detected_mobs.size() == 0 ){ //si on ne detecte aucun mob, pas la peine de continuer
@@ -392,13 +455,14 @@ class Tower{
         }
         else{
           if(type.equals("tack shooter")){
-            instantiate_new_proj(shoot_type, deviation);
+            projectiles.add(new Projectile(this, x, y, deviation, shoot_type));
           }
           else{
             float[] futur_pos = map.get_pos(target.avancement + target.speed);                              //on prévois juste un coup d'avance
             float direction=atan2(futur_pos[1]-y, futur_pos[0]-x);
+            this.orientation = direction+HALF_PI;
             
-            instantiate_new_proj(shoot_type, direction + deviation);
+            projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));
           }
         }
         time_before_next_attack += 1 / attack_speed;      //affecter la valeur reste utile pour le while (sinon il faut remplacer par un _list.get(i)<=0 )
@@ -449,159 +513,9 @@ class Tower{
       pos_finale=pos_inutile;
     }
     
-    switch(boomerang_type){
-      case "basic boomerang":
-        boomerangs.add(new Basic_boomerang(this, pos_finale[0], pos_finale[1], range/2));
-        break;
-      case "multi target boomerang ":
-        boomerangs.add(new Multi_target_boomerang(this, pos_finale[0], pos_finale[1], range/2));
-        break;
-      case "sonic multi target boomerang":
-        boomerangs.add(new Sonic_multi_target_boomerang(this, pos_finale[0], pos_finale[1], range/2));
-        break;
-      case "red hot multi target boomerang":
-        boomerangs.add(new Red_hot_multi_target_boomerang(this, pos_finale[0], pos_finale[1], range/2));
-        break;
-      case "glaive boomerang":
-        boomerangs.add(new Glaive_boomerang(this, pos_finale[0], pos_finale[1], range/2));
-        break;
-      case "sonic glaive boomerang":
-        boomerangs.add(new Sonic_glaive_boomerang(this, pos_finale[0], pos_finale[1], range/2));
-        break;
-        
-      case "red hot glaive boomerang":
-        boomerangs.add(new Red_hot_glaive_boomerang(this, pos_finale[0], pos_finale[1], range/2));
-        break;
-      default:
-        println("ERROR : Shoot type ", boomerang_type, " not suitable for shooting boomerang");
-        break;
-    }
+      boomerangs.add(new Boomerang(this, pos_finale[0], pos_finale[1], range/2, boomerang_type));
        
   }
-  
-  void instantiate_new_bullet(String shoot_type, Mob target){
-    Instant_projectile bull;
-    switch(shoot_type){
-      case "bullet":
-        bull = new Bullet(this, target);  //bullet take action instantly, no need to add them to an ArrayList
-        break;
-      case "full metal bullet":
-        bull = new Full_metal_bullet(this, target);
-        break;
-      case "point five bullet":
-        bull = new Point_five_bullet(this, target);
-        break;
-      case "deadly bullet":
-        bull = new Deadly_bullet(this, target);
-        break;
-      default:
-        println("ERROR : Shoot type ", shoot_type, " not suitable for shooting bullet");
-        break;
-    } 
-  }
-  
-  void instantiate_new_spike(String shoot_type, float dest_x, float dest_y){
-    switch(shoot_type){
-      case "spike":
-        spikes.add(new Spike(this, dest_x, dest_y));
-        break;
-      case "stack spike":
-        spikes.add(new Stack_spike(this, dest_x, dest_y));
-        break;
-      case "hot spike":
-        spikes.add(new Hot_spike(this, dest_x, dest_y));
-        break;
-      case "spike ball":
-        spikes.add(new Spike_ball(this, dest_x, dest_y));
-        break;
-      case "spike mine":
-        spikes.add(new Spike_mine(this, dest_x, dest_y));
-        break;
-      default:
-        println("ERROR : Shoot type ", shoot_type, " not suitable for shooting spike");
-        break;
-    }
-  }
-          
-  
-  void instantiate_new_proj(String shoot_type, float dir){
-    switch(shoot_type){
-      case "dart":
-        projectiles.add(new Dart(this, x, y, dir));
-        break;
-      case "dart ball":
-        projectiles.add(new Dart_ball(this, x, y, dir));
-        break;
-      case "huge dart ball":
-        projectiles.add(new Huge_dart_ball(this, x, y, dir));
-        break;
-      case "sharp dart":
-        projectiles.add(new Sharp_dart(this, x, y, dir));
-        break;
-      case "powerful dart":
-        projectiles.add(new Powerful_dart(this, x, y, dir));
-        break;
-      case "razor sharp dart":
-        projectiles.add(new Razor_sharp_dart(this, x, y, dir));
-        break;
-      case "tack":
-        projectiles.add(new Tack(this, x, y, dir, range));
-        break;
-      case "blade":
-        projectiles.add(new Blade(this, x, y, dir, range));
-        break;        
-      case "glaive ricochet":
-        projectiles.add(new Glaive_ricochet(this, x, y, dir));
-        break;
-      case "sonic glaive ricochet":
-        projectiles.add(new Sonic_glaive_ricochet(this, x, y, dir));
-        break;
-      case "red hot glaive ricochet":
-        projectiles.add(new Red_hot_glaive_ricochet(this, x, y, dir));
-        break;
-      case "laser cannon":
-        projectiles.add(new Laser_cannon(this, x, y, dir));
-        break;
-      case "bloontonium laser cannon":
-        projectiles.add(new Bloontonium_laser_cannon(this, x, y, dir));
-        break;
-      case "ray of doom":
-        projectiles.add(new Ray_of_doom(this, x, y, dir));
-        break;
-      case "bloontonium dart":
-        projectiles.add(new Bloontonium_dart(this, x, y, dir));
-        break;
-      case "hydra rocket":
-        projectiles.add(new Hydra_rocket(this, x, y, dir));
-        break;
-      case "purple ball":
-        projectiles.add(new Purple_ball(this, x, y, dir));
-        break;
-      case "huge purple ball":
-        projectiles.add(new Huge_purple_ball(this, x, y, dir));
-        break;
-      case "fireball":
-        projectiles.add(new Fireball(this, x, y, dir));
-        break;
-      case "flame":
-        projectiles.add(new Flame(this, x, y, dir, range));
-        break;
-      case "shuriken":
-        projectiles.add(new Shuriken(this, x, y, dir));
-        break;
-      case "sharp shuriken":
-        projectiles.add(new Sharp_shuriken(this, x, y, dir));
-        break;
-      case "seeking shuriken":
-        projectiles.add(new Seeking_shuriken(this, x, y, dir));
-        break;
-      case "flash bomb":
-        projectiles.add(new Flash_bomb(this, x, y, dir));
-        break;
-      default:
-        println("ERROR : Shoot type ", shoot_type, " not suitable for shooting projectile");
-        break;
-    }
-  }
+
   
 }

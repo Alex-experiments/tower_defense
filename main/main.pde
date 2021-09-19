@@ -45,28 +45,48 @@ void load_sprites(){
   
   //peut etre pour les clous vu qu'ils doivent etre aligné ajouter 2 coord de centre histoire de pouvoir extraire la bonne pos
   
-  int space_index;
-  int x_index;
+  int space_index, offset_index;
+  int separateur_index;
   String name;
-  int dx;
-  int dy;
-  int x;
-  int y;      
+  int dx, dy, x, y, offset_x, offset_y;
+  int half, quarter;
+  
   for(String ligne : lines){
     space_index = ligne.indexOf(" : ");
+    offset_index = ligne.indexOf(" offset ");
+    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter");
+    
       if(space_index!=-1){
-      name = ligne.substring(0, space_index);
-      x_index = ligne.indexOf('x', space_index);
-      dx=int(ligne.substring(space_index+3, x_index));
-      space_index=ligne.indexOf(" a ", x_index);
-      dy=int(ligne.substring(x_index+1, space_index));
-      x_index = ligne.indexOf(", ", space_index);
-      x=int(ligne.substring(space_index+3, x_index));
-      y=int(ligne.substring(x_index+2, ligne.length()));
-      pos_coins_sprites.put(name, new int[] {x, y, dx, dy});
-      
-      
-    }
+        name = ligne.substring(0, space_index);
+        separateur_index = ligne.indexOf('*', space_index);
+        dx=int(ligne.substring(space_index+3, separateur_index));
+        space_index=ligne.indexOf(" a ", separateur_index);
+        dy=int(ligne.substring(separateur_index+1, space_index));
+        separateur_index = ligne.indexOf(", ", space_index);
+        x=int(ligne.substring(space_index+3, separateur_index));
+        if(offset_index == -1){
+          int end = ligne.length();
+          if(half>-1)  end = half;
+          else if(quarter>-1)  end = quarter;
+          y=int(ligne.substring(separateur_index+2, end));
+          offset_x=0;
+          offset_y=0;
+        }
+        else{
+          y=int(ligne.substring(separateur_index+2, offset_index));
+          separateur_index = ligne.indexOf(';');
+          offset_x = int(ligne.substring(offset_index+8, separateur_index));
+          int end = ligne.length();
+          if(half>-1)  end = half;
+          else if(quarter>-1)  end = quarter;
+          offset_y = int(ligne.substring(separateur_index+2, end));
+        }
+        if(half==-1)  half = 0;  //on passe half et quarter en boolean
+        else half = 1;
+        if(quarter==-1)  quarter = 0;
+        else quarter = 1;
+        pos_coins_sprites.put(name, new int[] {x, y, dx, dy, offset_x, offset_y, half, quarter});
+     }
   }
   
   bloons_sprites=loadImage("bloons_sprites_transp.png");
@@ -97,9 +117,17 @@ void load_sprites(){
       
     }
   }
-  
-  
-  
+}
+
+ArrayList<int[]> get_sprites_pos(StringList sprites_names){
+  ArrayList<int[]> pos = new ArrayList<int[]>();
+  for(String sprite_name : sprites_names){
+    if(pos_coins_sprites.containsKey(sprite_name)){
+      pos.add(pos_coins_sprites.get(sprite_name));
+    }
+    else  println("couldn't find pos of ", sprite_name);
+  }
+  return pos;
 }
 
 
@@ -138,7 +166,6 @@ void setup(){
 
 void draw(){  
   FAKE_TIME_ELAPSED = get_fake_time_elapsed(FAKE_TIME_ELAPSED);    //ATTENTION : NE PAS COMPTER LE TEMPS ENTRE LES ROUNDS
-  
   background(255);    //fond blanc
   image(background, 875/2, 650/2);  
   //map.show();
@@ -184,7 +211,7 @@ void draw(){
   //On update tous les projectiles tirés
   int nb_proj = projectiles.size();
   for (int i = nb_proj - 1; i >= 0; i--){
-    println(projectiles.get(i).damage_type);
+    projectiles.get(i).verif_damage_type();
     projectiles.get(i).core(i, nb_proj);
   }
   

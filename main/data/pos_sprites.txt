@@ -1,64 +1,134 @@
-spike_10 : 60x48 a 0, 1729
-spike_9 : 60x48 a 434, 1288
-spike_8 : 60x48 a 515, 1222
-spike_7 : 50x48 a 1140, 986
-spike_6 : 52x48 a 967, 1183
-spike_5 : 46x48 a 1290, 1185
-spike_4 : 31x47 a 1842, 1093
-spike_3 : 32x32 a 1134, 1810
-spike_2 : 28x33 a 1834, 1235
-spike_1 : 14x28 a 583, 1777
+//il faut un * comme séparateur pour la dim
+//une virgule pour la pos
+//un point virgule pour l'offset
 
-hot spike_10 : 59x46 a 534, 1166
-hot spike_9 : 59x46 a 72, 1644
-hot spike_8 : 59x46 a 359, 1368
-hot spike_7 : 59x46 a 666, 1468
-hot spike_6 : 52x46 a 1084, 1063
-hot spike_5 : 45x46 a 806, 507
-hot spike_4 : 31x46 a 1731, 1205
-hot spike_3 : 32x32 a 1890, 860
-hot spike_2 : 29x31 a 1224, 1658
-hot spike_1 : 15x30 a 583, 1745
+pop animation : 84*87 a 1715, 573
+spike_10 : 60*48 a 0, 1729
+spike_9 : 60*48 a 434, 1288
+spike_8 : 60*48 a 515, 1222
+spike_7 : 50*48 a 1140, 986
+spike_6 : 52*48 a 967, 1183
+spike_5 : 46*48 a 1290, 1185
+spike_4 : 31*47 a 1842, 1093
+spike_3 : 32*32 a 1134, 1810
+spike_2 : 28*33 a 1834, 1235
+spike_1 : 14*28 a 583, 1777
 
-spike mine_10 : 55x56 a 433, 1656
-spike mine_9 : 55x56 a 709, 312
-spike mine_8 : 54x56 a 652, 1517
-spike mine_7 : 54x55 a 1140, 1035
-spike mine_6 : 54x55 a 1195, 986
-spike mine_5 : 54x55 a 477, 1712
-spike mine_4 : 45x55 a 1448, 1030
-spike mine_3 : 46x48 a 1346, 1132
-spike mine_2 : 45x43 a 851, 1643
-spike mine_1 : 45x34 a 898, 1594
+hot spike_10 : 59*46 a 534, 1166
+hot spike_9 : 59*46 a 72, 1644
+hot spike_8 : 59*46 a 359, 1368
+hot spike_7 : 59*46 a 666, 1468
+hot spike_6 : 52*46 a 1084, 1063
+hot spike_5 : 45*46 a 806, 507
+hot spike_4 : 31*46 a 1731, 1205
+hot spike_3 : 32*32 a 1890, 860
+hot spike_2 : 29*31 a 1224, 1658
+hot spike_1 : 15*30 a 583, 1745
+
+spike mine_10 : 55*56 a 433, 1656
+spike mine_9 : 55*56 a 709, 312
+spike mine_8 : 54*56 a 652, 1517
+spike mine_7 : 54*55 a 1140, 1035
+spike mine_6 : 54*55 a 1195, 986
+spike mine_5 : 54*55 a 477, 1712
+spike mine_4 : 45*55 a 1448, 1030
+spike mine_3 : 46*48 a 1346, 1132
+spike mine_2 : 45*43 a 851, 1643
+spike mine_1 : 45*34 a 898, 1594
+
+dart : 14*40 a 1471, 330
+sharp dart : 14*40 a 1471, 330
+razor sharp dart : 14*40 a 1471, 330
+dart ball : 28*28 a 1582, 1553
+sharp dart ball : 28*28 a 1582, 1553
+razor sharp dart ball : 28*28 a 1582, 1553
+huge dart ball : 72*72 a 461, 1021
+sharp huge dart ball : 72*72 a 461, 1021
+razor sharp huge dart ball : 72*72 a 461, 1021
+
+tack : 11*23 a 1128, 988
+
+fireball : 26*44 a 1564, 1638
+fireball_2 : 26*43 a 1639, 1558
+fireball_3 : 26*44 a 1768, 1426
+fireball_4 : 26*43 a 1802, 1400
+
+purple ball : 25*25 a 1645, 1602
+purple ball_background : 44*44 a 1403, 1036
+huge purple ball : 31*31 a 757, 1572
+huge purple ball_background : 52*57 a 843, 1378
+huge purple ball_2 : 31*31 a 1358, 1659
+huge purple ball_2_background : 52*57 a 1022, 1194
+
+napalm flame_1 : 16*21 a 1707, 1789
+napalm flame_2 : 16*21 a 1777, 1718
+napalm flame_3 : 16*21 a 1798, 1693
+napalm flame_4 : 16*21 a 1868, 1629
 
 
-dart : 14x40 a 1471, 330
-dart ball : 28x28 a 1582, 1553
-huge dart ball : 72x72 a 461, 1021
+basic boomerang : 37*22 a 974, 1818
+multi target boomerang : 37*22 a 974, 1818
+sonic boomerang : 37*22 a 974, 1818
+sonic multi target boomerang : 37*22 a 974, 1818
 
-tack : 11x23 a 1128, 988
+red hot boomerang : 38*22 a 1657, 1118
+red hot multi target boomerang : 38*22 a 1657, 1118
+glaive boomerang : 53*55 a 651, 1573
+glaive ricochet : 53*55 a 651, 1573
+sonic glaive boomerang : 53*55 a 651, 1573
+sonic glaive ricochet : 53*55 a 651, 1573
+red hot glaive boomerang : 53*55 a 1138, 1091
+red hot glaive ricochet : 53*55 a 1138, 1091
 
-fireball : 26x44 a 1564, 1638
-fireball_autre : 26x43 a 1639, 1558
-fireball_autre_2 : 26x44 a 1768, 1426
-fireball_autre_3 : 26x43 a 1802, 1400
+shuriken : 27*27 a 1739, 1447
+sharp shuriken : 27*27 a 1739, 1447
+seeking shuriken : 27*27 a 1739, 1447
+seeking sharp shuriken : 27*27 a 1739, 1447
 
-purple ball : 20x20 a 1472, 1785
-huge purple ball : 46x50 a 533, 1748
-flame : 25x59 a 1675, 1529
+flash bomb : 40*40 a 1358, 1286
+flash bomb_2 : 40*50 a 1538, 1086
+flash bomb_3 : 40*43 a 1134, 1501
 
-napalm flame_1 : 16x21 a 1707, 1789
-napalm flame_2 : 16x21 a 1777, 1718
-napalm flame_3 : 16x21 a 1798, 1693
-napalm flame_4 : 16x21 a 1868, 1629
+flash bomb gray_3 : 40*43 a 1401, 1225
 
 
-red_glaive : 53x55 a 1138, 1091
-yellow_glaive : 53x55 a 651, 1573
+laser cannon : 25*59 a 1675, 1529
+powerful laser cannon : 25*59 a 1675, 1529
+bloontonium laser cannon : 25*59 a 1675, 1529
 
-shuriken : 27x27 a 1739, 1447
-hydra rocket : 23x33 a 1810, 1496
-rocket_droite : 22x37 a 1231, 745
+hydra rocket : 23*33 a 1810, 1496
+rocket_droite : 22*37 a 1231, 745
 
-blade : 38x38 a 1332, 1428
+blade : 38*38 a 1332, 1428
+maelstrom blade : 38*38 a 1332, 1428
+
+
+laser eyes : 38*39 a 1304, 896
+
+
+unknown purple ball : 20*20 a 1472, 1785
+unknown huge purple ball : 46*50 a 533, 1748
+
+dart monkey : 57*59 a 790, 1190
+bandana vert : 43*15 a 182, 1833 offset 0; -12
+bandana rouge : 43*15 a 1018, 1393 offset 0; -12
+triple dart bandana : 41*14 a 542, 1703 offset 0; -12
+super monkey fan club : 62*66 a 434, 1337
+
+tack shooter body : 28*54 a 1658, 435 half
+blade shooter body : 53*53 a 413, 1771
+blade maelstrom body : 53*53 a 545, 1646
+two tacks : 16*28 a 579, 1213 half
+three tacks : 32*33 a 1644, 1338
+tack shooter sorties shooting : 36*36 a 1187, 1663 quarter
+tack shooter sorties : 38*38 a 1618, 1118 quarter
+tack shooter sorties big shooting : 36*36 a 1734, 1106 quarter
+tack shooter sorties big : 38*38 a 1216, 1543 quarter
+tack sprayer sorties shooting : 36*36 a 1149, 1701 quarter
+tack sprayer sorties : 38*38 a 1298, 1469 quarter
+blade shooter sorties shooting : 76*76 a 158, 1070
+blade shooter sorties : 76*76 a 237, 1013
+ring of fire : 38*73 a 1220, 1469 half
+ring of fire_2 : 38*73 a 1293, 1395 half
+ring of fire_3 : 38*73 a 1334, 1354 half
 

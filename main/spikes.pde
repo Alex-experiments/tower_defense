@@ -15,10 +15,9 @@ class Spikes{
   boolean deplacement_fini=false;
   
   int dmg_done_this_frame;
-  float angle_decalage;
 
   
-  Spikes(Tower fired_from_tower, float destination_x, float destination_y){
+  Spikes(Tower fired_from_tower, float destination_x, float destination_y, String spike_type){
     this.fired_from_tower=fired_from_tower;
     this.x=fired_from_tower.x;
     this.y=fired_from_tower.y;
@@ -26,10 +25,11 @@ class Spikes{
     this.destination_y=destination_y;
     this.speed=initial_speed;
     this.total_distance = distance(new float[] {x, y}, new float[] {destination_x, destination_y});
-    
-    angle_decalage=random(2*PI);
+    this.type = spike_type;
     
     fired_time =  FAKE_TIME_ELAPSED;
+    
+    set_stats();
   }
   
   void core(int i, int nb_spikes){
@@ -48,8 +48,9 @@ class Spikes{
   
   void show(){
     int[] pos_aff;
-    if(type.equals("spike ball"))  pos_aff = pos_coins_sprites.get("spike mine_"+str(min(pierce, 10)));    //normalement les spike balls n'ont pas de crane dessus
-    else pos_aff = pos_coins_sprites.get(type+"_"+str(min(pierce, 10)));
+    if(type.equals("spike ball") || type.equals("spike mine"))  pos_aff = pos_coins_sprites.get("spike mine_"+str(min(pierce, 10)));    //normalement les spike balls n'ont pas de crane dessus
+    else if(type.indexOf("hot")>=0)  pos_aff = pos_coins_sprites.get("hot spike_"+str(min(pierce, 10)));
+    else pos_aff = pos_coins_sprites.get("spike_"+str(min(pierce, 10)));
     image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
   
@@ -105,49 +106,32 @@ class Spikes{
     
     if(mob.layers<=0)  enemis.remove(mob);
   }
-}
-
-class Spike extends Spikes{
   
-  static final int damage = 1, pierce = 5;
-  static final String damage_type = "sharp", type = "spike";
-  Spike(Tower fired_from_tower, float destination_x, float destination_y){
-    super(fired_from_tower, destination_x, destination_y);
-  }
-}
-
-class Stack_spike extends Spikes{
-  
-  static final int damage = 1, pierce = 10;
-  static final String damage_type = "sharp", type = "stack spike";
-  Stack_spike(Tower fired_from_tower, float destination_x, float destination_y){
-    super(fired_from_tower, destination_x, destination_y);
-  }
-}
-
-class Hot_spike extends Spikes{
-  
-  static final int damage = 1, pierce = 10;
-  static final String damage_type = "normal", type = "hot spike";
-  Hot_spike(Tower fired_from_tower, float destination_x, float destination_y){
-    super(fired_from_tower, destination_x, destination_y);
-  }
-}
-
-class Spike_ball extends Spikes{    //ajouter le fait que ca fasse 3* les degats aux ceramics
-  
-  static final int damage = 1, pierce = 16;
-  static final String damage_type = "normal", type = "spike ball";
-  Spike_ball(Tower fired_from_tower, float destination_x, float destination_y){
-    super(fired_from_tower, destination_x, destination_y);
-  }
-}
-
-class Spike_mine extends Spikes{    //ajouter le fait que ca fasse 3* les degats aux ceramics et //explosion donne un effet napalm  The napalm pops bloons every 2 seconds for 6 seconds. The explosions pop 4 layers
-  
-  static final int damage = 1, pierce = 16;
-  static final String damage_type = "normal", type = "spike mine";
-  Spike_mine(Tower fired_from_tower, float destination_x, float destination_y){
-    super(fired_from_tower, destination_x, destination_y);
+  void set_stats(){
+    switch(type){
+      case "spike":
+        damage = 1; pierce = 5;
+        damage_type = "sharp";
+        break;
+      case "stack spike":
+        damage = 1; pierce = 10;
+        damage_type = "sharp";
+        break;
+      case "hot spike":
+        damage = 1; pierce = 10;
+        damage_type = "normal";
+        break;
+      case "spike ball":
+        damage = 1; pierce = 16;
+        damage_type = "normal";
+        break;
+      case "spike mine":
+        damage = 1; pierce = 16;
+        damage_type = "normal";
+        break;
+      default:
+        println("ERROR : Spike type ", type, " not suitable for shooting spike");
+        break;
+    }
   }
 }

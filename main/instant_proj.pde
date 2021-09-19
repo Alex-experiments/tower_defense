@@ -4,8 +4,10 @@ class Instant_projectile{
   String damage_type, bullet_type;
   Tower fired_from_tower;
 
-  Instant_projectile(Tower fired_from_tower, Mob target){
+  Instant_projectile(Tower fired_from_tower, Mob target, String bullet_type){
     this.fired_from_tower=fired_from_tower;
+    this.bullet_type = bullet_type;
+    set_stats();
     hit(target);
   }
   
@@ -22,40 +24,29 @@ class Instant_projectile{
       enemis.remove(target);
     }
   }
-}
-
-class Bullet extends Instant_projectile{
-  static final int damage = 2, pierce = 1;
-  static final String damage_type = "sharp", bullet_type = "bullet";
   
-  Bullet(Tower fired_from_tower, Mob target){
-    super(fired_from_tower, target);
-  }  
-}
-
-class Full_metal_bullet extends Instant_projectile{
-  static final int damage = 4, pierce = 1;
-  static final String damage_type = "normal", bullet_type = "full metal bullet";
+  void set_stats(){
+    switch(bullet_type){
+      case "bullet":
+        damage = 2; pierce = 1;
+        damage_type = "sharp";
+        break;
+      case "full metal bullet":
+        damage = 4; pierce = 1;
+        damage_type = "normal";
+        break;
+      case "point five bullet":
+        damage = 7; pierce = 1;
+        damage_type = "normal";
+        break;
+      case "deadly bullet":
+        damage = 18; pierce = 1;
+        damage_type = "normal";
+        break;
+      default:
+        println("ERROR : Shoot type ", bullet_type, " not suitable for shooting bullet");
+        break;
+    }
+  }
   
-  Full_metal_bullet(Tower fired_from_tower, Mob target){
-    super(fired_from_tower, target);
-  }  
-}
-
-class Point_five_bullet extends Instant_projectile{
-  static final int damage = 7, pierce = 1;
-  static final String damage_type = "normal", bullet_type = "point five bullet";
-  
-  Point_five_bullet(Tower fired_from_tower, Mob target){
-    super(fired_from_tower, target);
-  }  
-}
-
-class Deadly_bullet extends Instant_projectile{
-  static final int damage = 18, pierce = 1;
-  static final String damage_type = "normal", bullet_type = "deadly bullet";
-  
-  Deadly_bullet(Tower fired_from_tower, Mob target){
-    super(fired_from_tower, target);
-  }  
 }

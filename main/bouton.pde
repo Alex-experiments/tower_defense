@@ -1,5 +1,7 @@
 class Button{
 
+  //rajouter une touche raccourci
+  
   float top_left_x;
   float top_left_y;
   float bottom_right_x;

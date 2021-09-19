@@ -18,17 +18,22 @@ class Boomerang{
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   
   String boomerang_type, damage_type;
+  boolean rotate=true;
+  float rotation_angle=0., rotation_speed=PI/16;
 
   
-  Boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
+  Boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle, String boomerang_type){
     this.centre_x=centre_x;
     this.centre_y=centre_y;
     this.rayon_cercle=rayon_cercle;
     this.fired_from_tower = fired_from_tower;
+    this.boomerang_type = boomerang_type;
     angle_dep = atan2(fired_from_tower.y - centre_y, fired_from_tower.x - centre_x); 
     
     x=fired_from_tower.x;  //sinon ca chie avec collision() car sachant que prev_x n'a pas de valeur par défault ca sera 0...
     y=fired_from_tower.y;
+    
+    set_stats();
   }
   
   void core(){
@@ -48,13 +53,29 @@ class Boomerang{
   }
   
   void show(){
-    fill(0, 0, 0);
-    noStroke();
-    ellipse(x, y, size, size);
-    stroke(0);
-    strokeWeight(1);
-    line(prev_x, prev_y, x, y);
-    //afficher les glaives differements
+
+    int[] pos_aff;
+    if(pos_coins_sprites.containsKey(boomerang_type)){
+      pos_aff = pos_coins_sprites.get(boomerang_type);
+      if(rotate){
+        rotation_angle+=rotation_speed;
+        pushMatrix();
+        translate(x, y);
+        rotate(HALF_PI+rotation_angle);
+        image(all_sprites, 0, 0, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+        popMatrix();
+      }
+      else  image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    }
+    else{
+      fill(0, 0, 0);
+      noStroke();
+      ellipse(x, y, size, size);
+      stroke(0);
+      strokeWeight(1);
+      line(prev_x, prev_y, x, y);
+    }
+    
   }
   
   boolean ended_circle(){
@@ -119,87 +140,57 @@ class Boomerang{
   }
 
 
-}
+  void set_stats(){
+    switch(boomerang_type){
+      case "basic boomerang":
+        speed = 15.; size=10.;
+        damage = 1; pierce = 3;
+        damage_type = "sharp";
+        break;
+      case "sonic boomerang":
+        speed = 15.; size=10.;
+        damage = 1; pierce = 3;
+        damage_type = "shatter";
+        break;
+      case "red hot boomerang":
+        speed = 15.; size=10.;
+        damage = 1; pierce = 3;
+        damage_type = "normal";
+        break;
+      case "multi target boomerang":
+        speed = 15.; size=10.;
+        damage = 1; pierce = 7;
+        damage_type = "sharp";
+        break;
+      case "sonic multi target boomerang":
+        speed = 15.; size=10.;
+        damage = 1; pierce = 7;
+        damage_type = "shatter";
+        break;
+      case "red hot multi target boomerang":
+        speed = 15.; size=10.;
+        damage = 1; pierce = 7;
+        damage_type = "normal";
+        break;
+      case "glaive boomerang":
+        speed = 15.; size=38.;
+        damage = 1; pierce = 12;
+        damage_type = "sharp";
+        break;
+      case "sonic glaive boomerang":
+        speed = 15.; size=38.;
+        damage = 1; pierce = 12;
+        damage_type = "shatter";
+        break; 
+      case "red hot glaive boomerang":
+        speed = 15.; size=38.;
+        damage = 1; pierce = 12;
+        damage_type = "normal";
+        break;
+      default:
+        println("ERROR : Boomerang type ", boomerang_type, " not suitable for shooting boomerang");
+        break;
+    }
+  }
 
-class Basic_boomerang extends Boomerang{
-  
-  static final float speed = 15., size=10.;
-  static final int damage = 1, pierce = 3;
-  static final String damage_type = "sharp", boomerang_type = "basic boomerang";
-  
-  Basic_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
-    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
-  } 
-  
-}
-
-class Multi_target_boomerang extends Boomerang{
-  
-  static final float speed = 15., size=10.;
-  static final int damage = 1, pierce = 7;
-  static final String damage_type = "sharp", boomerang_type = "multi target boomerang";
-  
-  Multi_target_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
-    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
-  } 
-  
-}
-
-class Sonic_multi_target_boomerang extends Boomerang{
-  
-  static final float speed = 15., size=10.;
-  static final int damage = 1, pierce = 7;
-  static final String damage_type = "shatter", boomerang_type = "sonic multi target boomerang";
-  
-  Sonic_multi_target_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
-    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
-  } 
-  
-}
-
-class Red_hot_multi_target_boomerang extends Boomerang{
-  
-  static final float speed = 15., size=10.;
-  static final int damage = 1, pierce = 7;
-  static final String damage_type = "normal", boomerang_type = "red hot multi target boomerang";
-  
-  Red_hot_multi_target_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
-    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
-  } 
-  
-}
-
-class Glaive_boomerang extends Boomerang{
-  
-  static final float speed = 15., size=38.;
-  static final int damage = 1, pierce = 12;
-  static final String damage_type = "sharp", boomerang_type = "glaive boomerang";
-  
-  Glaive_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
-    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
-  } 
-  
-}
-
-class Sonic_glaive_boomerang extends Boomerang{
-  
-  static final float speed = 15., size=38.;
-  static final int damage = 1, pierce = 12;
-  static final String damage_type = "shatter", boomerang_type = "sonic glaive boomerang";
-  
-  Sonic_glaive_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
-    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
-  } 
-  
-}
-class Red_hot_glaive_boomerang extends Boomerang{
-  
-  static final float speed = 15., size=38.;
-  static final int damage = 1, pierce = 12;
-  static final String damage_type = "normal", boomerang_type = "red hot glaive boomerang";
-  
-  Red_hot_glaive_boomerang(Tower fired_from_tower, float centre_x, float centre_y, float rayon_cercle){
-    super(fired_from_tower, centre_x, centre_y, rayon_cercle);
-  } 
-  
 }

@@ -16,13 +16,6 @@ class Panel{
   float sell_percent=0.8;
   
   Tower last_selected_tower;
-  
-  /*Panel(float top_left_x, float top_left_y, float bottom_right_x, float bottom_right_y){
-    this.top_left_x=top_left_x;
-    this.top_left_y=top_left_y;
-    this.bottom_right_x=bottom_right_x;
-    this.bottom_right_y=bottom_right_y;
-  }*/
 
   void show(Tower selected_tower){
     

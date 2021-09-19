@@ -45,8 +45,8 @@ class Joueur{
   }
 
   void interactions(){
-    boolean can_place_tower= mouseX>=0 && mouseX<875/*tower_panel...*/&& mouseY>=0 && mouseY<info_panel.top_left_y;      //il faut pas que le curseur soit hors map    //a changer ici aussi
-    if(can_place_tower && placing_tower!=""){    //si on a selectionné une tour
+    boolean can_place_tower= mouseX>=0 && mouseX<tower_panel.top_left_x && mouseY>=0 && mouseY<info_panel.top_left_y;      //il faut pas que le curseur soit hors map    //a changer ici aussi
+    if(can_place_tower && !placing_tower.equals("")){    //si on a selectionné une tour
             
       Tower temp = null;
       
@@ -94,35 +94,33 @@ class Joueur{
       temp.show_range(can_place_tower);
       
       
-      if(can_place_tower){
-        if(mousePressed && mouseButton==LEFT){
+      if(can_place_tower && mousePressed && mouseButton==LEFT){
           
-          if(placing_tower.equals("spike factory")){      //il calculer ses pos atteignables
-            temp.on_track_pos = new ArrayList<float[]>();
-            int pas = 5;
-            
-            for(float a=temp.x-temp.range; a<=temp.x+temp.range; a+=pas){
-              for(float b=temp.y-temp.range; b<=temp.y+temp.range; b+=pas){
-                if(map.is_on_track(a, b, 0) && distance(new float[] {a, b}, new float[] {temp.x, temp.y}) <= temp.range){
-                  temp.on_track_pos.add(new float[] {a, b});
-                }
+        if(placing_tower.equals("spike factory")){      //il calculer ses pos atteignables
+          temp.on_track_pos = new ArrayList<float[]>();
+          int pas = 5;
+          
+          for(float a=temp.x-temp.range; a<=temp.x+temp.range; a+=pas){
+            for(float b=temp.y-temp.range; b<=temp.y+temp.range; b+=pas){
+              if(map.is_on_track(a, b, 0) && distance(new float[] {a, b}, new float[] {temp.x, temp.y}) <= temp.range){
+                temp.on_track_pos.add(new float[] {a, b});
               }
             }
-          } 
-          
-          towers.add(temp);
-          argent-= temp.price;
-          if( !god_mode){
-            placing_tower="";
-            selected_tower=temp;
           }
+        } 
+        
+        towers.add(temp);
+        argent-= temp.price;
+        if( !god_mode){
+          placing_tower="";
+          selected_tower=temp;
         }
-      }     
+      }
     }
   }
   
   void select_existing_tower(){
-    if( selected_tower!=null && (placing_tower!="" || mousePressed && mouseButton==LEFT) ){  //si on place une nouvelle tour ou si on clique ailleurs en ayant une tour de selectionnée
+    if( selected_tower!=null && (!placing_tower.equals("") || mousePressed && mouseButton==LEFT) ){  //si on place une nouvelle tour ou si on clique ailleurs en ayant une tour de selectionnée
       if(distance(new float[] {selected_tower.x, selected_tower.y}, new float[] {mouseX, mouseY})>selected_tower.size/2){
         if(!(mouseX>=info_panel.top_left_x && mouseX<=info_panel.bottom_right_x && mouseY>=info_panel.top_left_y && mouseY<=info_panel.bottom_right_y)){  //cliquer sur l'info bar ne change rien
           selected_tower.highlight=false;
@@ -130,7 +128,7 @@ class Joueur{
         }
       }
     }
-    if(placing_tower!="" || selected_tower!=null)  return;    //si on est en train de placer une tour ou si on en a deja selectionnée une
+    if(!placing_tower.equals("") || selected_tower!=null)  return;    //si on est en train de placer une tour ou si on en a deja selectionnée une
     if(mousePressed && mouseButton==LEFT){
       for(Tower tour : towers){
         if( distance(new float[] {tour.x, tour.y}, new float[] {mouseX, mouseY})<=tour.size/2 ){

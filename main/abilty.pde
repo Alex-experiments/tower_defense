@@ -90,9 +90,22 @@ class Ability{
     if(!towers_in_cd.contains(tour_to_be_deleted))   this.uses_available--;
     else  towers_in_cd.remove(tour_to_be_deleted);
     this.max_uses_available--;
-    if(max_uses_available<=0)  abilities.remove(this);
+    if(max_uses_available<=0){
+      abilities.remove(this);
+      for(int i=0; i<abilities.size(); i++){
+        abilities.get(i).update_show_slot(i);
+      }
+    }
     if(tower_actually_in_cd == tour_to_be_deleted)  tower_actually_in_cd = null;
   }
+  
+  void update_show_slot(int place_in_list){
+    show_slot = place_in_list;
+    bouton.top_left_x = 48*show_slot;
+    bouton.bottom_right_x = 48*(show_slot+1);
+  }
+  
+  
  
 }
 
@@ -180,7 +193,7 @@ class Blade_maelstrom extends Ability{
   
   void use(Tower tour_used){
     for(int i=0; i<64; i++){
-      //projectiles.add(new Projectile(tour_used, tour_used.x, tour_used.y, tour_used.projectile_speed, i*PI/64, tour_used.projectile_damage_list.get(0), int(Float.POSITIVE_INFINITY), false, "maelstrom blade"));
+     projectiles.add(new Projectile(tour_used, tour_used.x, tour_used.y, i*PI/32, "maelstrom blade"));
     }
   }
   

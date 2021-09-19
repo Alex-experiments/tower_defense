@@ -22,16 +22,22 @@ class Projectile{
   int explosion_diameter;
   color couleur;  
   boolean rotate=false;
-  float rotation_angle=0, rotation_speed;
+  float rotation_angle=0., rotation_speed;
+  ArrayList<int[]> sprites_pos;
   
   Tower fired_from_tower;
    
   
-  Projectile(Tower fired_from_tower, float x_dep, float y_dep, float direction){
+  Projectile(Tower fired_from_tower, float x_dep, float y_dep, float direction, String projectile_type){
     x=x_dep;
     y=y_dep;
     this.direction=direction;
     this.fired_from_tower=fired_from_tower;
+    this.projectile_type = projectile_type;
+    
+    set_stats();
+    sprites_pos = get_sprites_pos(new StringList(projectile_type));
+    if(sprites_pos.size()==0)  sprites_pos = get_sprites_pos(new StringList("dart"));    //pour avoir un sprite dart de base
   }
   
   void core(int i, int nb_proj){
@@ -53,22 +59,13 @@ class Projectile{
     //fill(couleur);
     //noStroke();
     //ellipse(x, y, size, size);
-    int[] pos_aff;
-    if(pos_coins_sprites.containsKey(projectile_type)){
-      pos_aff = pos_coins_sprites.get(projectile_type);
-    }
-    else{
-      pos_aff = pos_coins_sprites.get("dart");
-    }
-    if(rotate)  rotation_angle+=rotation_speed;
-    
+    if(rotate)   rotation_angle+=rotation_speed;
+    pushMatrix();
     translate(x, y);
-    rotate(direction+PI/2+rotation_angle);
-    translate(-x, -y);
-    image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
-    translate(x, y);
-    rotate(-direction-PI/2-rotation_angle);
-    translate(-x, -y);
+    rotate(direction+HALF_PI+rotation_angle);
+    for(int[] pos_aff : sprites_pos)    image(all_sprites, 0, 0, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    popMatrix();
+
   }
   
   void deplacement(){
@@ -161,284 +158,195 @@ class Projectile{
     if(mob.layers<=0)  enemis.remove(mob);
   }
   
-}
-
-
-class Dart extends Projectile{
-  static final float speed = 20., size=14.;
-  static final int damage = 1, pierce = 1;
-  static final String damage_type = "sharp", projectile_type = "dart";
+  void set_stats(){
+    switch(projectile_type){
+      case "dart":
+        speed = 20.; size=14.;
+        damage = 1; pierce = 1;
+        damage_type = "sharp";
+        break;
+      case "dart ball":
+        speed = 20.; size=28;
+        damage = 1; pierce = 18;
+        damage_type = "shatter";
+        break;
+      case "sharp dart ball":
+        speed = 20.; size=28;
+        damage = 1; pierce = 19;
+        damage_type = "shatter";
+        break;
+      case "razor sharp dart ball":
+        speed = 20.; size=28;
+        damage = 1; pierce = 21;
+        damage_type = "shatter";
+        break;
+      case "huge dart ball":
+        speed = 20.; size=72;
+        damage = 1; pierce = 100;
+        damage_type = "normal";
+        break;
+      case "sharp huge dart ball":
+        speed = 20.; size=72;
+        damage = 1; pierce = 101;
+        damage_type = "normal";
+        break;
+      case "razor sharp huge dart ball":
+        speed = 20.; size=72;
+        damage = 1; pierce = 103;
+        damage_type = "normal";
+        break;
+      case "sharp dart":
+        speed = 20.; size=14.;
+        damage = 1; pierce = 2;
+        damage_type = "sharp";
+        break;
+      case "powerful dart":
+        speed = 30.; size=14.;
+        damage = 1; pierce = 3;
+        damage_type = "sharp";
+        break;
+      case "razor sharp dart":
+        speed = 20.; size=14.;
+        damage = 1; pierce = 4;
+        damage_type = "sharp";
+        break;
+      case "tack":
+        speed = 10.; size=11.;
+        damage = 1; pierce = 1;
+        damage_type = "sharp";
+        has_max_range = true;
+        max_range = fired_from_tower.range;
+        break;
+      case "blade":
+        speed = 10.; size=38.;
+        damage = 1; pierce = 2;
+        damage_type = "sharp";
+        has_max_range = true;
+        max_range = fired_from_tower.range;
+        break;
+      case "maelstrom blade":
+        speed = 20.; size=38.;
+        damage = 1; pierce = int(Float.POSITIVE_INFINITY);
+        damage_type = "sharp";
+        break;
+      case "glaive ricochet":
+        speed = 15.; size=50.;
+        damage = 1; pierce = 100;
+        damage_type = "sharp";
+        can_bounce = true;
+        max_bounce_distance = 130.;
+        rotate=true;
+        rotation_speed = PI/16;
+        break;
+      case "sonic glaive ricochet":
+        speed = 15.; size=50.;
+        damage = 1; pierce = 100;
+        damage_type = "shatter";
+        can_bounce = true;
+        max_bounce_distance = 130.;
+        rotate=true;
+        rotation_speed = PI/16;
+        break;
+      case "red hot glaive ricochet":
+        speed = 15.; size=50.;
+        damage = 1; pierce = 100;
+        damage_type = "normal";
+        can_bounce = true;
+        max_bounce_distance = 130.;
+        rotate=true;
+        rotation_speed = PI/16;
+        break;   
+      case "laser cannon":
+        speed = 20.; size=25.;
+        damage = 1; pierce = 13;
+        damage_type = "shatter";
+        break;
+      case "powerful laser cannon":
+        speed = 20.; size=25.;
+        damage = 1; pierce = 16;
+        damage_type = "shatter";
+        break;
+      case "bloontonium laser cannon":
+        speed = 20.; size=25.;
+        damage = 1; pierce = 16;
+        damage_type = "normal";
+        break;
+      case "ray of doom":      // AAAATTENTION : a enlever des projectiles en vrai c'est pas comme ca que ca fonctionne
+        speed = 20.; size=14.;
+        damage = 1; pierce = 100;
+        damage_type = "normal";
+        break;
+      case "bloontonium dart":
+        speed = 30.; size=14.;
+        damage = 1; pierce = 3;
+        damage_type = "normal";
+        break;
+      case "hydra rocket":
+        speed = 30.; size=23.;
+        damage = 1; pierce = 1;
+        damage_type = "normal";
+        explose = true;
+        explosion_diameter = 60;
+        break;
+      case "purple ball":
+        speed = 10.; size=25.;
+        damage = 1; pierce = 2;
+        damage_type = "normal";
+        break;
+      case "huge purple ball":
+        speed = 10.; size=31.;
+        damage = 1; pierce = 7;
+        damage_type = "normal";
+        break;
+      case "fireball":
+        speed = 20.; size=26.;
+        damage = 1; pierce = 40;
+        damage_type = "normal";
+        explose = true;
+        explosion_diameter = 60;
+        break;
+      case "flame":
+        speed = 40.; size=26.;
+        damage = 2; pierce = 1;
+        damage_type = "normal";
+        has_max_range = true;
+        max_range = fired_from_tower.range;
+        break;
+      case "shuriken":
+        speed = 20.; size=27.;
+        damage = 1; pierce = 2;
+        damage_type = "sharp";
+        break;
+      case "sharp shuriken":
+        speed = 20.; size=27.;
+        damage = 1; pierce = 4;
+        damage_type = "sharp";
+        break;
+      case "seeking shuriken":
+        speed = 20.; size=27.;
+        damage = 1; pierce = 2;
+        damage_type = "sharp";
+        can_bounce=true;
+        max_bounce_distance = 130;
+        break;
+      case "seeking sharp shuriken":
+        speed = 20.; size=27.;
+        damage = 1; pierce = 4;
+        damage_type = "sharp";
+        can_bounce=true;
+        max_bounce_distance = 130;
+        break;
+      case "flash bomb":
+        speed = 20.; size=40.;
+        damage = 1; pierce = 60;
+        damage_type = "normal";
+        explose=true;
+        explosion_diameter = 330;
+        break;      
+      default:
+        println("ERROR : can't assign any projectile type with ", projectile_type);
+        break;
+    }  
+  }
   
-  Dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Dart_ball extends Projectile{
-  static final float speed = 20., size=28;
-  static final int damage = 1, pierce = 18;
-  static final String damage_type = "shatter", projectile_type = "dart ball";
-  
-  Dart_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Huge_dart_ball extends Projectile{    //il faut implémenter le fait que ca fasse 5 dmg aux céramics
-  static final float speed = 20., size=72;
-  static final int damage = 1, pierce = 100;
-  static final String damage_type = "normal", projectile_type = "huge dart ball";
-  
-  Huge_dart_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Sharp_dart extends Projectile{
-  static final float speed = 20., size=14.;
-  static final int damage = 1, pierce = 2;
-  static final String damage_type = "sharp", projectile_type = "sharp dart";
-  
-  Sharp_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-class Powerful_dart extends Projectile{
-  static final float speed = 30., size=14.;
-  static final int damage = 1, pierce = 3;
-  static final String damage_type = "sharp", projectile_type = "powerful dart";
-  
-  Powerful_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Razor_sharp_dart extends Projectile{
-  static final float speed = 20., size=14.;
-  static final int damage = 1, pierce = 4;
-  static final String damage_type = "sharp", projectile_type = "razor sharp dart";
-  
-  Razor_sharp_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Tack extends Projectile{
-  static final float speed = 10., size=11.;
-  static final int damage = 1, pierce = 1;
-  static final String damage_type = "sharp", projectile_type = "tack";
-  
-  Tack(Tower fired_from_tower, float x_dep, float y_dep, float direction, float max_range){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.has_max_range = true;
-    this.max_range = max_range;
-  } 
-}
-
-class Blade extends Projectile{
-  static final float speed = 10., size=38.;
-  static final int damage = 1, pierce = 2;
-  static final String damage_type = "sharp", projectile_type = "blade";
-  
-  Blade(Tower fired_from_tower, float x_dep, float y_dep, float direction, float max_range){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.has_max_range = true;
-    this.max_range = max_range;
-  } 
-}
-
-class Blade_maelstrom_proj extends Projectile{
-  static final float speed = 10., size=38.;
-  static final int damage = 1;
-  int pierce = int(Float.POSITIVE_INFINITY);
-  static final String damage_type = "sharp", projectile_type = "blade maelstrom";
-  
-  Blade_maelstrom_proj(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Glaive_ricochet extends Projectile{
-  
-  static final float speed = 15., size=50.;
-  static final int damage = 1, pierce = 100;
-  static final String damage_type = "sharp", projectile_type = "glaive ricochet" ;
-  
-  Glaive_ricochet(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.can_bounce = true;
-    this.max_bounce_distance = 130.;
-  } 
-  
-}
-
-class Sonic_glaive_ricochet extends Projectile{
-  
-  static final float speed = 15., size=50.;
-  static final int damage = 1, pierce = 100;
-  static final String damage_type = "shatter", projectile_type = "sonic glaive ricochet";
-  
-  Sonic_glaive_ricochet(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.can_bounce = true;
-    this.max_bounce_distance = 130.;
-  } 
-  
-}
-
-class Red_hot_glaive_ricochet extends Projectile{
-  
-  static final float speed = 15., size=50.;
-  static final int damage = 1, pierce = 100;
-  static final String damage_type = "normal", projectile_type = "red hot glaive ricochet";
-  
-  Red_hot_glaive_ricochet(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.can_bounce = true;
-    this.max_bounce_distance = 130.;
-  } 
-  
-}
-
-class Laser_cannon extends Projectile{
-  
-  static final float speed = 20., size=14.;
-  static final int damage = 1, pierce = 13;
-  static final String damage_type = "shatter", projectile_type = "laser cannon";
-  
-  Laser_cannon(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Bloontonium_laser_cannon extends Projectile{
-  
-  static final float speed = 20., size=14.;
-  static final int damage = 1, pierce = 13;
-  static final String damage_type = "normal", projectile_type = "bloontonium laser cannon";
-  
-  Bloontonium_laser_cannon(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Ray_of_doom extends Projectile{            // AAAATTENTION : a enlever des projectiles en vrai c'est pas comme ca que ca fonctionne
-  
-  static final float speed = 20., size=14.;
-  static final int damage = 1, pierce = 100;
-  static final String damage_type = "normal", projectile_type = "ray of doom";
-  
-  Ray_of_doom(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Bloontonium_dart extends Projectile{
-  static final float speed = 30., size=14.;
-  static final int damage = 1, pierce = 3;
-  static final String damage_type = "normal", projectile_type = "bloontonium dart";
-  
-  Bloontonium_dart(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Hydra_rocket extends Projectile{
-  static final float speed = 30., size=23.;
-  static final int damage = 1, pierce = 3;
-  static final String damage_type = "normal", projectile_type = "hydra rocket";
-  
-  Hydra_rocket(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.explose = true;
-    this.explosion_diameter = 60;
-  } 
-}
-
-class Purple_ball extends Projectile{
-  static final float speed = 10., size=20.;
-  static final int damage = 1, pierce = 2;
-  static final String damage_type = "normal", projectile_type = "purple ball";
-  
-  Purple_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Huge_purple_ball extends Projectile{
-  static final float speed = 10., size=46.;
-  static final int damage = 1, pierce = 7;
-  static final String damage_type = "normal", projectile_type = "huge purple ball";
-  
-  Huge_purple_ball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Fireball extends Projectile{
-  static final float speed = 20., size=26.;
-  static final int damage = 1, pierce = 40;
-  static final String damage_type = "normal", projectile_type = "fireball";
-  
-  Fireball(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.explose = true;
-    this.explosion_diameter = 60;
-  } 
-}
-
-class Flame extends Projectile{
-  static final float speed = 40., size=26.;
-  static final int damage = 2, pierce = 1;
-  static final String damage_type = "normal", projectile_type = "flame";
-  
-  Flame(Tower fired_from_tower, float x_dep, float y_dep, float direction, float max_range){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    this.has_max_range = true;
-    this.max_range = max_range;
-  } 
-}
-
-class Shuriken extends Projectile{
-  static final float speed = 20., size=27.;
-  static final int damage = 1, pierce = 2;
-  static final String damage_type = "sharp", projectile_type = "shuriken";
-  
-  Shuriken(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Sharp_shuriken extends Projectile{
-  static final float speed = 20., size=27.;
-  static final int damage = 1, pierce = 4;
-  static final String damage_type = "sharp", projectile_type = "sharp shuriken";
-  
-  Sharp_shuriken(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-  } 
-}
-
-class Seeking_shuriken extends Projectile{
-  static final float speed = 20., size=27.;
-  static final int damage = 1, pierce = 4;
-  static final String damage_type = "sharp", projectile_type = "seeking shuriken";
-  
-  Seeking_shuriken(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    can_bounce=true;
-    max_bounce_distance = 130;
-  } 
-}
-
-class Flash_bomb extends Projectile{
-  static final float speed = 20., size=27.;
-  static final int damage = 1, pierce = 60;
-  static final String damage_type = "normal", projectile_type = "flash bomb";
-  
-  Flash_bomb(Tower fired_from_tower, float x_dep, float y_dep, float direction){
-    super(fired_from_tower, x_dep, y_dep, direction);
-    explose=true;
-    explosion_diameter = 330;
-  } 
 }

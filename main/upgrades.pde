@@ -40,6 +40,7 @@ class Upgrades{
     
     
     if(tour.type.equals("dart monkey")){
+      String temp_shooting_type;
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
@@ -50,12 +51,18 @@ class Upgrades{
             tour.detects_camo=true;
             break;
           case 2:
-            change_shooting_type(tour, "dart ball");
+            temp_shooting_type = "dart ball";
+            if(tour.shoots_list.get(0).equals("sharp dart"))  temp_shooting_type="sharp dart ball";
+            else if(tour.shoots_list.get(0).equals("razor sharp dart"))  temp_shooting_type="razor sharp dart ball";
+            change_shooting_type(tour, temp_shooting_type);
             set_attack_speed(tour,  0.63);
             break;
           case 3:
             tour.range = int(tour.range*1.15);
-            change_shooting_type(tour, "huge dart ball");
+            temp_shooting_type = "huge dart ball";
+            if(tour.shoots_list.get(0).equals("sharp dart ball"))  temp_shooting_type="sharp huge dart ball";
+            else if(tour.shoots_list.get(0).equals("razor sharp dart ball"))  temp_shooting_type="razor sharp huge dart ball";
+            change_shooting_type(tour, temp_shooting_type);
            
                                //il faut implémenter le fait que ca fasse 5 dmg aux céramics
             break;          
@@ -63,11 +70,17 @@ class Upgrades{
       }
       if(path_to_upgrade==2){
         switch(tour.path_2_progression){
-          case 0:
-            change_shooting_type(tour, "sharp dart");
+          case 0:            
+            temp_shooting_type = "sharp dart";
+            if(tour.shoots_list.get(0).equals("dart ball"))  temp_shooting_type="sharp dart ball";
+            else if(tour.shoots_list.get(0).equals("huge dart ball"))  temp_shooting_type="sharp huge dart ball";
+            change_shooting_type(tour, temp_shooting_type);
             break;
           case 1:
-            change_shooting_type(tour, "razor sharp dart");
+            temp_shooting_type = "razor sharp dart";
+            if(tour.shoots_list.get(0).equals("sharp dart ball"))  temp_shooting_type="razor sharp dart ball";
+            else if(tour.shoots_list.get(0).equals("sharp huge dart ball"))  temp_shooting_type="razor sharp huge dart ball";
+            change_shooting_type(tour, temp_shooting_type);
             break;
           case 2:
             tour.deviation_list.append(-0.216);
@@ -148,6 +161,20 @@ class Upgrades{
             break;
           case 3:
             //implémenter les abilities
+            boolean already_have_one = false;
+            for(Ability abi : abilities){
+              if(abi instanceof Blade_maelstrom){
+                already_have_one = true;
+                abi.towers_having_this_ability.add(tour);
+                abi.add_one_use(true);
+                tour.linked_ability = abi;
+                break;
+              }
+            }
+            if( !already_have_one){
+              abilities.add(new Blade_maelstrom(tour, 20., 0.));
+              tour.linked_ability = abilities.get(abilities.size()-1);
+            }
             break;          
         }
       }
@@ -193,30 +220,32 @@ class Upgrades{
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
-            if(tour.shoots_list.get(0).equals("sonic boomerang"))  change_shooting_type(tour, "sonic multi target boomerang");
-            else if (tour.shoots_list.get(0).equals("red hot boomerang"))  change_shooting_type(tour, "red hot multi target boomerang");
+            if(tour.shoots_list.get(0).indexOf("sonic")>=0)  change_shooting_type(tour, "sonic multi target boomerang");
+            else if (tour.shoots_list.get(0).indexOf("red hot")>=0)  change_shooting_type(tour, "red hot multi target boomerang");
             else change_shooting_type(tour, "multi target boomerang");
             break;
           case 1:
-            if(tour.shoots_list.get(0).equals("sonic boomerang"))  change_shooting_type(tour, "sonic glaive boomerang");
-            else if (tour.shoots_list.get(0).equals("red hot boomerang"))  change_shooting_type(tour, "red hot glaive boomerang");
+            if(tour.shoots_list.get(0).indexOf("sonic")>=0)  change_shooting_type(tour, "sonic glaive boomerang");
+            else if (tour.shoots_list.get(0).indexOf("red hot")>=0)  change_shooting_type(tour, "red hot glaive boomerang");
             else change_shooting_type(tour, "glaive boomerang");
             change_attack_speed(tour, 1.064);
             break;
           case 2:
-            if(tour.shoots_list.get(0).equals("sonic boomerang"))  change_shooting_type(tour, "sonic glaive ricochet boomerang");
-            else if (tour.shoots_list.get(0).equals("red hot boomerang"))  change_shooting_type(tour, "red hot glaive ricochet boomerang");
-            else change_shooting_type(tour, "glaive ricochet boomerang");
+            if(tour.shoots_list.get(0).indexOf("sonic")>=0)  change_shooting_type(tour, "sonic glaive ricochet");
+            else if (tour.shoots_list.get(0).indexOf("red hot")>=0)  change_shooting_type(tour, "red hot glaive ricochet");
+            else change_shooting_type(tour, "glaive ricochet");
             break;
           case 3:
             tour.detects_camo=true;        
             Boomerang temp;
+            String temp_boomer_type;
+            if(tour.shoots_list.get(0).indexOf("sonic")>=0)  temp_boomer_type = "sonic glaive boomerang";
+            else if (tour.shoots_list.get(0).indexOf("red hot")>=0)  temp_boomer_type = "red hot glaive boomerang";
+            else temp_boomer_type = "glaive boomerang";
             for(int i=0; i<2; i++){
-              temp = new Boomerang(tour, tour.x, tour.y, 65.);    //Les 2 nouveaux boomerangs doivent pop les memes choses que les autres : FAUT LES UPDATE SI JAMAIS UP LE PATH2 APRES CA
+              temp = new Boomerang(tour, tour.x, tour.y, 65., temp_boomer_type);    //Les 2 nouveaux boomerangs doivent pop les memes choses que les autres : FAUT LES UPDATE SI JAMAIS UP LE PATH2 APRES CA
               temp.speed = 5.;
-              temp.boomerang_type =  tour.shoots_list.get(0);    //il va falloir changer leur taille mais bon
-              temp.damage_type = get_damage_type(temp.boomerang_type);
-              temp.orbiting=true;   // également : il faut qu'ils aient l'apparence de glaives
+              temp.orbiting=true;
               if(i==1)  temp.angle_dep=PI;
               temp.deplacement();  //pour éviter qu'il y ait un prev_x sur la tour et déclancer des collisions qui ne doivent pas avoir lieu
               temp.deplacement();
@@ -230,20 +259,24 @@ class Upgrades{
         switch(tour.path_2_progression){
           case 0:
             temp_shooting_type = "sonic boomerang";
-            if(tour.shoots_list.get(0).equals("glaive boomerang"))  temp_shooting_type = "sonic glaive boomerang";
+            if(tour.shoots_list.get(0).indexOf("multi target")>=0)  temp_shooting_type = "sonic multi target boomerang";
+            else if(tour.shoots_list.get(0).indexOf("ricochet")>=0)  temp_shooting_type = "sonic glaive ricochet";
+            else if(tour.shoots_list.get(0).indexOf("glaive")>=0)  temp_shooting_type = "sonic glaive boomerang";
             change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les frozen
             for(Boomerang boomer : boomerangs){
-              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.damage_type = temp_shooting_type;    //pas bien du tout
+              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.boomerang_type = "sonic glaive boomerang";    //pas bien du tout
             }
             break;
           case 1:
             temp_shooting_type = "red hot boomerang";
-            if(tour.shoots_list.get(0).equals("glaive boomerang"))  temp_shooting_type = "red hot glaive boomerang";
+            if(tour.shoots_list.get(0).indexOf("multi target")>=0)  temp_shooting_type = "red hot multi target boomerang";
+            else if(tour.shoots_list.get(0).indexOf("ricochet")>=0)  temp_shooting_type = "red hot glaive ricochet";
+            else if(tour.shoots_list.get(0).indexOf("glaive")>=0)  temp_shooting_type = "red hot glaive boomerang";
             change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les lead
             for(Boomerang boomer : boomerangs){
-              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.damage_type = temp_shooting_type;
+              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.boomerang_type = "red hot glaive boomerang";
             }
             break;
           case 2:
@@ -283,7 +316,8 @@ class Upgrades{
           case 2:
             change_attack_speed(tour, 1.15);
             temp_shooting_type = "laser cannon";
-            if(tour.shoots_list.get(0).equals("bloontonium dart"))  temp_shooting_type = "bloontonium laser cannon";
+            if(tour.shoots_list.get(0).equals("powerful dart"))  temp_shooting_type = "powerful laser cannon";
+            else if(tour.shoots_list.get(0).equals("bloontonium dart"))  temp_shooting_type = "bloontonium laser cannon";
             change_shooting_type(tour, temp_shooting_type);
             break;
           case 3:
@@ -297,15 +331,18 @@ class Upgrades{
       if(path_to_upgrade==2){
         switch(tour.path_2_progression){
           case 0:
-            change_shooting_type(tour, "powerful dart");
+            if(tour.shoots_list.get(0).equals("ray of doom"))  break;    //en gros ca sert à rien d'ajouter du pierce vu que ray of doom est pas destiné à etre avec du pierce
+            if(tour.shoots_list.get(0).equals("laser cannon"))  change_shooting_type(tour, "powerful laser cannon");
+            else  change_shooting_type(tour, "powerful dart");
             break;
           case 1:
             temp_shooting_type = "bloontonium dart";
-            if(tour.shoots_list.get(0).equals("laser cannon"))  temp_shooting_type = "bloontonium laser cannon";
+            if(tour.shoots_list.get(0).equals("ray of doom"))  break;    //en gros ca sert à rien d'ajouter du pierce vu que ray of doom est pas destiné à etre avec du pierce
+            if(tour.shoots_list.get(0).equals("powerful laser cannon"))  temp_shooting_type = "bloontonium laser cannon";
             change_shooting_type(tour, temp_shooting_type);
             break;
           case 2:
-            for(int i=0; i<tour.shoots_list.size(); i++){      //peut tj tout pop attention
+            for(int i=0; i<tour.shoots_list.size(); i++){
               tour.shoots_list.set(i, "hydra rocket");  
             }
             
@@ -396,7 +433,8 @@ class Upgrades{
             tour.range = int(tour.range * 1.16);
             break;
           case 1:
-            change_shooting_type(tour, "sharp shuriken");
+            if(tour.shoots_list.get(0).indexOf("seeking")>=0)  tour.shoots_list.set(0, "seeking sharp shuriken");
+            else tour.shoots_list.set(0, "sharp shuriken");
             break;
           case 2:
             temp_shooting_type = tour.shoots_list.get(0);
@@ -422,7 +460,8 @@ class Upgrades{
         switch(tour.path_2_progression){
           case 0:
                                 //change to do on seeking shuriken ?
-            change_shooting_type(tour, "seeking shuriken");
+            if(tour.shoots_list.get(0).indexOf("sharp")>=0)  change_shooting_type(tour, "seeking sharp shuriken");
+            else change_shooting_type(tour, "seeking shuriken");
             break;
           case 1:
             //implémenter la distraction -> fonctionne exactement comme la tornade
@@ -493,6 +532,7 @@ class Upgrades{
       tour.path_2_progression++;
       joueur.argent-=price_2;
     }
+    tour.set_sprites();
     
   }
   
