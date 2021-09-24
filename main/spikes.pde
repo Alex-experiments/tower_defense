@@ -6,7 +6,7 @@ class Spikes{
   float destination_x, destination_y;
   int damage, pierce;
   static final float initial_speed = 10., rayon=20.;  //si on le modifie, le modifier aussi dans joueur -> place tower
-  float speed;
+  float speed, direction;
   String type, damage_type;
   float fired_time;       
   static final float DURATION = 70.;    //ca vit 70s
@@ -25,6 +25,8 @@ class Spikes{
     this.destination_y=destination_y;
     this.speed=initial_speed;
     this.total_distance = distance(new float[] {x, y}, new float[] {destination_x, destination_y});
+    if(total_distance == 0)  deplacement_fini = true;
+    else direction=atan2(destination_y-fired_from_tower.y, destination_x-fired_from_tower.x);
     this.type = spike_type;
     
     fired_time =  FAKE_TIME_ELAPSED;
@@ -51,30 +53,27 @@ class Spikes{
     if(type.equals("spike ball") || type.equals("spike mine"))  pos_aff = pos_coins_sprites.get("spike mine_"+str(min(pierce, 10)));    //normalement les spike balls n'ont pas de crane dessus
     else if(type.indexOf("hot")>=0)  pos_aff = pos_coins_sprites.get("hot spike_"+str(min(pierce, 10)));
     else pos_aff = pos_coins_sprites.get("spike_"+str(min(pierce, 10)));
-    image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    image(all_sprites, x+pos_aff[4], y+pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
   
   
   void update(){
-    for(int i=0; i<joueur.game_speed; i++){    //on itère plusieurs fois pour faire des petits pas et ne pas dépasser de trop la destination
-      if(!deplacement_fini){
+    if(!deplacement_fini){
+      for(int i=0; i<joueur.game_speed; i++){    //on itère plusieurs fois pour faire des petits pas et ne pas dépasser de trop la destination
         float dist = distance(new float[] {x, y}, new float[] {destination_x, destination_y});
         speed=(0.5-initial_speed)*(total_distance-dist)/total_distance+initial_speed;
         //on commence à s = init_s et on arrive a s=0.5 lors de l'arrivée
-        float direction=atan2(destination_y-fired_from_tower.y, destination_x-fired_from_tower.x);
         x+=speed*cos(direction);
         y+=speed*sin(direction);
         if(distance(new float[] {x, y}, new float[] {destination_x, destination_y}) < speed){
           x=destination_x;
           y=destination_y;
           deplacement_fini=true;
+          break;
         }
       }
-      else{
-        kill();
-        break;
-      }
     }
+    else kill();
     
   }
   
@@ -89,7 +88,7 @@ class Spikes{
         pierce--;
         if(pierce<=0){
           if(type.equals("spike mine")){
-            explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, type));      //A CHANGER POUR LE TYPE d'EXPLOSION
+            explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, damage_type));      //A CHANGER POUR LE TYPE d'EXPLOSION
           }
           break;
         }

@@ -1,7 +1,7 @@
 boolean auto_pass_levels=true;
 boolean god_mode=true;
 
-//Problème : les boomerangs touchent un ballon et peuvent faire demi tour pour toucher ses fils
+//Problème : les boomerangs touchent un ballon et peuvent faire demi tour pour toucher ses fils //semble pas etre le cas en fait
 
 float FAKE_TIME_ELAPSED;//à chaque frame c'est une constante
 
@@ -20,12 +20,13 @@ ArrayList<Pop_animation> pop_animations=new ArrayList<Pop_animation>();
 ArrayList<Explosion> explosions = new ArrayList<Explosion>();
 ArrayList<Spikes> spikes = new ArrayList<Spikes>();
 ArrayList<Ability> abilities = new ArrayList<Ability>();
+ArrayList<Banana> bananas = new ArrayList<Banana>();
 
 Map map = new Map(2);
 Joueur joueur= new Joueur(200, 650);
 Rounds round= new Rounds();
 Panel info_panel= new Panel();
-Tower_panel tower_panel = new Tower_panel();
+Tower_panel tower_panel;
 Upgrades upgrades = new Upgrades();
 
 HashMap<String,Integer> force_list = new HashMap<String,Integer>();
@@ -55,7 +56,7 @@ void load_sprites(){
     space_index = ligne.indexOf(" : ");
     offset_index = ligne.indexOf(" offset ");
     half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter");
-    
+    println(ligne);
       if(space_index!=-1){
         name = ligne.substring(0, space_index);
         separateur_index = ligne.indexOf('*', space_index);
@@ -133,6 +134,7 @@ ArrayList<int[]> get_sprites_pos(StringList sprites_names){
 
 void setup(){
   load_sprites();
+  tower_panel = new Tower_panel();    //ne pas le mettre avant car quand tower panel crée ses boutons il a besoin des sprites
   imageMode(CENTER);
   frameRate(60);
   surface.setResizable(true);
@@ -226,6 +228,10 @@ void draw(){
     spikes.get(i).core(i, nb_spikes);
   }
   
+  for(int i=bananas.size()-1; i>=0; i--){
+    bananas.get(i).core();
+  }
+  
   //On affiche toutes les explosions
   for (int i = explosions.size() - 1; i >= 0; i--){
     explosions.get(i).core();
@@ -235,6 +241,7 @@ void draw(){
   for (int i = pop_animations.size() - 1; i >= 0; i--){
     pop_animations.get(i).core();
   }
+  
   
   textAlign(CENTER, CENTER);
   for(Ability abi : abilities){

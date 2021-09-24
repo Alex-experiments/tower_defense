@@ -25,7 +25,11 @@ class Pop_animation{
   
   void show(){
     int[] pos_aff = pos_coins_sprites.get("pop animation");
+    //pushMatrix();
+    //translate(x, y);      //bien mais slow too much
+    //rotate(random(TWO_PI));
     image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    //popMatrix();
     /*float intensity= 255*(FAKE_TIME_ELAPSED-pop_time)/DURATION;   
     stroke(intensity, intensity, intensity);            //to go from black to white
     strokeWeight(2);

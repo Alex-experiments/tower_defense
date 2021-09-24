@@ -7,8 +7,7 @@ class dart_monkey extends Tower{
   void set_param_tower(){
     couleur=color(0, 0, 255);
     price=200;
-    //size=base_size;
-    size=59;
+    size=base_size;
     range=128;
     
     shoots_list.append("dart");
@@ -24,7 +23,10 @@ class dart_monkey extends Tower{
         
     if(max(path_1_progression, path_2_progression)==1)  sprites_names.append("bandana vert");
     else if(max(path_1_progression, path_2_progression)==2)  sprites_names.append("bandana rouge");
-    else if(path_2_progression == 3)  sprites_names.append("triple dart bandana");
+    else if(path_2_progression == 3){
+      sprites_names.append("triple dart bandana");
+      sprites_names.append("carquois");
+    }
     
     
     sprites_pos = get_sprites_pos(sprites_names);
@@ -88,6 +90,34 @@ class sniper extends Tower{
     deviation_list.append(0);
     attack_speed_list.append(0.45);
   }
+  
+  void set_sprites(){
+    sprites_names = new StringList();
+    
+    sprites_names.append("dart monkey");
+      
+    if(path_2_progression >= 2)  sprites_names.append("sniper monkey googles");
+    
+    if(path_1_progression == 0 && path_2_progression==0)  sprites_names.append("sniper monkey green hat");
+    else if(path_1_progression == 3)  sprites_names.append("sniper monkey black hat");
+    else if(path_2_progression == 3)  sprites_names.append("sniper monkey target hat");
+    else if(path_1_progression == 2)  sprites_names.append("sniper monkey purple hat");      //le purple a la prio sur le blue qui a la prio sur le red
+    else if(path_2_progression == 1 || path_2_progression==2)  sprites_names.append("sniper monkey blue hat");
+    else if(path_1_progression == 1)  sprites_names.append("sniper monkey red hat");
+    
+    
+    sprites_names.append("sniper monkey gachette");
+    sprites_names.append("sniper monkey gun");
+    if(path_1_progression>=3)  sprites_names.append("sniper monkey green ray");
+    else if(path_2_progression>=3)  sprites_names.append("sniper monkey grand silencieux");
+    else sprites_names.append("sniper monkey silencieux");
+    
+    if(path_1_progression == 4)  sprites_names.append("sniper monkey green camo");
+    else if(path_2_progression==4)  sprites_names.append("sniper monkey black camo");
+    
+    sprites_pos = get_sprites_pos(sprites_names);
+  }
+    
   
   ArrayList<Mob> get_enemis_in_range(){
     ArrayList<Mob> liste= new ArrayList<Mob>();
@@ -442,6 +472,7 @@ class Tower{
         }
         else if(this.type.equals("sniper")){
           Instant_projectile bullet = new Instant_projectile(this, target, shoot_type);    //bullet take action instantly, no need to add them to an ArrayList
+          this.orientation = atan2(target.y-y, target.x-x)+HALF_PI;
           
           if(target.layers<=0){
             detected_mobs = get_enemis_in_range();

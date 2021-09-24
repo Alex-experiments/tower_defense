@@ -17,6 +17,8 @@ class Projectile{
   int pierce;            //  pierce correspond au nombre d'ennemis maximum touchable : indépendant du fait qu'on puisse rebondir ou pas
                          // Si on veut rebondir un maximum de 2 fois, il faut mettre can_bounce=true et pierce = 2
                          
+                         //pour l'instant lorsque que qqch explose, il explose dès qu'il rencontre un enemi et son pierce revient donc à son explosion !
+                         
   String damage_type, projectile_type;
   boolean explose = false;
   int explosion_diameter;
@@ -283,7 +285,7 @@ class Projectile{
         break;
       case "hydra rocket":
         speed = 30.; size=23.;
-        damage = 1; pierce = 1;
+        damage = 1; pierce = 40;
         damage_type = "normal";
         explose = true;
         explosion_diameter = 60;

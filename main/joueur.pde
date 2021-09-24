@@ -48,34 +48,7 @@ class Joueur{
     boolean can_place_tower= mouseX>=0 && mouseX<tower_panel.top_left_x && mouseY>=0 && mouseY<info_panel.top_left_y;      //il faut pas que le curseur soit hors map    //a changer ici aussi
     if(can_place_tower && !placing_tower.equals("")){    //si on a selectionné une tour
             
-      Tower temp = null;
-      
-      switch(placing_tower){
-        case "dart monkey":
-          temp = new dart_monkey(placing_tower, mouseX, mouseY);
-          break;
-        case "wizard monkey":
-          temp = new wizard_monkey(placing_tower, mouseX, mouseY);
-          break;
-        case "sniper":
-          temp = new sniper(placing_tower, mouseX, mouseY);
-          break;
-        case "tack shooter":
-          temp = new tack_shooter(placing_tower, mouseX, mouseY);
-          break;
-        case "dartling gun":
-          temp = new dartling_gun(placing_tower, mouseX, mouseY);
-          break;
-        case "boomerang thrower":
-          temp = new boomerang_thrower(placing_tower, mouseX, mouseY);
-          break;
-        case "ninja monkey":
-          temp = new ninja_monkey(placing_tower, mouseX, mouseY);
-          break;
-        case "spike factory":
-          temp = new spike_factory(placing_tower, mouseX, mouseY);
-          break;       
-      }
+      Tower temp = get_new_tower(placing_tower, mouseX, mouseY);
       
       //on regarde si la hitbox rencontre celle d'une tour deja placée
       for(Tower tour : towers){            
@@ -155,4 +128,42 @@ class Joueur{
     }
   }
 
+}
+
+Tower get_new_tower(String tower_type, float x, float y){
+  
+  Tower temp=null;
+  
+  
+  switch(tower_type){
+      case "dart monkey":
+        temp = new dart_monkey(tower_type, x, y);
+        break;
+      case "wizard monkey":
+        temp = new wizard_monkey(tower_type, x, y);
+        break;
+      case "sniper":
+        temp = new sniper(tower_type, x, y);
+        break;
+      case "tack shooter":
+        temp = new tack_shooter(tower_type, x, y);
+        break;
+      case "dartling gun":
+        temp = new dartling_gun(tower_type, x, y);
+        break;
+      case "boomerang thrower":
+        temp = new boomerang_thrower(tower_type, x, y);
+        break;
+      case "ninja monkey":
+        temp = new ninja_monkey(tower_type, x, y);
+        break;
+      case "spike factory":
+        temp = new spike_factory(tower_type, x, y);
+        break;    
+      default :
+        println(tower_type, "is not a proper tower type !!");
+        break;
+    }
+    
+    return temp;
 }

@@ -7,6 +7,8 @@ class Ability{
   int show_slot;
   int uses_available=1, max_uses_available=1;
   Button bouton;
+  boolean global_cooldown = false;
+  private float smallest_cd = -1.;
   
   Ability(Tower enabled_by_tower, float cooldown_duration, float duration){
     this.cooldown_duration = cooldown_duration;
@@ -15,19 +17,31 @@ class Ability{
     this.towers_having_this_ability.add(enabled_by_tower);
   }
   
-  void core(){
+  public void core(){
     if(this.bouton.is_cliqued()){
       Tower tour_used = get_tour_to_use();
       this.use(tour_used);  //le bouton sera non cliquable si aucune tour n'est utilisable (uses_available==0)
       tour_used.ability_use_time = FAKE_TIME_ELAPSED;
+      if(!global_cooldown){
+        tour_used.ability_cooldown_timer = FAKE_TIME_ELAPSED;
+        if(smallest_cd < 0)  smallest_cd = FAKE_TIME_ELAPSED;
+      }
       towers_in_cd.add(tour_used);
       this.uses_available--;
+      
     }
     update();
     show();
   }
   
-  Tower get_tour_to_use(){
+  public void initial_cd(Tower tour){
+    uses_available--;
+    tour.ability_cooldown_timer = FAKE_TIME_ELAPSED;
+    towers_in_cd.add(tour);
+    set_smallest_cd();
+  }
+  
+  private Tower get_tour_to_use(){
     //on doit d'abord déterminer de quelle tour l'effet part :
     Tower tour_used=null;
     for(Tower tour : towers_having_this_ability){
@@ -45,46 +59,71 @@ class Ability{
   void use(Tower tour_used){}
   void end_effect(Tower tour){}
   
-  void update(){    
-    
-    if(tower_actually_in_cd != null && FAKE_TIME_ELAPSED - tower_actually_in_cd.ability_cooldown_timer > cooldown_duration){
-      this.add_one_use(false);
-      towers_in_cd.remove(tower_actually_in_cd);
-      tower_actually_in_cd = null;
-    }
-    
-    if(towers_in_cd.size()==0)  return;  //il n'y a rien a faire car durée d'un cd est forcément > durée effective de l'ability
-    
-    if(tower_actually_in_cd == null){
-      tower_actually_in_cd = towers_in_cd.get(0);
-      tower_actually_in_cd.ability_cooldown_timer = FAKE_TIME_ELAPSED;
-    }
+  private void update(){
+    if(global_cooldown){
+      if(tower_actually_in_cd != null && FAKE_TIME_ELAPSED - tower_actually_in_cd.ability_cooldown_timer > cooldown_duration){
+        this.add_one_use(false);
+        towers_in_cd.remove(tower_actually_in_cd);
+        tower_actually_in_cd = null;
+      }
       
-    for(Tower tour : towers_in_cd){
-      if(tour.ability_use_time >= 0 && FAKE_TIME_ELAPSED - tour.ability_use_time > duration){
-        this.end_effect(tour);
+      if(towers_in_cd.size()==0)  return;  //il n'y a rien a faire car durée d'un cd est forcément > durée effective de l'ability
+      
+      if(tower_actually_in_cd == null){
+        tower_actually_in_cd = towers_in_cd.get(0);
+        tower_actually_in_cd.ability_cooldown_timer = FAKE_TIME_ELAPSED;
       }
     }
+    else{
+      boolean need_to_set_smallest_cd = false;
+      for(int i=towers_in_cd.size()-1; i>=0; i--){
+        if(FAKE_TIME_ELAPSED - towers_in_cd.get(i).ability_cooldown_timer > cooldown_duration){
+          this.add_one_use(false);
+          towers_in_cd.remove(i);
+          need_to_set_smallest_cd = true;
+        }
+      }
+      if(need_to_set_smallest_cd)  set_smallest_cd();
+    }
+    for(Tower tour : towers_in_cd){
+        if(tour.ability_use_time >= 0 && FAKE_TIME_ELAPSED - tour.ability_use_time > duration){
+          this.end_effect(tour);
+        }
+      }
   }
   
-  void add_one_use(boolean max_use_too){
+  public void add_one_use(boolean max_use_too){
     this.uses_available++;
     if(max_use_too)  this.max_uses_available++;
     this.bouton.text="";
     this.bouton.unclickable=false;
   }
   
+  private void set_smallest_cd(){
+    if(towers_in_cd.size() == 0)  smallest_cd = -1.;
+    else{
+      float min_cd_time = Float.POSITIVE_INFINITY;
+      for(Tower tour : towers_in_cd){
+        if(tour.ability_cooldown_timer < min_cd_time){
+          min_cd_time = tour.ability_cooldown_timer;
+        }
+      }
+      smallest_cd = min_cd_time;
+    }
+  }
   
-  void show(){
+  
+  private void show(){
     if(this.uses_available==0){
-      this.bouton.text=str(ceil(this.cooldown_duration - FAKE_TIME_ELAPSED + tower_actually_in_cd.ability_cooldown_timer));
+      if(global_cooldown)  this.bouton.text=str(ceil(this.cooldown_duration - FAKE_TIME_ELAPSED + tower_actually_in_cd.ability_cooldown_timer));
+      else this.bouton.text=str(ceil(this.cooldown_duration - FAKE_TIME_ELAPSED + smallest_cd));
       this.bouton.unclickable = true;
     }
     this.bouton.show();
     text(str(this.uses_available), 48*show_slot, 600, 48*(show_slot+.4), 616);
   }
   
-  void delete(Tower tour_to_be_deleted){
+  public void delete(Tower tour_to_be_deleted){
     this.end_effect(tour_to_be_deleted);
     towers_having_this_ability.remove(tour_to_be_deleted);
     if(!towers_in_cd.contains(tour_to_be_deleted))   this.uses_available--;
@@ -96,10 +135,11 @@ class Ability{
         abilities.get(i).update_show_slot(i);
       }
     }
-    if(tower_actually_in_cd == tour_to_be_deleted)  tower_actually_in_cd = null;
+    if(!global_cooldown)  set_smallest_cd();
+    else if(tower_actually_in_cd == tour_to_be_deleted)  tower_actually_in_cd = null;
   }
   
-  void update_show_slot(int place_in_list){
+  private void update_show_slot(int place_in_list){
     show_slot = place_in_list;
     bouton.top_left_x = 48*show_slot;
     bouton.bottom_right_x = 48*(show_slot+1);
@@ -225,4 +265,20 @@ class Turbo_charge extends Ability{
     tour.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
   }
 
+}
+
+
+class Supply_drop extends Ability{
+
+  Supply_drop(Tower enabled_by_tower, float cooldown_duration, float duration){
+    super(enabled_by_tower, cooldown_duration, duration);
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    initial_cd(enabled_by_tower);
+  }
+  
+  void use(Tower tour_used){
+    float x = random(20, 855), y = random(20, 630);    //on se garde une marge de 20px sur les cotes pour pas que ca soit trop chiant
+    bananas.add(new Banana(x, y, x, y, int(random(500, 1501)), "supply drop"));
+  }
+  
 }

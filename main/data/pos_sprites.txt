@@ -2,17 +2,25 @@
 //une virgule pour la pos
 //un point virgule pour l'offset
 
+
+//https://bloons.fandom.com/wiki/MOAB-Class_Bloon#BTD5
+// all bloons skins
+
+//https://basicallyaverage.com/all-btd5-towers-strategy/
+// all tower skins
+
 pop animation : 84*87 a 1715, 573
-spike_10 : 60*48 a 0, 1729
-spike_9 : 60*48 a 434, 1288
-spike_8 : 60*48 a 515, 1222
-spike_7 : 50*48 a 1140, 986
-spike_6 : 52*48 a 967, 1183
-spike_5 : 46*48 a 1290, 1185
-spike_4 : 31*47 a 1842, 1093
-spike_3 : 32*32 a 1134, 1810
-spike_2 : 28*33 a 1834, 1235
-spike_1 : 14*28 a 583, 1777
+
+spike_10 : 61*47 a 0, 1729
+spike_9 : 61*47 a 434, 1288
+spike_8 : 61*47 a 515, 1222
+spike_7 : 53*47 a 1140, 986 offset 6; 0
+spike_6 : 53*47 a 967, 1184 offset 6; 0
+spike_5 : 43*47 a 1290, 1186
+spike_4 : 31*47 a 1842, 1093 offset -6; 0
+spike_3 : 31*33 a 1134, 1811 offset -6; -7
+spike_2 : 29*31 a 1834, 1235 offset -4; -8
+spike_1 : 15*29 a 583, 1777 offset -11; -6
 
 hot spike_10 : 59*46 a 534, 1166
 hot spike_9 : 59*46 a 72, 1644
@@ -39,6 +47,8 @@ spike mine_1 : 45*34 a 898, 1594
 dart : 14*40 a 1471, 330
 sharp dart : 14*40 a 1471, 330
 razor sharp dart : 14*40 a 1471, 330
+powerful dart : 14*40 a 1471, 330
+bloontonium dart : 14*40 a 1471, 330
 dart ball : 28*28 a 1582, 1553
 sharp dart ball : 28*28 a 1582, 1553
 razor sharp dart ball : 28*28 a 1582, 1553
@@ -109,15 +119,21 @@ laser eyes : 38*39 a 1304, 896
 unknown purple ball : 20*20 a 1472, 1785
 unknown huge purple ball : 46*50 a 533, 1748
 
+
+supply drop : 51*60 a 1021, 1252
+
+
 dart monkey : 57*59 a 790, 1190
 bandana vert : 43*15 a 182, 1833 offset 0; -12
 bandana rouge : 43*15 a 1018, 1393 offset 0; -12
 triple dart bandana : 41*14 a 542, 1703 offset 0; -12
 super monkey fan club : 62*66 a 434, 1337
+carquois : 48*25 a 531, 1719 offset -6; 7
 
 tack shooter body : 28*54 a 1658, 435 half
 blade shooter body : 53*53 a 413, 1771
 blade maelstrom body : 53*53 a 545, 1646
+blade maelstrom body shooting : 53*53 a 789, 1378
 two tacks : 16*28 a 579, 1213 half
 three tacks : 32*33 a 1644, 1338
 tack shooter sorties shooting : 36*36 a 1187, 1663 quarter
@@ -131,4 +147,30 @@ blade shooter sorties : 76*76 a 237, 1013
 ring of fire : 38*73 a 1220, 1469 half
 ring of fire_2 : 38*73 a 1293, 1395 half
 ring of fire_3 : 38*73 a 1334, 1354 half
+
+
+
+sniper monkey green hat : 47*34 a 755, 1661 offset 0; -4
+sniper monkey red hat : 47*34 a 701, 1711 offset 0; -4
+sniper monkey blue hat : 47*34 a 651, 1760 offset 0; -4
+sniper monkey purple hat : 47*34 a 1070, 1345 offset 0; -4
+sniper monkey black hat : 47*34 a 841, 1570 offset 0; -4
+sniper monkey target hat : 47*37 a 891, 1510 offset 0; -2
+sniper monkey black camo : 69*62 a 0, 1589 offset -4; 2
+sniper monkey green camo : 66*63 a 532, 1100 offset -2; -1
+sniper monkey googles : 40*22 a 1030, 1632 offset 0; -17
+
+sniper monkey gun : 11*38 a 158, 868 offset -10; -37
+sniper monkey gachette : 7*6 a 1423, 1664 offset -18; -28
+sniper monkey green ray : 5*85 a 1220, 609 offset -10; -77
+sniper monkey silencieux : 8*10 a 518, 498 offset -10; -60
+sniper monkey grand silencieux : 11*20 a 1547, 940 offset -10; -66
+
+
+
+
+
+818 1219
+
+googles : 43*42 a 1165, 1353
 

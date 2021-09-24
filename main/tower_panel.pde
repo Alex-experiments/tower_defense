@@ -136,7 +136,7 @@ class Tower_panel{
   }
   
   int get_tower_price(String tower_type){
-    Tower tour = new Tower(tower_type, 0, 0);
+    Tower tour = get_new_tower(tower_type, 0, 0);
     return tour.price;
   }
 

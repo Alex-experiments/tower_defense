@@ -1,15 +1,9 @@
 class Upgrades{
   
-  int price_1;
-  int price_2;
-  String name_1;
-  String name_2;
-  String descr_1;
-  String descr_2;
-  boolean can_purchase_1;
-  boolean can_purchase_2;
+  int price_1, price_2;
+  String name_1, name_2, descr_1, descr_2;
+  boolean can_purchase_1, can_purchase_2;
   
-  //POSSIBLEMENT UN GROS PRBM AVEC String==String -> utiliser str1.equals(str2)
 
   void change_attack_speed(Tower tour, float multiplicateur){
     for(int i=0; i<tour.attack_speed_list.size(); i++){
@@ -33,10 +27,8 @@ class Upgrades{
   
   
   void apply_upgrade(Tower tour, int path_to_upgrade){
-    //get_possible_upgrades(tour.type, tour.path_1_progression, tour.path_2_progression);
     
     if(path_to_upgrade==1 && !can_purchase_1 || path_to_upgrade==2 && !can_purchase_2)  return;
-      
     
     
     if(tour.type.equals("dart monkey")){
@@ -115,7 +107,7 @@ class Upgrades{
       }
     }
     
-    if(tour.type == "tack shooter"){
+    if(tour.type.equals("tack shooter")){
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
@@ -160,7 +152,6 @@ class Upgrades{
             change_shooting_type(tour, "blade");
             break;
           case 3:
-            //implémenter les abilities
             boolean already_have_one = false;
             for(Ability abi : abilities){
               if(abi instanceof Blade_maelstrom){
@@ -180,7 +171,7 @@ class Upgrades{
       }
     }
     
-    if(tour.type == "sniper"){
+    if(tour.type.equals("sniper")){
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
@@ -209,14 +200,28 @@ class Upgrades{
             change_attack_speed(tour, 3);   
             break;
           case 3:
-            //implémenter les abilities
-            break;          
+            boolean already_have_one = false;
+            for(Ability abi : abilities){
+              if(abi instanceof Supply_drop){
+                already_have_one = true;
+                abi.towers_having_this_ability.add(tour);
+                abi.add_one_use(true);
+                tour.linked_ability = abi;
+                abi.initial_cd(tour);    //cette abilité a un cd initial
+                break;
+              }
+            }
+            if( !already_have_one){
+              abilities.add(new Supply_drop(tour, 60., 0.));
+              tour.linked_ability = abilities.get(abilities.size()-1);
+            }
+            break;       
         }
       }
     }
     
     
-    if(tour.type == "boomerang thrower"){
+    if(tour.type.equals("boomerang thrower")){
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
@@ -303,7 +308,7 @@ class Upgrades{
     }
     
     
-    if(tour.type == "dartling gun"){
+    if(tour.type.equals("dartling gun")){
       String temp_shooting_type;
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
@@ -362,7 +367,7 @@ class Upgrades{
     }
     
     
-    if(tour.type == "wizard monkey"){
+    if(tour.type.equals("wizard monkey")){
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
@@ -411,7 +416,7 @@ class Upgrades{
           case 2:
             //FIRE ATTACKS UNFREEZE BALLONS
             tour.shoots_list.append("flame");      //si on change ce nom, il faut aussi le changer dans 'tower' car on rajoute une max range
-            tour.deviation_list.append(0);         //change  r la vitesse du projectile -> doit etre bien plus rapide
+            tour.deviation_list.append(0);         //changer la vitesse du projectile -> doit etre bien plus rapide
             tour.attack_speed_list.append(10);
             tour.time_before_next_attack_list.append(0);            
             break;
@@ -424,7 +429,7 @@ class Upgrades{
     }
     
     
-    if(tour.type == "ninja monkey"){
+    if(tour.type.equals("ninja monkey")){
       if(path_to_upgrade==1){
         String temp_shooting_type;
         switch(tour.path_1_progression){
@@ -539,7 +544,7 @@ class Upgrades{
   
   void get_possible_upgrades(String type, int path_1_progression, int path_2_progression){
     
-    if(type == "dart monkey"){
+    if(type.equals("dart monkey")){
       switch(path_1_progression){
         case 0:
           name_1 = "Long Range Darts";
@@ -594,7 +599,7 @@ class Upgrades{
       }
     }
     
-    if(type == "tack shooter"){
+    if(type.equals("tack shooter")){
       switch(path_1_progression){
         case 0:
           name_1 = "Faster Shooting";
@@ -650,7 +655,7 @@ class Upgrades{
     }
     
     
-    if(type == "sniper"){
+    if(type.equals("sniper")){
       switch(path_1_progression){
         case 0:
           name_1 = "Full Metal Jacket";
@@ -706,7 +711,7 @@ class Upgrades{
     }
     
     
-    if(type == "boomerang thrower"){
+    if(type.equals("boomerang thrower")){
       switch(path_1_progression){
         case 0:
           name_1 = "Multi-Target";
@@ -753,7 +758,7 @@ class Upgrades{
       }
     }
     
-     if(type == "dartling gun"){
+     if(type.equals("dartling gun")){
       switch(path_1_progression){
         case 0:
           name_1 = "Focused Firing";
@@ -801,7 +806,7 @@ class Upgrades{
     }
     
     
-    if(type == "wizard monkey"){
+    if(type.equals("wizard monkey")){
       switch(path_1_progression){
         case 0:
           name_1 = "Intense Magic";
@@ -848,7 +853,7 @@ class Upgrades{
       }
     }
     
-    if(type == "ninja monkey"){
+    if(type.equals("ninja monkey")){
       switch(path_1_progression){
         case 0:
           name_1 = "Ninja Discipline";
@@ -975,7 +980,4 @@ class Upgrades{
     }
     
   }
-  
-  
-  
 }
