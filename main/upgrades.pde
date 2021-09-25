@@ -133,10 +133,12 @@ class Upgrades{
             }
             break;
           case 3:
-              //pop limit of 60 bloons per shot  
-              //ring attack
-              //can pop every bloon It shoots out a ring of fire that can pop Lead Bloons and Frozen Bloons
-              //slightly better attack speed(?) and range 
+            float temp=tour.time_before_next_attack_list.get(0);
+            tour.range = int(tour.range * 1.2);      //on passe de 90 de range de base à 108
+            tour.shoots_list=new StringList("ring of fire");
+            tour.deviation_list=new FloatList(0.);
+            tour.attack_speed_list = new FloatList(2.3);
+            tour.time_before_next_attack_list = new FloatList(temp);
             break;          
         }
       }
@@ -360,6 +362,20 @@ class Upgrades{
               tour.shoots_list.append("hydra rocket");
               tour.time_before_next_attack_list.append(tour.time_before_next_attack_list.get(0));
               tour.attack_speed_list.append(tour.attack_speed_list.get(0));
+            }
+            boolean already_have_one = false;
+            for(Ability abi : abilities){
+              if(abi instanceof Rocket_storm){
+                already_have_one = true;
+                abi.towers_having_this_ability.add(tour);
+                abi.add_one_use(true);
+                tour.linked_ability = abi;
+                break;
+              }
+            }
+            if( !already_have_one){
+              abilities.add(new Rocket_storm(tour, 30., 10.));
+              tour.linked_ability = abilities.get(abilities.size()-1);
             }
             break;          
         }

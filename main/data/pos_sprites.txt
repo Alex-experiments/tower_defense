@@ -111,6 +111,7 @@ rocket_droite : 22*37 a 1231, 745
 
 blade : 38*38 a 1332, 1428
 maelstrom blade : 38*38 a 1332, 1428
+ring of fire : 108*108 a 920, 770 quarter
 
 
 laser eyes : 38*39 a 1304, 896
@@ -144,9 +145,9 @@ tack sprayer sorties shooting : 36*36 a 1149, 1701 quarter
 tack sprayer sorties : 38*38 a 1298, 1469 quarter
 blade shooter sorties shooting : 76*76 a 158, 1070
 blade shooter sorties : 76*76 a 237, 1013
-ring of fire : 38*73 a 1220, 1469 half
-ring of fire_2 : 38*73 a 1293, 1395 half
-ring of fire_3 : 38*73 a 1334, 1354 half
+ring of fire body : 38*73 a 1220, 1469 half
+ring of fire body_2 : 38*73 a 1293, 1395 half
+ring of fire body_3 : 38*73 a 1334, 1354 half
 
 
 

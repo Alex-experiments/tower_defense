@@ -21,6 +21,7 @@ ArrayList<Explosion> explosions = new ArrayList<Explosion>();
 ArrayList<Spikes> spikes = new ArrayList<Spikes>();
 ArrayList<Ability> abilities = new ArrayList<Ability>();
 ArrayList<Banana> bananas = new ArrayList<Banana>();
+ArrayList<Ring_of_fire> rings_of_fire = new ArrayList<Ring_of_fire>();
 
 Map map = new Map(2);
 Joueur joueur= new Joueur(200, 650);
@@ -235,6 +236,10 @@ void draw(){
   //On affiche toutes les explosions
   for (int i = explosions.size() - 1; i >= 0; i--){
     explosions.get(i).core();
+  }
+  
+  for(int i=rings_of_fire.size()-1; i>=0; i--){
+    rings_of_fire.get(i).core();
   }
   
   //On affiche toutes les pop_animations

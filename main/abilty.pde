@@ -57,6 +57,7 @@ class Ability{
   
   //function to be over rided
   void use(Tower tour_used){}
+  void continue_use(Tower tour){}
   void end_effect(Tower tour){}
   
   private void update(){
@@ -86,9 +87,8 @@ class Ability{
       if(need_to_set_smallest_cd)  set_smallest_cd();
     }
     for(Tower tour : towers_in_cd){
-        if(tour.ability_use_time >= 0 && FAKE_TIME_ELAPSED - tour.ability_use_time > duration){
-          this.end_effect(tour);
-        }
+        if(tour.ability_use_time >= 0 && FAKE_TIME_ELAPSED - tour.ability_use_time > duration)    this.end_effect(tour);
+        else  continue_use(tour);
       }
   }
   
@@ -252,14 +252,14 @@ class Turbo_charge extends Ability{
   void use(Tower tour_used){
 
     for(int i=0; i<tour_used.attack_speed_list.size(); i++){
-      tour_used.attack_speed_list.set(i, tour_used.attack_speed_list.get(i) * 5);    //en attendant le super monkey
+      tour_used.attack_speed_list.set(i, tour_used.attack_speed_list.get(i) * 5);
     }
   
   }  
   
   void end_effect(Tower tour){
     for(int i=0; i<tour.attack_speed_list.size(); i++){
-      tour.attack_speed_list.set(i, tour.attack_speed_list.get(i) / 5);    //en attendant le super monkey
+      tour.attack_speed_list.set(i, tour.attack_speed_list.get(i) / 5);
     }
     
     tour.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
@@ -279,6 +279,34 @@ class Supply_drop extends Ability{
   void use(Tower tour_used){
     float x = random(20, 855), y = random(20, 630);    //on se garde une marge de 20px sur les cotes pour pas que ca soit trop chiant
     bananas.add(new Banana(x, y, x, y, int(random(500, 1501)), "supply drop"));
+  }
+  
+}
+
+class Rocket_storm extends Ability{
+  //normalement on tire sur les 100 ballons les plus proches, mais moins gourmant de demander les 100 premiers ballons de la liste
+  static final float time_beetween_shoots = 2.;
+
+  Rocket_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
+    super(enabled_by_tower, cooldown_duration, duration);
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+  }
+  
+  void use(Tower tour_used){
+    tour_used.ability_state = 1;
+  }
+  
+  void continue_use(Tower tour){
+    Mob target;
+    float direction;
+    while((tour.ability_state-1) * time_beetween_shoots + tour.ability_use_time <= FAKE_TIME_ELAPSED){
+      for(int i=0; i<min(100, enemis.size()); i++){
+        target = enemis.get(i);
+        direction=atan2(target.y-tour.y, target.x-tour.x);
+        projectiles.add(new Projectile(tour, tour.x, tour.y, direction, tour.shoots_list.get(0)));
+      }
+      tour.ability_state++;
+    }
   }
   
 }

@@ -62,7 +62,7 @@ class tack_shooter extends Tower{
     
     if(path_2_progression == 3)  sprites_names.append("blade shooter body");
     else if(path_2_progression == 4)  sprites_names.append("blade maelstrom body");
-    else if(path_1_progression == 4)  sprites_names.append("ring of fire");
+    else if(path_1_progression == 4)  sprites_names.append("ring of fire body");
     else sprites_names.append("tack shooter body");
     
     if(max(path_1_progression, path_2_progression)<=1)  sprites_names.append("two tacks");
@@ -306,6 +306,7 @@ class Tower{
   
   ArrayList<Tower> towers_affected_by_ability = new ArrayList<Tower>();
   float ability_use_time, ability_cooldown_timer;
+  int ability_state;
   Ability linked_ability;
   
   StringList sprites_names = new StringList();
@@ -466,6 +467,9 @@ class Tower{
 
         if(shoot_type.equals("laser")){
           lasers.add(new Laser(this, x, y, target));
+        }
+        else if(shoot_type.equals("ring of fire")){
+          rings_of_fire.add(new Ring_of_fire(this));
         }
         else if(shoot_type.indexOf("boomerang")>=0){
           shoot_boomerang(target, shoot_type);
