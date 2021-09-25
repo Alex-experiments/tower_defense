@@ -165,7 +165,7 @@ class Upgrades{
               }
             }
             if( !already_have_one){
-              abilities.add(new Blade_maelstrom(tour, 20., 0.));
+              abilities.add(new Blade_maelstrom(tour, 20., 3.));    //ca dure moins de 3 sec mais c'est pas grave on gère le cas avec le nb de frame dans continue_use
               tour.linked_ability = abilities.get(abilities.size()-1);
             }
             break;          

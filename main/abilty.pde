@@ -232,8 +232,15 @@ class Blade_maelstrom extends Ability{
   }
   
   void use(Tower tour_used){
-    for(int i=0; i<64; i++){
-     projectiles.add(new Projectile(tour_used, tour_used.x, tour_used.y, i*PI/32, "maelstrom blade"));
+    tour_used.ability_state = 0;
+  }
+  
+  void continue_use(Tower tour){
+    for(int i=0; i<joueur.game_speed; i++){
+      if(tour.ability_state>128)  return;
+      projectiles.add(new Projectile(tour, tour.x, tour.y, tour.ability_state*PI/32, "maelstrom blade"));
+      projectiles.add(new Projectile(tour, tour.x, tour.y, tour.ability_state*PI/32+PI, "maelstrom blade"));
+      tour.ability_state++;
     }
   }
   
@@ -293,13 +300,13 @@ class Rocket_storm extends Ability{
   }
   
   void use(Tower tour_used){
-    tour_used.ability_state = 1;
+    tour_used.ability_state = 0;
   }
   
   void continue_use(Tower tour){
     Mob target;
     float direction;
-    while((tour.ability_state-1) * time_beetween_shoots + tour.ability_use_time <= FAKE_TIME_ELAPSED){
+    while(tour.ability_state<5 && tour.ability_state * time_beetween_shoots + tour.ability_use_time <= FAKE_TIME_ELAPSED){
       for(int i=0; i<min(100, enemis.size()); i++){
         target = enemis.get(i);
         direction=atan2(target.y-tour.y, target.x-tour.x);
