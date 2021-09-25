@@ -5,14 +5,15 @@ class Spikes{
   float x, y;
   float destination_x, destination_y;
   int damage, pierce;
-  static final float initial_speed = 10., rayon=20.;  //si on le modifie, le modifier aussi dans joueur -> place tower
-  float speed, direction;
+  static final float rayon=20.;  //si on le modifie, le modifier aussi dans joueur -> place tower
+  float speed, direction, initial_speed = 10.;
   String type, damage_type;
-  float fired_time;       
-  static final float DURATION = 70.;    //ca vit 70s
+  float landing_time;       
+  float duration = 70.;    //ca vit 70s
   Tower fired_from_tower;
   float total_distance;
   boolean deplacement_fini=false;
+  boolean is_from_spike_storm = false;
   
   int dmg_done_this_frame;
 
@@ -23,20 +24,28 @@ class Spikes{
     this.y=fired_from_tower.y;
     this.destination_x=destination_x;
     this.destination_y=destination_y;
-    this.speed=initial_speed;
     this.total_distance = distance(new float[] {x, y}, new float[] {destination_x, destination_y});
-    if(total_distance == 0)  deplacement_fini = true;
+    if(total_distance == 0){
+      deplacement_fini = true;
+      landing_time = FAKE_TIME_ELAPSED;
+    }
     else direction=atan2(destination_y-fired_from_tower.y, destination_x-fired_from_tower.x);
-    this.type = spike_type;
     
-    fired_time =  FAKE_TIME_ELAPSED;
-    
+    int index_spike_storm = spike_type.indexOf(" spike storm");    //si c'est un pic de spike storm, on le note mais on ne change pas le type car les sprites et dmg sont les memes
+    if(index_spike_storm>=0){
+      is_from_spike_storm = true;
+      this.type = spike_type.substring(0, index_spike_storm);
+      this.duration = 5.;
+      this.initial_speed = 50;
+    }
+    else this.type = spike_type;
+        
     set_stats();
   }
   
   void core(int i, int nb_spikes){
     update();
-    if(pierce<= 0 || FAKE_TIME_ELAPSED - fired_time > DURATION){
+    if(pierce<= 0 || deplacement_fini && FAKE_TIME_ELAPSED - landing_time > duration){
       spikes.remove(i);
       return;
     }
@@ -69,6 +78,7 @@ class Spikes{
           x=destination_x;
           y=destination_y;
           deplacement_fini=true;
+          landing_time = FAKE_TIME_ELAPSED;
           break;
         }
       }
@@ -84,6 +94,9 @@ class Spikes{
     for (int i = enemis.size() - 1; i >= 0; i--){
       Mob mob = enemis.get(i);
       if(can_detect(mob, true) && pierce>0 && distance(new float[] {mob.x, mob.y}, new float[] {x, y}) < rayon+ mob.size/2){
+        
+        if(is_from_spike_storm)    duration = 10.;  //un spike storm ne dure que 5sec, mais si il touche un enemi, il dure 5sec de plus
+
         hit(mob);
         pierce--;
         if(pierce<=0){

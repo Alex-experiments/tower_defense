@@ -137,28 +137,28 @@ Tower get_new_tower(String tower_type, float x, float y){
   
   switch(tower_type){
       case "dart monkey":
-        temp = new dart_monkey(tower_type, x, y);
+        temp = new Dart_monkey(tower_type, x, y);
         break;
       case "wizard monkey":
-        temp = new wizard_monkey(tower_type, x, y);
+        temp = new Wizard_monkey(tower_type, x, y);
         break;
       case "sniper":
-        temp = new sniper(tower_type, x, y);
+        temp = new Sniper(tower_type, x, y);
         break;
       case "tack shooter":
-        temp = new tack_shooter(tower_type, x, y);
+        temp = new Tack_shooter(tower_type, x, y);
         break;
       case "dartling gun":
-        temp = new dartling_gun(tower_type, x, y);
+        temp = new Dartling_gun(tower_type, x, y);
         break;
       case "boomerang thrower":
-        temp = new boomerang_thrower(tower_type, x, y);
+        temp = new Boomerang_thrower(tower_type, x, y);
         break;
       case "ninja monkey":
-        temp = new ninja_monkey(tower_type, x, y);
+        temp = new Ninja_monkey(tower_type, x, y);
         break;
       case "spike factory":
-        temp = new spike_factory(tower_type, x, y);
+        temp = new Spike_factory(tower_type, x, y);
         break;    
       default :
         println(tower_type, "is not a proper tower type !!");

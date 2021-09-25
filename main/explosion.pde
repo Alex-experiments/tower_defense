@@ -30,7 +30,7 @@ class Explosion{
   }
   
   void core(){
-    if(FAKE_TIME_ELAPSED - explosion_time > DURATION){
+    if(round.waiting_next_round || FAKE_TIME_ELAPSED - explosion_time > DURATION){
       explosions.remove(this);
       return;
     }

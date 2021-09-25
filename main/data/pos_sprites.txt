@@ -107,11 +107,17 @@ powerful laser cannon : 25*59 a 1675, 1529
 bloontonium laser cannon : 25*59 a 1675, 1529
 
 hydra rocket : 23*33 a 1810, 1496
+hydra rocket flame : 22*31 a 1721, 1601
 rocket_droite : 22*37 a 1231, 745
 
 blade : 38*38 a 1332, 1428
 maelstrom blade : 38*38 a 1332, 1428
 ring of fire : 108*108 a 920, 770 quarter
+
+ray of doom 28px : 28*8 a 534, 1213
+ray of doom 28px start : 38*51 a 1360, 1232 offset 0; -7
+ray of doom 32px : 32*8 a 371, 1356
+ray of doom 32px start : 40*51 a 1225, 1296 offset 0; -7
 
 
 laser eyes : 38*39 a 1304, 896
@@ -119,6 +125,7 @@ laser eyes : 38*39 a 1304, 896
 
 unknown purple ball : 20*20 a 1472, 1785
 unknown huge purple ball : 46*50 a 533, 1748
+
 
 
 supply drop : 51*60 a 1021, 1252

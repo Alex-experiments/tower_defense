@@ -23,7 +23,6 @@ class Ring_of_fire{
   public void core(){
     for(int i = 0; i<joueur.game_speed; i++){
       if(ray>max_ray){
-        println(ray, max_ray);
         rings_of_fire.remove(this);
         return;
       }

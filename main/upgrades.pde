@@ -165,7 +165,7 @@ class Upgrades{
               }
             }
             if( !already_have_one){
-              abilities.add(new Blade_maelstrom(tour, 20., 3.));    //ca dure moins de 3 sec mais c'est pas grave on gère le cas avec le nb de frame dans continue_use
+              abilities.add(new Blade_maelstrom(tour, 20., 6.));    //ca dure moins de 6 sec mais c'est pas grave on gère le cas avec le nb de frame dans continue_use
               tour.linked_ability = abilities.get(abilities.size()-1);
             }
             break;          
@@ -328,10 +328,7 @@ class Upgrades{
             change_shooting_type(tour, temp_shooting_type);
             break;
           case 3:
-            for(int i=0; i<tour.attack_speed_list.size(); i++){
-              tour.attack_speed_list.set(i, 60.);    //1 attaque par image
-            }
-             change_shooting_type(tour, "ray of doom");
+            rays_of_doom.add(new Ray_of_doom(tour));
             break;          
         }
       }
@@ -355,7 +352,6 @@ class Upgrades{
             
             break;
           case 3:
-            //implémenter les abilities : rocket storm
             tour.deviation_list.append(-0.22);
             tour.deviation_list.append(0.22);
             for(int i=0; i<2; i++){
@@ -535,7 +531,20 @@ class Upgrades{
             //change_shooting_type(tour, "moab spike");
             break;
           case 3:
-            //implementer les abilities Lays a thick carpet of spikes over the whole track. Spikes last 5 seconds unless reacted upon, in which the spikes will get an extra 5 seconds to pop a bloon.
+            boolean already_have_one = false;
+            for(Ability abi : abilities){
+              if(abi instanceof Spike_storm){
+                already_have_one = true;
+                abi.towers_having_this_ability.add(tour);
+                abi.add_one_use(true);
+                tour.linked_ability = abi;
+                break;
+              }
+            }
+            if( !already_have_one){
+              abilities.add(new Spike_storm(tour, 60., 0.));
+              tour.linked_ability = abilities.get(abilities.size()-1);
+            }
             break;
         }
       }

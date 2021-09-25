@@ -1,7 +1,6 @@
 class Map{  
   float longueur_map;
-  int map_size_x;
-  int map_size_y;
+  int map_size_x, map_size_y;
   float epaisseur=20;
   
   String[] directions;
@@ -11,7 +10,8 @@ class Map{
   float y_depart;
   
   ArrayList<float[]> pos_extremales;
-  ArrayList<float[]> hidden_rect= new ArrayList<float[]>();
+  ArrayList<float[]> hidden_rect = new ArrayList<float[]>();
+  ArrayList<float[]> spike_storm_pos = new ArrayList<float[]>(); 
   
   int map_number;
   
@@ -50,6 +50,14 @@ class Map{
     map_size_y=int(coords_y.max());
     
     init_pos_extremales();
+    set_spike_storm_pos();
+  }
+  
+  void set_spike_storm_pos(){
+    //prends pas encore en compte les hiddens portions
+    for(int i=0; i<200; i++){
+      spike_storm_pos.add(get_pos(i * longueur_map/200.));
+    }
   }
   
   void load_map(){

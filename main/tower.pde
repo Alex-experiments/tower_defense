@@ -1,6 +1,6 @@
-class dart_monkey extends Tower{
+class Dart_monkey extends Tower{
   
-  dart_monkey(String type, float x, float y){
+  Dart_monkey(String type, float x, float y){
     super(type, x, y);
   }
   
@@ -33,9 +33,9 @@ class dart_monkey extends Tower{
   }
 }
 
-class tack_shooter extends Tower{
+class Tack_shooter extends Tower{
 
-  tack_shooter(String type, float x, float y){
+  Tack_shooter(String type, float x, float y){
     super(type, x, y);
   }
   
@@ -73,9 +73,9 @@ class tack_shooter extends Tower{
   
 }
 
-class sniper extends Tower{
+class Sniper extends Tower{
 
-  sniper(String type, float x, float y){
+  Sniper(String type, float x, float y){
     super(type, x, y);
   }
   
@@ -129,9 +129,9 @@ class sniper extends Tower{
   
 }
 
-class boomerang_thrower extends Tower{
+class Boomerang_thrower extends Tower{
 
-  boomerang_thrower(String type, float x, float y){
+  Boomerang_thrower(String type, float x, float y){
     super(type, x, y);
   }
   
@@ -148,9 +148,9 @@ class boomerang_thrower extends Tower{
   
 }
 
-class dartling_gun extends Tower{
+class Dartling_gun extends Tower{
 
-  dartling_gun(String type, float x, float y){
+  Dartling_gun(String type, float x, float y){
     super(type, x, y);
   }
   
@@ -170,6 +170,8 @@ class dartling_gun extends Tower{
   void shoot(){
     
     if(round.waiting_next_round)  return;      //sinon lance un projectile parasite
+    
+    if(path_1_progression == 4)  return;    //on a deja un ray_of_doom
     
     FloatList directions_list=new FloatList();
     for(int i=0; i<shoots_list.size(); i++){
@@ -200,9 +202,9 @@ class dartling_gun extends Tower{
   
 }
 
-class wizard_monkey extends Tower{
+class Wizard_monkey extends Tower{
 
-  wizard_monkey(String type, float x, float y){
+  Wizard_monkey(String type, float x, float y){
     super(type, x, y);
   }
   
@@ -218,9 +220,9 @@ class wizard_monkey extends Tower{
 }
 
 
-class ninja_monkey extends Tower{
+class Ninja_monkey extends Tower{
 
-  ninja_monkey(String type, float x, float y){
+  Ninja_monkey(String type, float x, float y){
     super(type, x, y);
   }
   
@@ -238,9 +240,9 @@ class ninja_monkey extends Tower{
 }
 
 
-class spike_factory extends Tower{
+class Spike_factory extends Tower{
 
-  spike_factory(String type, float x, float y){
+  Spike_factory(String type, float x, float y){
     super(type, x, y);
   }
   

@@ -315,5 +315,22 @@ class Rocket_storm extends Ability{
       tour.ability_state++;
     }
   }
+}
+
+class Spike_storm extends Ability{
+  //Lays a thick carpet of spikes over the whole track. Spikes last 5 seconds unless reacted upon, in which the spikes will get an extra 5 seconds to pop a bloon.
+  //on va dire 200 spikes sur le terrain
+  
+  Spike_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
+    super(enabled_by_tower, cooldown_duration, duration);
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+  }
+  
+  void use(Tower tour_used){
+    for(float[] pos : map.spike_storm_pos){
+      spikes.add(new Spikes(tour_used, pos[0], pos[1], tour_used.shoots_list.get(0)+" spike storm"));
+    }
+    
+  }
   
 }

@@ -1,4 +1,4 @@
-boolean auto_pass_levels=true;
+boolean auto_pass_levels=false;
 boolean god_mode=true;
 
 //Problème : les boomerangs touchent un ballon et peuvent faire demi tour pour toucher ses fils //semble pas etre le cas en fait
@@ -22,6 +22,7 @@ ArrayList<Spikes> spikes = new ArrayList<Spikes>();
 ArrayList<Ability> abilities = new ArrayList<Ability>();
 ArrayList<Banana> bananas = new ArrayList<Banana>();
 ArrayList<Ring_of_fire> rings_of_fire = new ArrayList<Ring_of_fire>();
+ArrayList<Ray_of_doom> rays_of_doom = new ArrayList<Ray_of_doom>();
 
 Map map = new Map(2);
 Joueur joueur= new Joueur(200, 650);
@@ -240,6 +241,10 @@ void draw(){
   
   for(int i=rings_of_fire.size()-1; i>=0; i--){
     rings_of_fire.get(i).core();
+  }
+  
+  for(Ray_of_doom ray : rays_of_doom){
+    ray.core();
   }
   
   //On affiche toutes les pop_animations
