@@ -7,7 +7,7 @@ class Ring_of_fire{
   ArrayList<int[]> sprites_pos;
   
   float max_ray, ray;
-  static final float epaisseur = 20., expansion_rate = 10.;
+  static final float epaisseur = 20., expansion_rate = 10., sprite_size=108.;
   Tower fired_from_tower;
   
   
@@ -23,6 +23,7 @@ class Ring_of_fire{
   public void core(){
     for(int i = 0; i<joueur.game_speed; i++){
       if(ray>max_ray){
+        println(ray, max_ray);
         rings_of_fire.remove(this);
         return;
       }
@@ -37,7 +38,7 @@ class Ring_of_fire{
     pushMatrix();
     translate(x, y);
     for(int[] pos_aff : sprites_pos){
-      float scale = ray/max_ray;
+      float scale = ray/sprite_size;
       float size = pos_aff[2] * scale;
       
       image(all_sprites, pos_aff[4]-pos_aff[2]*scale/2, pos_aff[5]-pos_aff[3]*scale/2, size, size, pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
