@@ -1,11 +1,8 @@
 class Mob{
-  float x;
-  float y;
+  float x, y;
   float avancement;
-  float base_speed=1.45;
-  float speed=base_speed;
-  int layers;
-  int type_max_layers;
+  float base_speed=1.45, speed=base_speed;
+  int layers, type_max_layers;
   float size=16;
   color couleur;
   String type;      //important pasque whites et blacks ont le meme nb de layers mais pas les memes carac
@@ -15,7 +12,8 @@ class Mob{
   
   boolean regrowth;
   boolean camo;
-  boolean is_frozen=false;
+  boolean is_frozen=false, is_stunned=false, is_rooted=false;    //stun est différent de rooted : quand on se fait tapper sous stun on repart, pas sous root
+  float stun_time, stun_duration, root_time, root_duration;;
   ArrayList<String> past_types;
   float last_dmg_taken_time;
   int min_RBE_reached;
@@ -37,8 +35,6 @@ class Mob{
     init_param_mob();
     init_regrowth();
     init_sprite_name();
-    
-    
   }
   
   void init_sprite_name(){
@@ -68,6 +64,7 @@ class Mob{
   void show(){
     int[] pos_aff;
     pos_aff = pos_coins_sprites.get(sprite_name);
+    //pos_aff = pos_coins_sprites.get("redbasic");
     
     image(bloons_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
@@ -112,7 +109,6 @@ class Mob{
   }
   
   void init_param_mob(){
-    //enfants=new ArrayList<Mob>();
     enfants=new StringList();
     switch(type){
       case "red":
@@ -226,6 +222,17 @@ class Mob{
     
   }
   
+  void core(int i){
+    update();
+    if(track_ended()){
+      joueur.vies-=get_RBE();
+      enemis.remove(i);
+    }
+    else{
+      show();
+    }
+  }
+  
   void update(){
     regrow();
     deplacement();
@@ -233,27 +240,30 @@ class Mob{
   
   void regrow(){
     if(regrowth && layers>0){                              //seuleument si on a deja été touché
-      if(FAKE_TIME_ELAPSED-last_dmg_taken_time >= 1){
-        layers++;
+      if(FAKE_TIME_ELAPSED-last_dmg_taken_time >= 1.){
         last_dmg_taken_time = FAKE_TIME_ELAPSED;
-        if( layers > type_max_layers ){ //on doit passer au type au dessus
-          if(past_types.size()>0){      //si il y a un type au dessus
+        if( layers >= type_max_layers){  //si on a atteint le max des layers
+          if(past_types.size()>0){ //on doit passer au type au dessus (si il y en a un)
             type=past_types.get(past_types.size()-1);
             past_types.remove(type);
-            init_param_mob();                                            //en faisant ca le ballon est direct au max de ses layers : ce n'est pas ce qu'on veut
-            layers=1;                   //on est du type d'au dessus avec juste une layer
-            init_sprite_name();         
-          }
-          else{                         //on est au type maximum donc on cap au max de layers
-            layers=min(layers, type_max_layers);
+            init_param_mob();                         //en faisant ca le ballon est direct au max de ses layers : ce n'est pas ce qu'on veut
+            layers=1;                                 //on est du type d'au dessus avec juste une layer
+            init_sprite_name();   
           }
         }
+        else{                         //on est au type maximum donc on cap au max de layers
+          layers++;
+        } 
       }
     }
   }
   
   void deplacement(){
-    avancement+=speed * joueur.game_speed;
+    if(is_stunned){
+      if(FAKE_TIME_ELAPSED - stun_time > stun_duration)  is_stunned = false;
+      else return;
+    }
+    avancement += speed * joueur.game_speed;
     update_pos();
   }
   
@@ -263,17 +273,30 @@ class Mob{
     y=new_pos[1];
   }
   
+  
+  void apply_effect(String effect, float duration){
+    if(duration<0)  return;    //si la durée est négative ca veut dire que l'effet ne vise pas ce type de bloon (ex : cripple bullet qui target que les MOABS)
+    if(effect.equals("stun")){
+      is_stunned = true;
+      stun_duration = duration;
+      stun_time = FAKE_TIME_ELAPSED;
+    }
+    else if(effect.equals("root")){
+      is_rooted = true;
+      root_duration = duration;
+      root_time = FAKE_TIME_ELAPSED;
+    }
+    else  println("ERROR : effect", effect, "not implemented yet");
+  }
+  
+  
   boolean track_ended(){
     return avancement>map.longueur_map;
   }
   
   void add_one_gold(){
     //Différent du nombre de layers pop : on ne gagne 1 de gold qu'a chaque fois qu'un ballon change de type (ex céramic à rainbow)
-    
-    if( !regrowth || get_RBE() <= min_RBE_reached){
-      joueur.argent++;
-    }
-    
+    if( !regrowth || get_RBE() <= min_RBE_reached)    joueur.argent++;
   }
   
   int pop_layers(int nb_layers_to_pop, boolean initial_hit, String damage_type){
@@ -292,6 +315,9 @@ class Mob{
     //pas besoin de check si il détecte les camos vu que si il y a eu pop_layers, il y a eu can_detect()
     
     if(nb_layers_to_pop<layers){
+      
+      if(is_stunned && stun_time < FAKE_TIME_ELAPSED)  is_stunned = false;    //si on se fait tapper au moins une frame après le stun on est plus stun
+      
       layers-=nb_layers_to_pop;
       if(regrowth){
         min_RBE_reached = min( get_RBE(), min_RBE_reached);
@@ -311,7 +337,7 @@ class Mob{
       
       int enemis_size=enemis.size();
       
-      if(enfants!=null){
+      if(enfants!=null){      //pourquoi pas faire en sorte de séparer les dégats sur les ballons sortants
         for(int i=0; i<enfants.size(); i++){
           Mob fils = new Mob(enfants.get(i), regrowth, camo);;
           fils.avancement = avancement + 5*i;

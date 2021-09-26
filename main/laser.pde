@@ -4,7 +4,7 @@ class Laser{
   static final float DURATION = 0.5;
   static final int max_targets = 25, damage = 1;
   int bounces_left;
-  float dmg_done_this_frame;
+  int dmg_done_this_frame;
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   ArrayList<Mob> enemis_before_pops;
   Mob initial_target;
@@ -85,8 +85,7 @@ class Laser{
       hit(target); 
     }
         
-    fired_from_tower.pop_count+=dmg_done_this_frame;
-    joueur.game_pop_count += dmg_done_this_frame;
+    fired_from_tower.add_pop_count(dmg_done_this_frame);
     
   }
   

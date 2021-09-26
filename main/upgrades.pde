@@ -186,7 +186,7 @@ class Upgrades{
             change_shooting_type(tour, "deadly bullet");
             break;
           case 3:
-                                                                    //IMMOBILISE LES CLASSES MOAB
+            change_shooting_type(tour, "cripple MOAB bullet");
             break;          
         }
       }
@@ -383,7 +383,7 @@ class Upgrades{
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
-            change_shooting_type(tour, "huge purple ball");
+            tour.shoots_list.set(0, "huge purple ball");
             break;
           case 1:
             tour.shoots_list.append("laser");
@@ -427,13 +427,26 @@ class Upgrades{
             break;
           case 2:
             //FIRE ATTACKS UNFREEZE BALLONS
-            tour.shoots_list.append("flame");      //si on change ce nom, il faut aussi le changer dans 'tower' car on rajoute une max range
+            tour.shoots_list.append("dragon's breath");      //si on change ce nom, il faut aussi le changer dans 'tower' car on rajoute une max range
             tour.deviation_list.append(0);         //changer la vitesse du projectile -> doit etre bien plus rapide
             tour.attack_speed_list.append(10);
             tour.time_before_next_attack_list.append(0);            
             break;
           case 3:
-            //implémenter abilites
+            boolean already_have_one = false;
+            for(Ability abi : abilities){
+              if(abi instanceof Summon_phoenix){
+                already_have_one = true;
+                abi.towers_having_this_ability.add(tour);
+                abi.add_one_use(true);
+                tour.linked_ability = abi;
+                break;
+              }
+            }
+            if( !already_have_one){
+              abilities.add(new Summon_phoenix(tour, 60., 20.));
+              tour.linked_ability = abilities.get(abilities.size()-1);
+            }
         
             break;          
         }
@@ -484,7 +497,7 @@ class Upgrades{
             //implémenter la distraction -> fonctionne exactement comme la tornade
             break;
           case 2:
-            tour.shoots_list.append("flash bomb");              // IMPLEMENTER LE STUN
+            tour.shoots_list.append("flash bomb");
             tour.deviation_list.append(0);
             if(tour.path_1_progression>0)  tour.attack_speed_list.append(0.504);
             else tour.attack_speed_list.append(0.42);
@@ -494,7 +507,20 @@ class Upgrades{
             
             break;
           case 3:
-            //implémenter les abilities
+            boolean already_have_one = false;
+            for(Ability abi : abilities){
+              if(abi instanceof Sabotage_supply_lines){
+                already_have_one = true;
+                abi.towers_having_this_ability.add(tour);
+                abi.add_one_use(true);
+                tour.linked_ability = abi;
+                break;
+              }
+            }
+            if( !already_have_one){
+              abilities.add(new Sabotage_supply_lines(tour, 60., 15.));
+              tour.linked_ability = abilities.get(abilities.size()-1);
+            }
             break;
         }
       }

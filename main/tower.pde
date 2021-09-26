@@ -219,6 +219,49 @@ class Wizard_monkey extends Tower{
   }
 }
 
+class Phoenix extends Tower{
+  static final float ORBIT_RAYON = 250, ANGULAR_SPEED = .01;
+  
+  Phoenix(Tower summoner){
+    super("phoenix", 0, 0);
+    this.summoner = summoner;
+    set_orientation_when_shoot = false;
+    selectable = false;
+    orientation = PI;
+  }
+  
+  void set_param_tower(){
+    couleur=color(209, 34, 234);
+    price=0;
+    size=base_size;
+    range=160;
+    shoots_list.append("dragon's breath");
+    deviation_list.append(0);
+    attack_speed_list.append(15);    //pas mal piffé
+    detects_camo = true;
+  }
+  
+  void set_sprites(){
+    sprites_names = new StringList();
+    sprites_names.append("phoenix body");
+    sprites_names.append("phoenix wing");
+    sprites_pos = get_sprites_pos(sprites_names);
+  }
+  
+  void update(){
+    moove();
+    update_time_before_next_attack();
+    shoot();
+  }
+  
+  void moove(){
+    orientation+=ANGULAR_SPEED * joueur.game_speed % TWO_PI;
+    x = tower_panel.top_left_x/2 - cos(orientation) * ORBIT_RAYON;
+    y = info_panel.top_left_y/2 - sin(orientation) * ORBIT_RAYON;    
+  }
+  
+}
+
 
 class Ninja_monkey extends Tower{
 
@@ -285,9 +328,8 @@ class Tower{
   float x, y;
   float range;
   String priority="first";
-  float base_size=60;
-  float size;
-  float pop_count=0;
+  float base_size=60, size;
+  int pop_count=0;
   String type;
  
   float max_dispersion;
@@ -313,7 +355,11 @@ class Tower{
   
   StringList sprites_names = new StringList();
   ArrayList<int[]> sprites_pos = new ArrayList<int[]>();
+  
   float orientation;
+  boolean set_orientation_when_shoot = true;
+  boolean selectable = true;
+  Tower summoner;
   
   
   Tower(String type, float x, float y){
@@ -478,7 +524,7 @@ class Tower{
         }
         else if(this.type.equals("sniper")){
           Instant_projectile bullet = new Instant_projectile(this, target, shoot_type);    //bullet take action instantly, no need to add them to an ArrayList
-          this.orientation = atan2(target.y-y, target.x-x)+HALF_PI;
+          if(set_orientation_when_shoot)  this.orientation = atan2(target.y-y, target.x-x)+HALF_PI;
           
           if(target.layers<=0){
             detected_mobs = get_enemis_in_range();
@@ -497,7 +543,7 @@ class Tower{
           else{
             float[] futur_pos = map.get_pos(target.avancement + target.speed);                              //on prévois juste un coup d'avance
             float direction=atan2(futur_pos[1]-y, futur_pos[0]-x);
-            this.orientation = direction+HALF_PI;
+            if(set_orientation_when_shoot)  this.orientation = direction+HALF_PI;
             
             projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));
           }
@@ -514,6 +560,12 @@ class Tower{
       float timer = time_before_next_attack_list.get(i);
       if(timer>0)  time_before_next_attack_list.set(i, timer - joueur.game_speed / 60.);
     }
+  }
+  
+  void add_pop_count(int dmg_done_this_frame){
+    pop_count+=dmg_done_this_frame;
+    if(summoner != null)  summoner.pop_count+=dmg_done_this_frame;
+    joueur.game_pop_count += dmg_done_this_frame;
   }
   
   void shoot_boomerang(Mob target, String boomerang_type){

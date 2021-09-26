@@ -1,7 +1,7 @@
 class Instant_projectile{
   int damage, pierce;
-  
   String damage_type, bullet_type;
+  boolean roots = false;
   Tower fired_from_tower;
 
   Instant_projectile(Tower fired_from_tower, Mob target, String bullet_type){
@@ -18,11 +18,20 @@ class Instant_projectile{
   
   void hit(Mob target){
     int nb_layers_popped=target.pop_layers(damage, true, damage_type);
-    fired_from_tower.pop_count+=nb_layers_popped;
-    joueur.game_pop_count+=nb_layers_popped;
+    fired_from_tower.add_pop_count(nb_layers_popped);
     if(target.layers<=0){
       enemis.remove(target);
     }
+    else if(roots){
+      target.apply_effect("root", get_root_time(target));
+    }
+  }
+  
+  float get_root_time(Mob target){
+    if(target.type.equals("MOAB"))  return 3.;
+    else if(target.type.equals("BFB") || target.type.equals("DDT"))  return 2.;
+    else if(target.type.equals("ZOMG"))  return .5;
+    else return -1;
   }
   
   void set_stats(){
@@ -42,6 +51,11 @@ class Instant_projectile{
       case "deadly bullet":
         damage = 18; pierce = 1;
         damage_type = "normal";
+        break;
+      case "cripple MOAB bullet":
+        damage = 18; pierce = 1;
+        damage_type = "normal";
+        roots = true;
         break;
       default:
         println("ERROR : Shoot type ", bullet_type, " not suitable for shooting bullet");

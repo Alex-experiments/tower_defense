@@ -122,8 +122,7 @@ class Boomerang{
       }
     }
     
-    fired_from_tower.pop_count+=dmg_done_this_frame;
-    joueur.game_pop_count += dmg_done_this_frame;
+    fired_from_tower.add_pop_count(dmg_done_this_frame);
   }
   
   

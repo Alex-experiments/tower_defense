@@ -3,7 +3,7 @@ class Projectile{
   float speed, size;
   float direction;
 
-  float dmg_done_this_frame;
+  int dmg_done_this_frame;
   float prev_x, prev_y;
   
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
@@ -20,7 +20,8 @@ class Projectile{
                          //pour l'instant lorsque que qqch explose, il explose dès qu'il rencontre un enemi et son pierce revient donc à son explosion !
                          
   String damage_type, projectile_type;
-  boolean explose = false;
+  boolean explose = false, explosion_stuns=false;
+  float explosion_stun_duration;
   int explosion_diameter;
   color couleur;  
   boolean rotate=false;
@@ -107,7 +108,7 @@ class Projectile{
       Mob mob = enemis.get(i);
       if(can_detect(mob, fired_from_tower.detects_camo) && pierce>0 && collision(new float[] {mob.x, mob.y}, mob.size) && !already_dmged_mobs.contains(mob)){
         if(explose){
-          explosions.add(new Explosion(fired_from_tower, mob.x, mob.y, explosion_diameter, damage, pierce, damage_type));
+          explosions.add(new Explosion(fired_from_tower, mob.x, mob.y, explosion_diameter, damage, pierce, damage_type, explosion_stuns, explosion_stun_duration));
           pierce=0;
           return;
         }
@@ -143,8 +144,7 @@ class Projectile{
     
     if(hit_someone && can_bounce && enemis.size()==0)  pierce=0;    //pour faire disparaite les projectiles rebondissant
     
-    fired_from_tower.pop_count+=dmg_done_this_frame;
-    joueur.game_pop_count += dmg_done_this_frame;
+    fired_from_tower.add_pop_count(dmg_done_this_frame);
   }
   
   
@@ -307,8 +307,8 @@ class Projectile{
         explose = true;
         explosion_diameter = 60;
         break;
-      case "flame":
-        speed = 40.; size=26.;
+      case "dragon's breath":
+        speed = 15.; size=26.;
         damage = 2; pierce = 1;
         damage_type = "normal";
         has_max_range = true;
@@ -344,6 +344,8 @@ class Projectile{
         damage_type = "normal";
         explose=true;
         explosion_diameter = 330;
+        explosion_stuns = true;
+        explosion_stun_duration = .75;
         break;      
       default:
         println("ERROR : can't assign any projectile type with ", projectile_type);

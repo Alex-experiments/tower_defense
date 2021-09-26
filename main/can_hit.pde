@@ -1,5 +1,5 @@
 static final StringList sharp_list = new StringList("dart", "sharp dart", "powerful dart", "razor sharp dart", "blade", "maelstrom blade", "basic boomerang", "multi target boomerang", "glaive boomerang", "glaive ricochet", "tack", "shuriken", "sharp shuriken", "seeking shuriken", "seeking sharp shuriken", "bullet", "spike", "stack spike");
-static final StringList normal_list = new StringList("huge dart ball", "sharp huge dart ball", "razor sharp huge dart ball", "red hot boomerang", "red hot multi target boomerang", "red hot glaive boomerang", "red hot glaive ricochet", "full metal bullet", "point five bullet", "deadly bullet", "bloontonium dart", "bloontonium laser cannon", "ray of doom", "hydra rocket", "purple ball", "huge purple ball", "fireball", "flame", "flash bomb", "hot spike", "spike ball", "spike mine", "normal");
+static final StringList normal_list = new StringList("huge dart ball", "sharp huge dart ball", "razor sharp huge dart ball", "red hot boomerang", "red hot multi target boomerang", "red hot glaive boomerang", "red hot glaive ricochet", "full metal bullet", "point five bullet", "deadly bullet", "cripple MOAB bullet", "bloontonium dart", "bloontonium laser cannon", "ray of doom", "hydra rocket", "purple ball", "huge purple ball", "fireball", "dragon's breath", "flash bomb", "hot spike", "spike ball", "spike mine", "normal");
 static final StringList shatter_list = new StringList("dart ball", "sharp dart ball", "razor sharp dart ball", "sonic boomerang", "sonic multi target boomerang", "sonic glaive boomerang", "sonic glaive ricochet", "laser cannon", "powerful laser cannon");
 static final StringList laser_list = new StringList("laser");  //c'est juste pour mob.pop_layers : un laser ne peut pas pop les enfants du ballon qu'il touche ! Sinon c'est un damage_type normal
 
@@ -46,7 +46,7 @@ boolean can_damage(Mob mob, String damage_type){
       return !mob.type.equals("white");
     
     case "sharp":
-      return !(mob.type.equals("lead") || mob.type.equals("frozen"));
+      return !(mob.type.equals("lead") || mob.is_frozen);
   }
   
   println("ERROR : WASNT ABLE TO DECIDE IF CAN DAMAGE WITH DAMAGE TYPE :  ", damage_type);

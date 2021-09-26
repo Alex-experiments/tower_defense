@@ -1,4 +1,4 @@
-boolean auto_pass_levels=false;
+boolean auto_pass_levels=true;
 boolean god_mode=true;
 
 //Problème : les boomerangs touchent un ballon et peuvent faire demi tour pour toucher ses fils //semble pas etre le cas en fait
@@ -165,6 +165,7 @@ void setup(){
   
   ellipseMode(CENTER);
   rectMode(CORNERS);
+  
 
 }
 
@@ -189,15 +190,7 @@ void draw(){
   
   //On update tous les enemis
   for (int i = enemis.size() - 1; i >= 0; i--){
-    Mob mob = enemis.get(i);
-    mob.update();
-    if(mob.track_ended()){
-      joueur.vies-=mob.get_RBE();
-      enemis.remove(i);
-    }
-    else{
-      mob.show();
-    }
+    enemis.get(i).core(i);
   }
   
   map.hide();

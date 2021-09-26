@@ -1,6 +1,6 @@
 class Ring_of_fire{
   float x, y;
-  float dmg_done_this_frame;
+  int dmg_done_this_frame;
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   int damage=1, pierce=60;
   String damage_type = "normal";
@@ -64,8 +64,7 @@ class Ring_of_fire{
       }
     }
     
-    fired_from_tower.pop_count+=dmg_done_this_frame;
-    joueur.game_pop_count += dmg_done_this_frame;
+    fired_from_tower.add_pop_count(dmg_done_this_frame);
   }
   
   private void hit(Mob mob){

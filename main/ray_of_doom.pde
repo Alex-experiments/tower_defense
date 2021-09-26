@@ -1,6 +1,6 @@
 class Ray_of_doom{
   float x, y, direction;
-  float dmg_done_this_frame;
+  int dmg_done_this_frame;
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   int damage=1, pierce, INIT_PIERCE=100;
   String damage_type = "normal";
@@ -45,8 +45,7 @@ class Ray_of_doom{
       }
     }
     
-    fired_from_tower.pop_count+=dmg_done_this_frame;
-    joueur.game_pop_count += dmg_done_this_frame;
+    fired_from_tower.add_pop_count(dmg_done_this_frame);
   }
   
   void hit(Mob mob){

@@ -58,7 +58,9 @@ class Ability{
   //function to be over rided
   void use(Tower tour_used){}
   void continue_use(Tower tour){}
-  void end_effect(Tower tour){}
+  void end_effect(Tower tour){
+    tour.ability_use_time = -1;
+  }
   
   private void update(){
     if(global_cooldown){
@@ -332,5 +334,46 @@ class Spike_storm extends Ability{
     }
     
   }
+}
+
+class Summon_phoenix extends Ability{
+
+  Summon_phoenix(Tower enabled_by_tower, float cooldown_duration, float duration){
+    super(enabled_by_tower, cooldown_duration, duration);
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+  }
   
+  void use(Tower tour_used){
+    towers.add(new Phoenix(tour_used));
+  }
+  
+  void end_effect(Tower tour_used){
+    for(int i = towers.size()-1; i>=0; i--){
+      Tower tour = towers.get(i);
+      if(tour instanceof Phoenix && tour.summoner == tour_used){
+        towers.remove(i);
+      }
+    }
+    tour_used.ability_use_time = -1;
+  }
+
+}
+
+class Sabotage_supply_lines extends Ability{
+  
+  Sabotage_supply_lines(Tower enabled_by_tower, float cooldown_duration, float duration){
+    super(enabled_by_tower, cooldown_duration, duration);
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+  }
+  
+  void use(Tower tour_used){
+    round.spawn_at_half_speed = true;
+    round.nb_of_sabotage_in_use++;
+  }
+  
+  void end_effect(Tower tour_used){
+    round.nb_of_sabotage_in_use--;
+    if(round.nb_of_sabotage_in_use==0)  round.spawn_at_half_speed = false;
+    tour_used.ability_use_time = -1;
+  }
 }

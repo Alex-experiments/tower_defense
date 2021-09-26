@@ -101,15 +101,14 @@ class Spikes{
         pierce--;
         if(pierce<=0){
           if(type.equals("spike mine")){
-            explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, damage_type));      //A CHANGER POUR LE TYPE d'EXPLOSION
+            explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, damage_type, false, 0));      //A CHANGER POUR LE TYPE d'EXPLOSION
           }
           break;
         }
       }
     }
     
-    fired_from_tower.pop_count+=dmg_done_this_frame;
-    joueur.game_pop_count += dmg_done_this_frame;
+    fired_from_tower.add_pop_count(dmg_done_this_frame);
   }
   
   void hit(Mob mob){

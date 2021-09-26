@@ -11,6 +11,9 @@ class Rounds{
   boolean waiting_next_round=true;
   float last_spawn_time;
   
+  boolean spawn_at_half_speed = false;
+  int nb_of_sabotage_in_use = 0;
+  
 
   void init_intervall_time(){
     intervall = initial_intervall * (1- 2*atan(float(round_number-1)/10)/PI);
@@ -142,7 +145,9 @@ class Rounds{
        add_bloons(9, "lead", false, false);
        break;
      default:
+       //add_bloons(1, "MOAB", false, false);
        add_bloons(round_number-10, "black", true, false);
+       //add_bloons(1, "black", true, false);
        break;
      
     }
@@ -160,6 +165,9 @@ class Rounds{
           for(int i=0; i<tour.time_before_next_attack_list.size(); i++){
             tour.time_before_next_attack_list.set(i, 0);
           }
+          //il faut pas que le nouveau round commence avec des spawns lents
+          if(tour.linked_ability instanceof Sabotage_supply_lines && tour.ability_use_time>=0)  tour.linked_ability.end_effect(tour);  //on end effect que si l'abilite est active
+          //sinon ca fais nb_sabo_actif -- ce qu'on veut pas
         }
         println("let's go for round ", round_number);
       }
@@ -178,6 +186,7 @@ class Rounds{
     int decalage=0;
     while(spawn_list.size()>0 && FAKE_TIME_ELAPSED-last_spawn_time > intervall){    //le while est la si jamais on doit spawn plusieurs enemis a la meme frame
       spawn_list.get(0).avancement -= 2*decalage;
+      if(spawn_at_half_speed)  spawn_list.get(0).speed /= 2.;
       enemis.add(spawn_list.get(0));
       spawn_list.remove(0);
       last_spawn_time+=intervall;

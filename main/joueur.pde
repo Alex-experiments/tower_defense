@@ -104,7 +104,7 @@ class Joueur{
     if(!placing_tower.equals("") || selected_tower!=null)  return;    //si on est en train de placer une tour ou si on en a deja selectionnée une
     if(mousePressed && mouseButton==LEFT){
       for(Tower tour : towers){
-        if( distance(new float[] {tour.x, tour.y}, new float[] {mouseX, mouseY})<=tour.size/2 ){
+        if( tour.selectable && distance(new float[] {tour.x, tour.y}, new float[] {mouseX, mouseY})<=tour.size/2 ){
           selected_tower=tour;
           selected_tower.highlight=true;
           break;

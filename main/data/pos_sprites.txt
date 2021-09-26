@@ -69,6 +69,12 @@ huge purple ball : 31*31 a 757, 1572
 huge purple ball_background : 52*57 a 843, 1378
 huge purple ball_2 : 31*31 a 1358, 1659
 huge purple ball_2_background : 52*57 a 1022, 1194
+dragon's breath : 64*59 a 72, 1582
+dragon's breath_2 : 70*56 a 150, 1419
+dragon's breath_3 : 55*58 a 535, 1545
+
+phoenix body : 33*138 a 1518, 1406 half
+phoenix wing : 150*93 a 504, 594 half
 
 napalm flame_1 : 16*21 a 1707, 1789
 napalm flame_2 : 16*21 a 1777, 1718
@@ -125,6 +131,7 @@ laser eyes : 38*39 a 1304, 896
 
 unknown purple ball : 20*20 a 1472, 1785
 unknown huge purple ball : 46*50 a 533, 1748
+unknown phoenix body : 88*196 a 1254, 699
 
 
 

@@ -38,7 +38,7 @@ class Panel{
     else{
       textAlign(LEFT, TOP);
       fill(0);
-      text("Pop Count "+str(int(selected_tower.pop_count)), 106, 653);
+      text("Pop Count "+str(selected_tower.pop_count), 106, 653);
       
       upgrades.get_possible_upgrades(selected_tower.type, selected_tower.path_1_progression, selected_tower.path_2_progression);
       upgrade_left.unclickable = !(upgrades.can_purchase_1 && joueur.argent>=upgrades.price_1);
