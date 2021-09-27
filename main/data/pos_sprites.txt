@@ -33,16 +33,16 @@ hot spike_3 : 32*32 a 1890, 860
 hot spike_2 : 29*31 a 1224, 1658
 hot spike_1 : 15*30 a 583, 1745
 
-spike mine_10 : 55*56 a 433, 1656
-spike mine_9 : 55*56 a 709, 312
-spike mine_8 : 54*56 a 652, 1517
-spike mine_7 : 54*55 a 1140, 1035
-spike mine_6 : 54*55 a 1195, 986
-spike mine_5 : 54*55 a 477, 1712
-spike mine_4 : 45*55 a 1448, 1030
-spike mine_3 : 46*48 a 1346, 1132
-spike mine_2 : 45*43 a 851, 1643
-spike mine_1 : 45*34 a 898, 1594
+spike ball_10 : 55*56 a 433, 1656
+spike ball_9 : 55*56 a 709, 312
+spike ball_8 : 54*56 a 652, 1517
+spike ball_7 : 54*55 a 1140, 1035
+spike ball_6 : 54*55 a 1195, 986
+spike ball_5 : 54*55 a 477, 1712
+spike ball_4 : 45*55 a 1448, 1030
+spike ball_3 : 46*48 a 1346, 1132
+spike ball_2 : 45*43 a 851, 1643
+spike ball_1 : 45*34 a 898, 1594
 
 dart : 14*40 a 1471, 330
 sharp dart : 14*40 a 1471, 330

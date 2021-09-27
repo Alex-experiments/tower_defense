@@ -339,13 +339,10 @@ class Tower{
   color couleur;
   int price=0;
   
-  int path_1_progression;
-  int path_2_progression;
+  int path_1_progression, path_2_progression;
   
   StringList shoots_list;     
-  FloatList  deviation_list;
-  FloatList attack_speed_list;
-  FloatList time_before_next_attack_list;
+  FloatList deviation_list, attack_speed_list, time_before_next_attack_list;
   ArrayList<float[]> on_track_pos;      //sert uniquement aux spikes factory
   
   ArrayList<Tower> towers_affected_by_ability = new ArrayList<Tower>();
@@ -541,8 +538,9 @@ class Tower{
             projectiles.add(new Projectile(this, x, y, deviation, shoot_type));
           }
           else{
-            float[] futur_pos = map.get_pos(target.avancement + target.speed);                              //on prévois juste un coup d'avance
-            float direction=atan2(futur_pos[1]-y, futur_pos[0]-x);
+            //float[] futur_pos = map.get_pos(target.avancement + target.speed);                              //on prévois juste un coup d'avance
+            //faut pas faire ca car quand les mobs sont blow_away (par ex avec tornado), ca fait tirer la tour n'importe ou
+            float direction=atan2(target.y-y, target.x-x);
             if(set_orientation_when_shoot)  this.orientation = direction+HALF_PI;
             
             projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));

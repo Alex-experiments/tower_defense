@@ -17,6 +17,10 @@ class Spikes{
   
   int dmg_done_this_frame;
 
+  StringList stronger_against = new StringList();;    //certains spikes ont de meilleurs dégats selon le type d'enemis. (pas pris en compte dans explosion)
+  int stronger_against_damage;
+  
+  String sprite_name;
   
   Spikes(Tower fired_from_tower, float destination_x, float destination_y, String spike_type){
     this.fired_from_tower=fired_from_tower;
@@ -58,10 +62,7 @@ class Spikes{
   }
   
   void show(){
-    int[] pos_aff;
-    if(type.equals("spike ball") || type.equals("spike mine"))  pos_aff = pos_coins_sprites.get("spike mine_"+str(min(pierce, 10)));    //normalement les spike balls n'ont pas de crane dessus
-    else if(type.indexOf("hot")>=0)  pos_aff = pos_coins_sprites.get("hot spike_"+str(min(pierce, 10)));
-    else pos_aff = pos_coins_sprites.get("spike_"+str(min(pierce, 10)));
+    int[] pos_aff = pos_coins_sprites.get(sprite_name+"_"+str(min(pierce, 10)));
     image(all_sprites, x+pos_aff[4], y+pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
   
@@ -112,13 +113,22 @@ class Spikes{
   }
   
   void hit(Mob mob){
-    int layers_popped=mob.pop_layers(damage, true, damage_type);      //on tappe le mob
+    int dmg_to_deal = damage;
+    
+    for(String type : stronger_against){
+      if(type.indexOf(mob.type)>=0){        //oblige de mettre un indexOf pasque si on veut focus plus les ceramic, ca peut très bien etre des ceramicbasic ou ceramic regrow etc
+        dmg_to_deal = stronger_against_damage;
+        break;
+      }
+    }
+    int layers_popped=mob.pop_layers(dmg_to_deal, true, damage_type);      //on tappe le mob
     dmg_done_this_frame+=layers_popped;
     
     if(mob.layers<=0)  enemis.remove(mob);
   }
   
   void set_stats(){
+    sprite_name = type;
     switch(type){
       case "spike":
         damage = 1; pierce = 5;
@@ -127,6 +137,7 @@ class Spikes{
       case "stack spike":
         damage = 1; pierce = 10;
         damage_type = "sharp";
+        sprite_name = "spike";
         break;
       case "hot spike":
         damage = 1; pierce = 10;
@@ -135,11 +146,38 @@ class Spikes{
       case "spike ball":
         damage = 1; pierce = 16;
         damage_type = "normal";
+        stronger_against.append("ceramic");
+        stronger_against_damage = 3;
         break;
       case "spike mine":
         damage = 1; pierce = 16;
         damage_type = "normal";
+        stronger_against.append("ceramic");
+        stronger_against_damage = 3;
+        sprite_name = "spike ball";
         break;
+      case "MOAB-SHREDR Spikes":
+        damage = 1; pierce = 20;
+        damage_type = "sharp";
+        stronger_against = new StringList("MOAB", "BFB", "DDT", "ZOMG");
+        stronger_against_damage = 4;
+        sprite_name = "spike";
+        break;
+      case "stack MOAB-SHREDR Spikes":
+        damage = 1; pierce = 40;
+        damage_type = "sharp";
+        stronger_against = new StringList("MOAB", "BFB", "DDT", "ZOMG");
+        stronger_against_damage = 4;
+        sprite_name = "spike";
+        break;
+      case "hot MOAB-SHREDR Spikes":
+        damage = 1; pierce = 40;
+        damage_type = "sharp";
+        stronger_against = new StringList("MOAB", "BFB", "DDT", "ZOMG");
+        stronger_against_damage = 4;
+        sprite_name = "hot spike";
+        break;
+        
       default:
         println("ERROR : Spike type ", type, " not suitable for shooting spike");
         break;

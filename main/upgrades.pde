@@ -55,8 +55,6 @@ class Upgrades{
             if(tour.shoots_list.get(0).equals("sharp dart ball"))  temp_shooting_type="sharp huge dart ball";
             else if(tour.shoots_list.get(0).equals("razor sharp dart ball"))  temp_shooting_type="razor sharp huge dart ball";
             change_shooting_type(tour, temp_shooting_type);
-           
-                               //il faut implémenter le fait que ca fasse 5 dmg aux céramics
             break;          
         }
       }
@@ -82,7 +80,6 @@ class Upgrades{
               tour.time_before_next_attack_list.append(tour.time_before_next_attack_list.get(0));
               tour.attack_speed_list.append(tour.attack_speed_list.get(0));
             }
-            
             break;
           case 3:
             //implémenter CORRECTEMENT les abilities
@@ -272,7 +269,7 @@ class Upgrades{
             change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les frozen
             for(Boomerang boomer : boomerangs){
-              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.boomerang_type = "sonic glaive boomerang";    //pas bien du tout
+              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.boomerang_type = "sonic glaive boomerang";
             }
             break;
           case 1:
@@ -395,21 +392,21 @@ class Upgrades{
             //Whirlwinds and Tornadoes cannot blow away Lead Bloons but the Tornadoes from Tempest Tornado Monkey Apprentices can pop Lead Bloons.
             //Sprite sur le site
             // removes ice and glue from the bloons.
-            /*tour.shoots_list.append("tornado");
+            tour.shoots_list.append("whirlwind");
             tour.deviation_list.append(0);
             tour.attack_speed_list.append(0.31);
-            tour.projectile_damage_list.append(0);
-            tour.projectile_pierce_list.append(25);*/
+            tour.time_before_next_attack_list.append(0);
             break;
           case 3:
             //removes ice and glue from the bloons.
             //Blows tornado FASTER, FURTHER AND MORE OFTEN
-            
-            /*tour.shoots_list.append("tornado");
-            tour.deviation_list.append(0);
-            tour.attack_speed_list.append(0.5);    //le 0.5 est piffé
-            tour.projectile_damage_list.append(1);
-            tour.projectile_pierce_list.append(70);*/
+            int index;      //on doit remplacer la whirlwind avec la tornado
+            for(index = tour.shoots_list.size()-1; index>=0; index--){    //on commence par le bout c'est plus opti
+              if(tour.shoots_list.get(index).equals("whirlwind"))   break;
+            }
+            tour.shoots_list.set(index, "tornado");
+            tour.deviation_list.set(index, 0);
+            tour.attack_speed_list.set(index, 0.6);    //le 0.6 est mesuré plus ou moins avec la version flash
             break;          
         }
       }
@@ -427,8 +424,8 @@ class Upgrades{
             break;
           case 2:
             //FIRE ATTACKS UNFREEZE BALLONS
-            tour.shoots_list.append("dragon's breath");      //si on change ce nom, il faut aussi le changer dans 'tower' car on rajoute une max range
-            tour.deviation_list.append(0);         //changer la vitesse du projectile -> doit etre bien plus rapide
+            tour.shoots_list.append("dragon's breath");
+            tour.deviation_list.append(0);
             tour.attack_speed_list.append(10);
             tour.time_before_next_attack_list.append(0);            
             break;
@@ -447,7 +444,6 @@ class Upgrades{
               abilities.add(new Summon_phoenix(tour, 60., 20.));
               tour.linked_ability = abilities.get(abilities.size()-1);
             }
-        
             break;          
         }
       }
@@ -501,10 +497,7 @@ class Upgrades{
             tour.deviation_list.append(0);
             if(tour.path_1_progression>0)  tour.attack_speed_list.append(0.504);
             else tour.attack_speed_list.append(0.42);
-            tour.time_before_next_attack_list.append(0);
-
-            //explosion de range environ 165pix (diametre 330)
-            
+            tour.time_before_next_attack_list.append(0);            
             break;
           case 3:
             boolean already_have_one = false;
@@ -527,13 +520,18 @@ class Upgrades{
     }
     
     if(tour.type.equals("spike factory")){
+      String temp_shooting_type;
       if(path_to_upgrade==1){
         switch(tour.path_1_progression){
           case 0:
-            change_shooting_type(tour, "stack spike");
+            temp_shooting_type = "stack spike";
+            if(tour.shoots_list.get(0).equals("MOAB-SHREDR Spikes"))  temp_shooting_type = "stack MOAB-SHREDR Spikes";
+            change_shooting_type(tour, temp_shooting_type);
             break;
           case 1:
-            change_shooting_type(tour, "hot spike");
+            temp_shooting_type = "hot spike";
+            if(tour.shoots_list.get(0).equals("stack MOAB-SHREDR Spikes"))  temp_shooting_type = "hot MOAB-SHREDR Spikes";
+            change_shooting_type(tour, temp_shooting_type);
             break;
           case 2:
             change_shooting_type(tour, "spike ball");    //ajouter le fait que ca fasse 3* les degats aux ceramics
@@ -553,8 +551,11 @@ class Upgrades{
             change_attack_speed(tour, 1.65);
             break;
           case 2:
-            change_attack_speed(tour, 1.62);    //ajouter le fait que ca fasse 4* les dégats (donc +3) aux moabs
-            //change_shooting_type(tour, "moab spike");
+            change_attack_speed(tour, 1.62);
+            temp_shooting_type = "MOAB-SHREDR Spikes";
+            if(tour.shoots_list.get(0).indexOf("stack")>=0)  temp_shooting_type = "stack MOAB-SHREDR Spikes";
+            else if(tour.shoots_list.get(0).indexOf("hot")>=0)  temp_shooting_type = "hot MOAB-SHREDR Spikes";
+            change_shooting_type(tour, temp_shooting_type);
             break;
           case 3:
             boolean already_have_one = false;

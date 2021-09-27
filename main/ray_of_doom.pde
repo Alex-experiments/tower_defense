@@ -89,7 +89,7 @@ class Ray_of_doom{
     for(float i=y_offset/pos_aff[3]; i<MAX_LEN_OF_RAY/pos_aff[3]; i++){    //141 iter
     //while(pos_x > - pos_aff[0] && pos_x < tower_panel.top_left_x + pos_aff[0] && pos_y > - pos_aff[1] && pos_y < info_panel.top_left_y + pos_aff[1]){
     //while(compteur<10){
-      image(all_sprites, 0, y_offset-i * pos_aff[3], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+      image(all_sprites, 0, 2*y_offset - i * pos_aff[3], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
       //pos_y += sin_direc * pos_aff[3];
       //pos_x += cos_direc * pos_aff[2];
       //len += pos_aff[3];

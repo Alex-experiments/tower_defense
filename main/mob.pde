@@ -12,8 +12,10 @@ class Mob{
   
   boolean regrowth;
   boolean camo;
-  boolean is_frozen=false, is_stunned=false, is_rooted=false;    //stun est différent de rooted : quand on se fait tapper sous stun on repart, pas sous root
-  float stun_time, stun_duration, root_time, root_duration;;
+  boolean is_frozen=false, is_stunned=false, is_rooted=false, is_blown_away = false;    //stun est différent de rooted : quand on se fait tapper sous stun on repart, pas sous root
+  float stun_time, stun_duration, root_time, root_duration;
+  float blown_away_cos_dir, blown_away_sin_dir, blown_away_speed, blown_away_landing_avancement;
+  float[] blown_away_landing_pos;
   ArrayList<String> past_types;
   float last_dmg_taken_time;
   int min_RBE_reached;
@@ -94,7 +96,7 @@ class Mob{
       case "ceramic":
         return 94+layers;
       case "MOAB":
-        return 416+layers;
+        return 416+layers;    //si changer, mettre dans apply_effect aussi
       case "BFB":
         return 2464+layers;
       case "ZOMG":
@@ -263,6 +265,17 @@ class Mob{
       if(FAKE_TIME_ELAPSED - stun_time > stun_duration)  is_stunned = false;
       else return;
     }
+    if(is_blown_away){
+      x += blown_away_cos_dir * blown_away_speed;
+      y += blown_away_sin_dir * blown_away_speed;
+      if(distance(new float[] {x, y}, blown_away_landing_pos) < blown_away_speed){
+        x = blown_away_landing_pos[0];
+        y = blown_away_landing_pos[1];
+        is_blown_away = false;
+        avancement = blown_away_landing_avancement;
+      }
+      return;
+    }
     avancement += speed * joueur.game_speed;
     update_pos();
   }
@@ -285,6 +298,16 @@ class Mob{
       is_rooted = true;
       root_duration = duration;
       root_time = FAKE_TIME_ELAPSED;
+    }
+    else if(effect.equals("blow away")){
+      if(get_RBE()>416)  return;    //n'affecte pas les MOABS
+      is_blown_away = true;
+      blown_away_landing_avancement = 0.;
+      blown_away_landing_pos = map.get_pos(blown_away_landing_avancement);
+      blown_away_speed = 5.;                                          //ici la duration est utilisée pour passer la speed !
+      float dir = atan2(blown_away_landing_pos[1] - y, blown_away_landing_pos[0]-x);
+      blown_away_cos_dir = cos(dir);
+      blown_away_sin_dir = sin(dir);
     }
     else  println("ERROR : effect", effect, "not implemented yet");
   }

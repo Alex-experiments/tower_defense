@@ -20,9 +20,12 @@ class Projectile{
                          //pour l'instant lorsque que qqch explose, il explose dès qu'il rencontre un enemi et son pierce revient donc à son explosion !
                          
   String damage_type, projectile_type;
-  boolean explose = false, explosion_stuns=false;
+  boolean explose = false, explosion_stuns=false, blows_away = false;
   float explosion_stun_duration;
   int explosion_diameter;
+  StringList stronger_against = new StringList();    //certains projectiles ont de meilleurs dégats selon le type d'enemis. (pas pris en compte dans explosion)
+  int stronger_against_damage;
+  
   color couleur;  
   boolean rotate=false;
   float rotation_angle=0., rotation_speed;
@@ -120,6 +123,7 @@ class Projectile{
       }
     }
     
+    
     if(hit_someone && can_bounce && pierce>0 && enemis.size()>0){
       //si on peut ricocher (capacité+touché qqn pendant ce déplacement) et qu'il reste des enemis
       Mob closest_mob=enemis.get(0);
@@ -149,15 +153,28 @@ class Projectile{
   
   
   void hit(Mob mob){
-    int layers_popped=mob.pop_layers(damage, true, damage_type);      //on tappe le mob
-    dmg_done_this_frame+=layers_popped;
-    
-    for(Mob dmged_mob : mob.bloons_dmged()){
-      already_dmged_mobs.add(dmged_mob);
+    if(damage>0){
+      int dmg_to_deal = damage;
+      
+      for(String type : stronger_against){
+        if(type.indexOf(mob.type)>=0){        //oblige de mettre un indexOf pasque si on veut focus plus les ceramic, ca peut très bien etre des ceramicbasic ou ceramic regrow etc
+          dmg_to_deal = stronger_against_damage;
+          break;
+        }
+      }
+      int layers_popped=mob.pop_layers(dmg_to_deal, true, damage_type);      //on tappe le mob
+      dmg_done_this_frame+=layers_popped;
+      
+      for(Mob dmged_mob : mob.bloons_dmged()){
+        already_dmged_mobs.add(dmged_mob);
+        if(blows_away)  dmged_mob.apply_effect("blow away", 0.);
+      }
+      
+      if(mob.layers<=0)  enemis.remove(mob);
     }
-    
-    
-    if(mob.layers<=0)  enemis.remove(mob);
+    else{  //c'est donc forcément qu'on blow_away avec une tornado qui fait 0 dégats
+      if(blows_away)  mob.apply_effect("blow away", 0.);
+    }
   }
   
   void set_stats(){
@@ -186,16 +203,22 @@ class Projectile{
         speed = 20.; size=72;
         damage = 1; pierce = 100;
         damage_type = "normal";
+        stronger_against.append("ceramic");
+        stronger_against_damage = 5;
         break;
       case "sharp huge dart ball":
         speed = 20.; size=72;
         damage = 1; pierce = 101;
         damage_type = "normal";
+        stronger_against.append("ceramic");
+        stronger_against_damage = 5;
         break;
       case "razor sharp huge dart ball":
         speed = 20.; size=72;
         damage = 1; pierce = 103;
         damage_type = "normal";
+        stronger_against.append("ceramic");
+        stronger_against_damage = 5;
         break;
       case "sharp dart":
         speed = 20.; size=14.;
@@ -314,6 +337,20 @@ class Projectile{
         has_max_range = true;
         max_range = fired_from_tower.range;
         break;
+      case "whirlwind":
+        speed = 10.; size = 30.;
+        damage = 0; pierce = 25;
+        damage_type = "normal";
+        blows_away = true;
+        has_max_range = true;
+        max_range = fired_from_tower.range;
+        break;
+      case "tornado":
+        speed = 20.; size = 30.;
+        damage = 1; pierce = 70;
+        damage_type = "normal";
+        blows_away = true;
+        break;
       case "shuriken":
         speed = 20.; size=27.;
         damage = 1; pierce = 2;
@@ -346,7 +383,7 @@ class Projectile{
         explosion_diameter = 330;
         explosion_stuns = true;
         explosion_stun_duration = .75;
-        break;      
+        break;
       default:
         println("ERROR : can't assign any projectile type with ", projectile_type);
         break;
