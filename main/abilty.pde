@@ -152,21 +152,21 @@ class Ability{
 }
 
 class Super_monkey_fan_club extends Ability{
-  //Abilité qui va transformer les 10 dart monkey les plus proche (range infinie) en super monkey pendant 15 sec)
+  //Abilité qui va transformer les 10 dart monkey les plus proche (range infinie) en super monkey fan pendant 15 sec)
   //The rate of fire also stacks to up to twice as fast as a regular Super Monkey.  
   
-  ArrayList<Tower> closest_dart_monkeys = new ArrayList<Tower>();  
+  ArrayList<Super_monkey_fan> list_of_super_monkey_fans = new ArrayList<Super_monkey_fan>();
+  //maintenir cette liste va permettre de les garder en mémoire et de maintenir à jour les summoner associé à chaque appel de use()
+  //ainsi le ability_casted_by_tour associé à un super monkey fan sera toujours à jour
   
   Super_monkey_fan_club(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
   }
-
-  void use(Tower tour_used){
-    
+  
+  ArrayList<Tower> get_closest_dart_monkeys(Tower tour_used){
     float dist_min=Float.POSITIVE_INFINITY;
-    
-    closest_dart_monkeys = new ArrayList<Tower>();
+    ArrayList<Tower> closest_dart_monkeys = new ArrayList<Tower>();
     
     Tower tower_to_replace=null;
     float dist_tower_to_replace=-1.;
@@ -199,27 +199,44 @@ class Super_monkey_fan_club extends Ability{
         }
       }
     }
-     
-    tour_used.towers_affected_by_ability = new ArrayList<Tower>();
-    for(Tower tour : this.closest_dart_monkeys){
-      for(int i=0; i<tour.attack_speed_list.size(); i++){
-        tour.attack_speed_list.set(i, tour.attack_speed_list.get(i) * 10);    //en attendant le super monkey
+    return closest_dart_monkeys;
+  }
+
+  void use(Tower tour_used){
+    ArrayList<Tower> closest_dart_monkeys = get_closest_dart_monkeys(tour_used);
+    
+    for(Tower tour : closest_dart_monkeys){
+      boolean has_already_a_smf_linked = false;
+      for(Super_monkey_fan smf : list_of_super_monkey_fans){
+        if(smf.summoner == tour){
+          has_already_a_smf_linked = true;
+          smf.ability_casted_by_tour = tour_used;  //on met ca à jour
+          break;
+        }
       }
-      tour_used.towers_affected_by_ability.add(tour);
-    }    
-  }  
-  
-  void end_effect(Tower tour){
-    //ATTENTION : cela ne marche pas car en attendant on peut toujours upgrade la tour, ce qui peut rajouter des attaques et donc apres on va lui diviser son attaque par deux...
-    //je préconise de créer un type spécial de tour : la fan_club_monkey qui imite un super monkey, sans aucune upgrade available, un prix qu'on va lui attribuer à chaque fois
-    //les tours de la liste ne seront juste pas updatées et remplacées par ces nouvelles tours le temps de l'ability
-    for(Tower t : tour.towers_affected_by_ability){
-      for(int i=0; i<t.attack_speed_list.size(); i++){
-        t.attack_speed_list.set(i, t.attack_speed_list.get(i) / 10);    //en attendant le super monkey
+      if(!has_already_a_smf_linked){
+        tour.active = false;
+        Super_monkey_fan smf = new Super_monkey_fan(tour, tour_used, "super monkey fan", tour.x, tour.y);
+        towers.add(smf);
+        list_of_super_monkey_fans.add(smf);
       }
     }
-    tour.towers_affected_by_ability = new ArrayList<Tower>();  //comme ca si on supprime la tour on ne re débuff pas les tours impactées.
-    tour.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
+    
+  }  
+  
+  void end_effect(Tower tour_used){
+    //on veut supprimer toutes les super monkey fans towers crées par cette instance
+    //mais on veut garder celles affectées par d'autres
+    
+    for(int i = list_of_super_monkey_fans.size()-1; i>=0; i--){
+      Super_monkey_fan smf = list_of_super_monkey_fans.get(i);
+      if(smf.ability_casted_by_tour != tour_used) continue;    //si le cast de l'abilité n'a pas crée cette tour ou si un autre cast a ré-affecté la tour entre temps
+      smf.summoner.active = true;
+      towers.remove(smf);
+      list_of_super_monkey_fans.remove(i);
+    }
+
+    tour_used.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
   }
 
 }
@@ -266,12 +283,12 @@ class Turbo_charge extends Ability{
   
   }  
   
-  void end_effect(Tower tour){
-    for(int i=0; i<tour.attack_speed_list.size(); i++){
-      tour.attack_speed_list.set(i, tour.attack_speed_list.get(i) / 5);
+  void end_effect(Tower tour_used){
+    for(int i=0; i<tour_used.attack_speed_list.size(); i++){
+      tour_used.attack_speed_list.set(i, tour_used.attack_speed_list.get(i) / 5);
     }
     
-    tour.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
+    tour_used.ability_use_time = -1;    //permet de dire que l'ability n'est plus effective
   }
 
 }

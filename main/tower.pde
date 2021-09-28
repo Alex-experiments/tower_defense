@@ -33,6 +33,30 @@ class Dart_monkey extends Tower{
   }
 }
 
+class Super_monkey_fan extends Tower{
+  Tower ability_casted_by_tour;
+  
+  Super_monkey_fan(Tower linked_tower, Tower ability_casted_by_tour, String type, float x, float y){
+    super(type, x, y);
+    selectable = false;
+    summoner = linked_tower;
+    this.ability_casted_by_tour = ability_casted_by_tour;
+    detects_camo = summoner.detects_camo;  //obligé de le faire la est pas dans set_param_tower() car super() appelle set_param_tower()
+  }
+  
+  void set_param_tower(){
+    couleur=color(0, 0, 255);
+    price=0;
+    size=base_size;
+    //range=162;    //ca c'est le super monkey de base mais la on est a range de supermonkey x/1
+    range=230;
+    
+    shoots_list.append("razor sharp dart");
+    deviation_list.append(0);
+    attack_speed_list.append(30);    //deux fois plus vite que les super monkey !
+  }
+}
+
 class Tack_shooter extends Tower{
 
   Tack_shooter(String type, float x, float y){
@@ -345,7 +369,6 @@ class Tower{
   FloatList deviation_list, attack_speed_list, time_before_next_attack_list;
   ArrayList<float[]> on_track_pos;      //sert uniquement aux spikes factory
   
-  ArrayList<Tower> towers_affected_by_ability = new ArrayList<Tower>();
   float ability_use_time, ability_cooldown_timer;
   int ability_state;
   Ability linked_ability;
@@ -357,7 +380,7 @@ class Tower{
   boolean set_orientation_when_shoot = true;
   boolean selectable = true;
   Tower summoner;
-  
+  boolean active = true;    //c'est par exemple quand une abilite remplace une tour par une autre temporairement : on update ni ne show() la tour remplacée
   
   Tower(String type, float x, float y){
     this.x=x;
@@ -367,6 +390,12 @@ class Tower{
     set_param_tower();
     init_time_before_next_attack_list();
     set_sprites();
+  }
+  
+  void core(){
+    if(!active)  return;
+    update();
+    show();
   }
   
   //subclasses func
@@ -434,7 +463,9 @@ class Tower{
   ArrayList<Mob> get_enemis_in_range(){
     ArrayList<Mob> liste= new ArrayList<Mob>();
     for(Mob mob : enemis){
-      if(distance(new float[] {mob.x, mob.y}, new float[] {x, y})<=range+mob.size/2){    //je prefere reconstruire 1 a 1 : évite peut etre des prbms de copie
+      float dist = distance(new float[] {mob.x, mob.y}, new float[] {x, y});
+      //pour shoot un boomerang, on a besoin de ne pas prendre en compte la taille du mob (sinon inter cercles renvoie des NaN
+      if(dist <= range || shoots_list.get(0).indexOf("boomerang")<0 && dist<=range+mob.size/2){    //je prefere reconstruire 1 a 1 : évite peut etre des prbms de copie
         if(can_detect(mob, detects_camo))  liste.add(mob);       //on ne l'ajoute que si il n'est pas caché, il n'est pas camo ou alors on les détecte
       }
     }
@@ -572,9 +603,7 @@ class Tower{
     float[] pos_finale=new float[2];
     float[] pos_inutile=new float[2];
     
-    float[] futur_pos = map.get_pos(target.avancement + target.speed);                              //on prévois juste un coup d'avance
-    if(distance(futur_pos, new float[] {x, y})>range)  futur_pos=new float[] {target.x, target.y};  //sauf si cela nous empeche de tapper la cible (plus de cercle sécants...)
-    float[] temp = find_intersection_cercles(x, y, range/2, futur_pos[0], futur_pos[1], range/2);
+    float[] temp = find_intersection_cercles(x, y, range/2, target.x, target.y, range/2);    
     
     pos1[0] = temp[0];
     pos1[1] = temp[1];
@@ -584,7 +613,7 @@ class Tower{
     //on determine la pos du centre tel que le boomerang tappe le ballon avant d'etre a la moitié de son cercle
     
     //retourne l'équation de la droite sous la forme y=ax+b
-    float a=(futur_pos[1]-y)/(futur_pos[0]-x); 
+    float a=(target.y-y)/(target.x-x); 
     float b=y-a*x;
     
     if(pos1[1] <= a * pos1[0] + b){
@@ -600,7 +629,7 @@ class Tower{
       pos_finale=pos_inutile;
     }
     
-      boomerangs.add(new Boomerang(this, pos_finale[0], pos_finale[1], range/2, boomerang_type));
+    boomerangs.add(new Boomerang(this, pos_finale[0], pos_finale[1], range/2, boomerang_type));
        
   }
 

@@ -490,7 +490,8 @@ class Upgrades{
             else change_shooting_type(tour, "seeking shuriken");
             break;
           case 1:
-            //implémenter la distraction -> fonctionne exactement comme la tornade
+            //Distraction : ne rien faire ici, implémentée dans Projectile (voir seeking sharp shuriken et seeking shuriken)
+            //comme tornade, également en partie faite dans Mob .apply_effect()
             break;
           case 2:
             tour.shoots_list.append("flash bomb");

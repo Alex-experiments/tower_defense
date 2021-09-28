@@ -50,6 +50,7 @@ class Spikes{
   void core(int i, int nb_spikes){
     update();
     if(pierce<= 0 || deplacement_fini && FAKE_TIME_ELAPSED - landing_time > duration){
+      if(type.equals("spike mine"))  explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, damage_type, false, 0));
       spikes.remove(i);
       return;
     }
@@ -100,12 +101,7 @@ class Spikes{
 
         hit(mob);
         pierce--;
-        if(pierce<=0){
-          if(type.equals("spike mine")){
-            explosions.add(new Explosion(fired_from_tower, x, y, 120, 4, 60, damage_type, false, 0));      //A CHANGER POUR LE TYPE d'EXPLOSION
-          }
-          break;
-        }
+        if(pierce<=0)  break;
       }
     }
     

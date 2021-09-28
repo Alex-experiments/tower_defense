@@ -167,13 +167,19 @@ class Projectile{
       
       for(Mob dmged_mob : mob.bloons_dmged()){
         already_dmged_mobs.add(dmged_mob);
-        if(blows_away)  dmged_mob.apply_effect("blow away", 0.);
+        if(blows_away){
+          if(projectile_type.equals("tornado"))  dmged_mob.apply_effect("blow away far", 0.);
+          else if(projectile_type.indexOf("shuriken")>=0){
+            if(random(0., 1.)<=.2)  dmged_mob.apply_effect("blow away distraction", 0.);    //les shuriken ayant la capacité distraction ont 20% de chance (piffé) de blow away
+          }
+          else println("ERROR : projectile", projectile_type, "blows away and does damage but not implemented");
+        }
       }
       
       if(mob.layers<=0)  enemis.remove(mob);
     }
     else{  //c'est donc forcément qu'on blow_away avec une tornado qui fait 0 dégats
-      if(blows_away)  mob.apply_effect("blow away", 0.);
+      mob.apply_effect("blow away", 0.);
     }
   }
   
@@ -296,11 +302,6 @@ class Projectile{
         damage = 1; pierce = 16;
         damage_type = "normal";
         break;
-      case "ray of doom":      // AAAATTENTION : a enlever des projectiles en vrai c'est pas comme ca que ca fonctionne
-        speed = 20.; size=14.;
-        damage = 1; pierce = 100;
-        damage_type = "normal";
-        break;
       case "bloontonium dart":
         speed = 30.; size=14.;
         damage = 1; pierce = 3;
@@ -343,7 +344,7 @@ class Projectile{
         damage_type = "normal";
         blows_away = true;
         has_max_range = true;
-        max_range = fired_from_tower.range;
+        max_range = fired_from_tower.range;    //dans le cas d'une whirlwind : on recule entre 40% et 70% de la longueur du track, contre 60% à 100% pour une tornado
         break;
       case "tornado":
         speed = 20.; size = 30.;
@@ -367,6 +368,7 @@ class Projectile{
         damage_type = "sharp";
         can_bounce=true;
         max_bounce_distance = 130;
+        if(this.fired_from_tower.path_2_progression>=2)  blows_away = true;
         break;
       case "seeking sharp shuriken":
         speed = 20.; size=27.;
@@ -374,6 +376,7 @@ class Projectile{
         damage_type = "sharp";
         can_bounce=true;
         max_bounce_distance = 130;
+        if(this.fired_from_tower.path_2_progression>=2)  blows_away = true;
         break;
       case "flash bomb":
         speed = 20.; size=40.;

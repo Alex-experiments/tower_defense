@@ -194,10 +194,9 @@ void draw(){
   }
   
   map.hide();
-  
+
   for(Tower tour : towers){
-    tour.update();
-    tour.show();
+    tour.core();
   }
   
   //On affiche tous les lasers

@@ -299,10 +299,13 @@ class Mob{
       root_duration = duration;
       root_time = FAKE_TIME_ELAPSED;
     }
-    else if(effect.equals("blow away")){
-      if(get_RBE()>416)  return;    //n'affecte pas les MOABS
+    else if(effect.indexOf("blow away")>=0){
+      if(is_blown_away || get_RBE()>416)  return;    //n'affecte pas les MOABS
       is_blown_away = true;
-      blown_away_landing_avancement = 0.;
+      float[] percentage_of_map = new float[] {0.4, 0.7};    //dans le cas d'une whirlwind : on recule entre 40% et 70% de la longueur du track, contre 60% à 100% pour une tornado
+      if(effect.equals("blow away far"))  percentage_of_map = new float[] {0.6, 1.};
+      else if(effect.equals("blow away distraction"))  percentage_of_map = new float[] {0.15, .45};    //et de 25% à 60% pour un shuriken
+      blown_away_landing_avancement = max(0., avancement-map.longueur_map * random(percentage_of_map[0], percentage_of_map[1]));
       blown_away_landing_pos = map.get_pos(blown_away_landing_avancement);
       blown_away_speed = 5.;                                          //ici la duration est utilisée pour passer la speed !
       float dir = atan2(blown_away_landing_pos[1] - y, blown_away_landing_pos[0]-x);

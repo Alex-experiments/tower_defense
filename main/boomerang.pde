@@ -57,6 +57,7 @@ class Boomerang{
     int[] pos_aff;
     if(pos_coins_sprites.containsKey(boomerang_type)){
       pos_aff = pos_coins_sprites.get(boomerang_type);
+      
       if(rotate){
         rotation_angle+=rotation_speed;
         pushMatrix();
@@ -68,7 +69,7 @@ class Boomerang{
       else  image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
     }
     else{
-      fill(0, 0, 0);
+      fill(0);
       noStroke();
       ellipse(x, y, size, size);
       stroke(0);
@@ -87,7 +88,7 @@ class Boomerang{
   }
   
   void deplacement(){
-    avancement+=speed * joueur.game_speed;
+    avancement += speed * joueur.game_speed;
     prev_x=x;
     prev_y=y;
     x = centre_x + rayon_cercle * cos(-avancement/rayon_cercle + angle_dep);
