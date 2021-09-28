@@ -12,8 +12,8 @@ class Projectile{
   float max_range;
   
   int damage;            // Correspond au nombre de layers max qu'on peut pop à un ballon
-  boolean can_bounce;
-  float max_bounce_distance;
+  boolean can_bounce=false, is_seeking=false;
+  float max_bounce_distance, seeking_force_intensity, seeking_max_distance = 200.;
   int pierce;            //  pierce correspond au nombre d'ennemis maximum touchable : indépendant du fait qu'on puisse rebondir ou pas
                          // Si on veut rebondir un maximum de 2 fois, il faut mettre can_bounce=true et pierce = 2
                          
@@ -77,8 +77,37 @@ class Projectile{
   void deplacement(){
     prev_x=x;
     prev_y=y;
-    x+=cos(direction)*speed * joueur.game_speed;
-    y+=sin(direction)*speed * joueur.game_speed;
+    if(is_seeking && enemis.size()>0){
+      Mob target = get_closest_enemi();
+      if(target == null || distance(new float[] {target.x, target.y}, new float[] {x, y}) > seeking_max_distance){
+        x+=cos(direction)*speed * joueur.game_speed;  //on applique un déplacement normal si : target trop loin ou si on a deja tappe tous les mobs encore en vie et deja spawn
+        y+=sin(direction)*speed * joueur.game_speed;
+      }
+      else{
+        // a savoir : je ne constraint() pas la speed ici ce qui fait que cette derniere n'est pas constante, mais franchement pas grave c'est meme plutot sympa
+        float force_dir = atan2(target.y-y, target.x-x);
+        x += (cos(direction)*speed + cos(force_dir) * seeking_force_intensity) * joueur.game_speed;
+        y += (sin(direction)*speed + sin(force_dir) * seeking_force_intensity) * joueur.game_speed;
+        direction = atan2(y-prev_y, x-prev_x);
+      }
+    }
+    else{
+      x+=cos(direction)*speed * joueur.game_speed;
+      y+=sin(direction)*speed * joueur.game_speed;
+    }
+  }
+  
+  Mob get_closest_enemi(){
+    float dist, dist_min = Float.POSITIVE_INFINITY;
+    Mob closest_mob = null;
+    for(Mob mob : enemis){
+      dist = distance(new float[] {mob.x, mob.y}, new float[] {x, y});
+      if(dist < dist_min && !already_dmged_mobs.contains(mob)){
+        closest_mob = mob;
+        dist_min = dist;
+      }
+    }
+    return closest_mob;
   }
   
   boolean out_of_map(){
@@ -363,19 +392,19 @@ class Projectile{
         damage_type = "sharp";
         break;
       case "seeking shuriken":
-        speed = 20.; size=27.;
+        speed = 15.; size=27.;
         damage = 1; pierce = 2;
         damage_type = "sharp";
-        can_bounce=true;
-        max_bounce_distance = 130;
+        is_seeking = true;
+        seeking_force_intensity = 6.;
         if(this.fired_from_tower.path_2_progression>=2)  blows_away = true;
         break;
       case "seeking sharp shuriken":
-        speed = 20.; size=27.;
+        speed = 15.; size=27.;
         damage = 1; pierce = 4;
         damage_type = "sharp";
-        can_bounce=true;
-        max_bounce_distance = 130;
+        is_seeking = true;
+        seeking_force_intensity = 6.;
         if(this.fired_from_tower.path_2_progression>=2)  blows_away = true;
         break;
       case "flash bomb":

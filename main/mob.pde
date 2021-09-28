@@ -3,9 +3,10 @@ class Mob{
   float avancement;
   float base_speed=1.45, speed=base_speed;
   int layers, type_max_layers;
-  float size=16;
+  float size=25;
   color couleur;
   String type;      //important pasque whites et blacks ont le meme nb de layers mais pas les memes carac
+  int id;
   
   //ArrayList<Mob> enfants;
   StringList enfants;

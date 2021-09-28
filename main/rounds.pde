@@ -3,13 +3,14 @@ class Rounds{
   //In Bloons TD 5, the speed multiplier can be calculated by this formula: max(6.6 * (waveNumber - 85) / (200 - 85),1)
   // voir part RAMPING https://bloons.fandom.com/wiki/Bloon : ya aussi la vie des mobs
   
-  int round_number=300;
+  int round_number=16;
   boolean finished;
-  float initial_intervall=0.865;
-  float intervall;
-  ArrayList<Mob> spawn_list=new ArrayList<Mob>();;
+  float initial_intervall=0.865, intervall;
+  ArrayList<Mob> spawn_list=new ArrayList<Mob>();  
   boolean waiting_next_round=true;
   float last_spawn_time;
+  
+  int spawn_list_size, current_id;
   
   boolean spawn_at_half_speed = false;
   int nb_of_sabotage_in_use = 0;
@@ -159,6 +160,8 @@ class Rounds{
         waiting_next_round=false;
         round_number++;
         init_spawn_list();
+        spawn_list_size = spawn_list.size();
+        current_id = 0;
         init_intervall_time();
         last_spawn_time=FAKE_TIME_ELAPSED;
         for(Tower tour : towers){    //on reset les attaques de toutes les tours pour pas que auto_pass désaventage le joueur
@@ -185,9 +188,12 @@ class Rounds{
   void spawn(){
     int decalage=0;
     while(spawn_list.size()>0 && FAKE_TIME_ELAPSED-last_spawn_time > intervall){    //le while est la si jamais on doit spawn plusieurs enemis a la meme frame
-      spawn_list.get(0).avancement -= 2*decalage;
-      if(spawn_at_half_speed)  spawn_list.get(0).speed /= 2.;
-      enemis.add(spawn_list.get(0));
+      Mob mob = spawn_list.get(0);
+      mob.id = current_id;
+      current_id++;
+      mob.avancement -= 2*decalage;
+      if(spawn_at_half_speed)  mob.speed /= 2.;
+      enemis.add(mob);
       spawn_list.remove(0);
       last_spawn_time+=intervall;
       decalage++;

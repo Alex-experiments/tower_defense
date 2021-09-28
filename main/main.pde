@@ -1,3 +1,5 @@
+//police de charactère ravie ?
+
 boolean auto_pass_levels=true;
 boolean god_mode=true;
 
@@ -52,12 +54,12 @@ void load_sprites(){
   int separateur_index;
   String name;
   int dx, dy, x, y, offset_x, offset_y;
-  int half, quarter;
+  int half, quarter, eigth;
   
   for(String ligne : lines){
     space_index = ligne.indexOf(" : ");
     offset_index = ligne.indexOf(" offset ");
-    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter");
+    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter"); eigth = ligne.indexOf(" eigth");
     println(ligne);
       if(space_index!=-1){
         name = ligne.substring(0, space_index);
@@ -71,6 +73,7 @@ void load_sprites(){
           int end = ligne.length();
           if(half>-1)  end = half;
           else if(quarter>-1)  end = quarter;
+          else if(eigth>-1)  end = eigth;
           y=int(ligne.substring(separateur_index+2, end));
           offset_x=0;
           offset_y=0;
@@ -82,13 +85,11 @@ void load_sprites(){
           int end = ligne.length();
           if(half>-1)  end = half;
           else if(quarter>-1)  end = quarter;
+          else if(eigth>-1)  end = eigth;
           offset_y = int(ligne.substring(separateur_index+2, end));
         }
-        if(half==-1)  half = 0;  //on passe half et quarter en boolean
-        else half = 1;
-        if(quarter==-1)  quarter = 0;
-        else quarter = 1;
-        pos_coins_sprites.put(name, new int[] {x, y, dx, dy, offset_x, offset_y, half, quarter});
+        int last_param = half>-1 ? 1:0 + 2*(quarter>-1 ? 1:0) + 3*(eigth>-1 ? 1:0);  //vaut 1 si half, 2 si quarter et 3 si eigth
+        pos_coins_sprites.put(name, new int[] {x, y, dx, dy, offset_x, offset_y, last_param});
      }
   }
   

@@ -86,7 +86,10 @@ class Tack_shooter extends Tower{
     
     if(path_2_progression == 3)  sprites_names.append("blade shooter body");
     else if(path_2_progression == 4)  sprites_names.append("blade maelstrom body");
-    else if(path_1_progression == 4)  sprites_names.append("ring of fire body");
+    else if(path_1_progression == 4){
+      sprites_names.append("ring of fire sorties flame");
+      sprites_names.append("ring of fire body");
+    }
     else sprites_names.append("tack shooter body");
     
     if(max(path_1_progression, path_2_progression)<=1)  sprites_names.append("two tacks");
@@ -168,6 +171,36 @@ class Boomerang_thrower extends Tower{
     shoots_list.append("basic boomerang");
     deviation_list.append(0);
     attack_speed_list.append(0.75);
+  }
+  
+  void set_sprites(){
+    sprites_names = new StringList();
+    
+    if(path_2_progression>=3)  sprites_names.append("boomerang shooter bionic arm");
+    
+    if(path_1_progression <= 1 && path_2_progression <= 2)  sprites_names.append("boomerang shooter body");
+    else if(path_2_progression>=3)  sprites_names.append("dart monkey");
+    else if(path_1_progression == 2)  sprites_names.append("boomerang shooter red body");
+    else if(path_1_progression == 3)  sprites_names.append("boomerang shooter purple body");
+    else if(path_1_progression == 4){
+      sprites_names.append("dart monkey");
+      sprites_names.append("boomerang shooter white suit");
+    }
+    
+    if(path_2_progression>=3)  sprites_names.append("boomerang shooter bionic eye");
+    
+    if(path_1_progression == 0){
+      if(path_2_progression==0)  sprites_names.append("boomerang shooter triangle");
+      else if(path_2_progression == 1)  sprites_names.append("boomerang shooter circle");
+      else if(path_2_progression == 2)  sprites_names.append("boomerang shooter cross");
+    }
+    else if(path_1_progression == 1){
+      if(path_2_progression==0)  sprites_names.append("boomerang shooter triple triangle");
+      else if(path_2_progression == 1)  sprites_names.append("boomerang shooter triple circle");
+      else if(path_2_progression == 2)  sprites_names.append("boomerang shooter cross");
+    }
+   
+    sprites_pos = get_sprites_pos(sprites_names);
   }
   
 }
@@ -413,7 +446,13 @@ class Tower{
       translate(x, y);
       rotate(orientation);
       for(int[] pos_aff : sprites_pos){
-        if(pos_aff[7]==1){
+        if(pos_aff[6]==3){
+          for(int i=0; i<8; i++){
+            rotate(QUARTER_PI);
+            image(all_sprites, pos_aff[4], pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+          }
+        }
+        if(pos_aff[6]==2){
           image(all_sprites, pos_aff[4]-pos_aff[2]/2, pos_aff[5]-pos_aff[3]/2, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
           image(all_sprites, pos_aff[4]+pos_aff[2]/2, pos_aff[5]-pos_aff[3]/2, pos_aff[2], pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1], pos_aff[0], pos_aff[1]+pos_aff[3]);
           image(all_sprites, pos_aff[4]+pos_aff[2]/2, pos_aff[5]+pos_aff[3]/2, pos_aff[2], pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3], pos_aff[0], pos_aff[1]);
@@ -548,6 +587,7 @@ class Tower{
           rings_of_fire.add(new Ring_of_fire(this));
         }
         else if(shoot_type.indexOf("boomerang")>=0){
+          if(set_orientation_when_shoot)  this.orientation = atan2(target.y-y, target.x-x)+HALF_PI;
           shoot_boomerang(target, shoot_type);
         }
         else if(this.type.equals("sniper")){
