@@ -669,7 +669,7 @@ class Tower{
       pos_finale=pos_inutile;
     }
     
-    boomerangs.add(new Boomerang(this, pos_finale[0], pos_finale[1], range/2, boomerang_type));
+    projectiles.add(new Boomerang(this, pos_finale[0], pos_finale[1], range/2, boomerang_type));
        
   }
 

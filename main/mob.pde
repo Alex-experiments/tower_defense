@@ -3,16 +3,14 @@ class Mob{
   float avancement;
   float base_speed=1.45, speed=base_speed;
   int layers, type_max_layers;
-  float size=25;
+  float size=25.;
   color couleur;
   String type;      //important pasque whites et blacks ont le meme nb de layers mais pas les memes carac
-  int id;
   
   //ArrayList<Mob> enfants;
   StringList enfants;
   
-  boolean regrowth;
-  boolean camo;
+  boolean regrowth, camo;
   boolean is_frozen=false, is_stunned=false, is_rooted=false, is_blown_away = false;    //stun est différent de rooted : quand on se fait tapper sous stun on repart, pas sous root
   float stun_time, stun_duration, root_time, root_duration;
   float blown_away_cos_dir, blown_away_sin_dir, blown_away_speed, blown_away_landing_avancement;
@@ -23,6 +21,8 @@ class Mob{
   
   //la sont des infos dont on a besoin pour pop_layers()
   ArrayList<Mob> list_of_bloons_dmged;
+  
+  ArrayList<Projectile> hurted_by_during_frame = new ArrayList<Projectile>();    //on va garder en mémoire tous les projectiles qui nous ont tappé durant cette frame
   
   String sprite_name;
  
@@ -237,6 +237,8 @@ class Mob{
   }
   
   void update(){
+    for(Projectile proj : hurted_by_during_frame)  proj.already_dmged_mobs.add(this);
+    hurted_by_during_frame.clear();
     regrow();
     deplacement();
   }
@@ -373,12 +375,6 @@ class Mob{
             fils.past_types=ArrayList_of_string_copy(past_types);
             fils.min_RBE_reached=min( min_RBE_reached, fils.get_RBE());      // la RBE minimum consiste en le min entre celle atteinte et la RBE actuelle du fils
           }
-          /*if(i==0 || !can_bounce || bounces_left>0){    //on ne fait des degats à cet enfant que si : c'est lengeance directe ou si ya pas de rebonds ou si il en reste
-            layers_popped+=fils.pop_layers(nb_layers_to_pop, false, bounces_left-1, can_bounce);    //pas besoin de créer de nouvelles explosions car on l'a deja fait
-            bounces_made+=fils.get_bounces_made();
-            bounces_left-=fils.get_bounces_made();
-            nb_layers_to_pop-=layers_popped;
-          }*/
           if( !damage_type.equals("laser")){    //un laser ne peut tuer les enfants d'un ballon
             int temp=fils.pop_layers(nb_layers_to_pop, false, damage_type);    //pas besoin de créer de nouvelles explosions car on l'a deja fait
             layers_popped+=temp;
@@ -392,6 +388,9 @@ class Mob{
       if(initial_hit){        
         for(int i=enemis_size; i<enemis.size(); i++){    //on ajoute tous les ballons enfantés qui ne sont pas morts    si aucun ballon enfanté (enemis_size==enemis.size() ) ca ne fait pas la boucle
           list_of_bloons_dmged.add(enemis.get(i));
+          for(int index=0; index<hurted_by_during_frame.size(); index++){
+            enemis.get(i).hurted_by_during_frame.add(hurted_by_during_frame.get(index));
+          }
         }
       }
       

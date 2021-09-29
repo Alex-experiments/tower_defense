@@ -7,15 +7,10 @@ boolean god_mode=true;
 
 float FAKE_TIME_ELAPSED;//à chaque frame c'est une constante
 
-PImage background;
-PImage all_sprites;
-PImage bloons_sprites;
-PImage coin_sprite;
-PImage coeur_sprite;
+PImage background, all_sprites, bloons_sprites, coin_sprite, coeur_sprite;
 
 ArrayList<Mob> enemis=new ArrayList<Mob>();
 ArrayList<Projectile> projectiles=new ArrayList<Projectile>();
-ArrayList<Boomerang> boomerangs=new ArrayList<Boomerang>();
 ArrayList<Laser> lasers=new ArrayList<Laser>();
 ArrayList<Tower> towers=new ArrayList<Tower>();
 ArrayList<Pop_animation> pop_animations=new ArrayList<Pop_animation>();
@@ -166,8 +161,6 @@ void setup(){
   
   ellipseMode(CENTER);
   rectMode(CORNERS);
-  
-
 }
 
 void draw(){  
@@ -180,11 +173,9 @@ void draw(){
     joueur.vies=100;
     joueur.argent=max(joueur.argent, 1000000);
   }
-  if(joueur.vies<=0){
+  else if(joueur.vies<=0){
     stop();
   }
-  
-  
   
   round.update();
   round.spawn();
@@ -212,10 +203,6 @@ void draw(){
     projectiles.get(i).core(i, nb_proj);
   }
   
-  //On update tous les boomerangs tirés
-  for (int i = boomerangs.size() - 1; i >= 0; i--){
-    boomerangs.get(i).core();
-  }
   
   //On update tous les spikes
   int nb_spikes = spikes.size();
@@ -262,9 +249,7 @@ void draw(){
   
   info_panel.interact(joueur.selected_tower);
   info_panel.show(joueur.selected_tower);
-  
-  
-  
+ 
 }
 
 

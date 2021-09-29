@@ -99,20 +99,20 @@ class Tower_panel{
   }
   
   void instantiate_all_buttons(){
-    dart_monkey =       new Button(875, 94, 875+62, 156, "");
-    tack_shooter =      new Button(938, 94, 1000, 156, "");
-    sniper_monkey =     new Button(875, 157, 875+62, 157+62, "");
-    boomerang_thrower = new Button(938, 157, 1000, 157+62, "");
-    ninja_monkey =      new Button(875, 220, 875+62, 282, "");
+    dart_monkey =       new Button(875, 94, 875+62, 156, "", 'q');
+    tack_shooter =      new Button(938, 94, 1000, 156, "", 'r');
+    sniper_monkey =     new Button(875, 157, 875+62, 157+62, "", 'z');
+    boomerang_thrower = new Button(938, 157, 1000, 157+62, "", 'w');
+    ninja_monkey =      new Button(875, 220, 875+62, 282, "", 'd');
     //canon
     //ice
     //glue
     //boat
     //plane
     //superman
-    wizard_monkey =     new Button(938, 220, 1000, 282, "");
-    dartling_gun =      new Button(875, 283, 875+62, 283+62, "");
-    spike_factory =     new Button(938, 283, 1000, 283+62, "");
+    wizard_monkey =     new Button(938, 220, 1000, 282, "", 'a');
+    dartling_gun =      new Button(875, 283, 875+62, 283+62, "", 'm');
+    spike_factory =     new Button(938, 283, 1000, 283+62, "", 'j');
     
     
     dart_monkey.descr = "Dart Monkey\n"+str(get_tower_price("dart monkey"));

@@ -161,7 +161,7 @@ class Super_monkey_fan_club extends Ability{
   
   Super_monkey_fan_club(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
   ArrayList<Tower> get_closest_dart_monkeys(Tower tour_used){
@@ -247,7 +247,7 @@ class Blade_maelstrom extends Ability{
   
   Blade_maelstrom(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
   void use(Tower tour_used){
@@ -272,7 +272,7 @@ class Turbo_charge extends Ability{
     
   Turbo_charge(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
 
   void use(Tower tour_used){
@@ -298,7 +298,7 @@ class Supply_drop extends Ability{
 
   Supply_drop(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
     initial_cd(enabled_by_tower);
   }
   
@@ -315,7 +315,7 @@ class Rocket_storm extends Ability{
 
   Rocket_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
   void use(Tower tour_used){
@@ -342,7 +342,7 @@ class Spike_storm extends Ability{
   
   Spike_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
   void use(Tower tour_used){
@@ -357,7 +357,7 @@ class Summon_phoenix extends Ability{
 
   Summon_phoenix(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
   void use(Tower tour_used){
@@ -380,7 +380,7 @@ class Sabotage_supply_lines extends Ability{
   
   Sabotage_supply_lines(Tower enabled_by_tower, float cooldown_duration, float duration){
     super(enabled_by_tower, cooldown_duration, duration);
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "");
+    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
   void use(Tower tour_used){

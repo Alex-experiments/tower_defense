@@ -1,6 +1,6 @@
 class Button{
 
-  //rajouter une touche raccourci
+  static final byte CASE_MASK = 1 << 5; // 0b00100000
   
   float top_left_x;
   float top_left_y;
@@ -17,13 +17,15 @@ class Button{
   color unclickable_color = color(144);
   
   boolean show_descr_above=true;
+  char shortcut_key;
   
-  Button(float top_left_x, float top_left_y, float bottom_right_x, float bottom_right_y, String text){
+  Button(float top_left_x, float top_left_y, float bottom_right_x, float bottom_right_y, String text, char shortcut_key){
     this.top_left_x=top_left_x;
     this.top_left_y=top_left_y;
     this.bottom_right_x=bottom_right_x;
     this.bottom_right_y=bottom_right_y;
     this.text=text;
+    this.shortcut_key = uppercase(shortcut_key);
   } 
   
   void show(){
@@ -79,11 +81,11 @@ class Button{
   boolean is_cliqued(){
     //return true uniquement si on vient de le cliquer a cette frame (pas enfoncé)
     if(enfonce){
-      if( !(mouse_on_button() && mousePressed && mouseButton==LEFT))    enfonce=false;
+      if( !(mouse_on_button() && mousePressed && mouseButton==LEFT) && !(keyPressed && uppercase(key) == shortcut_key))    enfonce=false;
       return false;
     }
     if(unclickable)  return false;
-    if(mousePressed && mouseButton==LEFT && mouse_on_button()){
+    if(mousePressed && mouseButton==LEFT && mouse_on_button() || keyPressed && uppercase(key) == shortcut_key ){
       enfonce=true;
       return true;
     }
@@ -94,4 +96,9 @@ class Button{
     return mouseX>=top_left_x && mouseX<=bottom_right_x && mouseY>=top_left_y && mouseY<=bottom_right_y;
   }
   
+  char uppercase(char c){
+    if(c>'z' || c < 'a')  return c;
+    return char(c & ~ CASE_MASK);
+  }
 }
+  

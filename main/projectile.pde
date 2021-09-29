@@ -1,10 +1,9 @@
 class Projectile{
-  float x, y;
+  float x, y, prev_x, prev_y;
   float speed, size;
   float direction;
 
   int dmg_done_this_frame;
-  float prev_x, prev_y;
   
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   
@@ -28,8 +27,10 @@ class Projectile{
   
   color couleur;  
   boolean rotate=false;
-  float rotation_angle=0., rotation_speed;
+  float rotation_angle=0., rotation_speed=PI/16;
   ArrayList<int[]> sprites_pos;
+  
+  boolean orbiting=false;
   
   Tower fired_from_tower;
    
@@ -65,11 +66,12 @@ class Projectile{
     //fill(couleur);
     //noStroke();
     //ellipse(x, y, size, size);
+    
     if(rotate)   rotation_angle+=rotation_speed;
     pushMatrix();
     translate(x, y);
     rotate(direction+HALF_PI+rotation_angle);
-    for(int[] pos_aff : sprites_pos)    image(all_sprites, 0, 0, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    for(int[] pos_aff : sprites_pos)    image(all_sprites, pos_aff[4], pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
     popMatrix();
 
   }
@@ -102,7 +104,7 @@ class Projectile{
     Mob closest_mob = null;
     for(Mob mob : enemis){
       dist = distance(new float[] {mob.x, mob.y}, new float[] {x, y});
-      if(dist < dist_min && !already_dmged_mobs.contains(mob)){
+      if(dist < dist_min && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){
         closest_mob = mob;
         dist_min = dist;
       }
@@ -135,10 +137,9 @@ class Projectile{
     boolean hit_someone=false;
     float[] pos_of_enemi_hitted= new float[]{0, 0};    //ceci sert a repositionner le projectile pile la ou etait le mob pour éviter les trajectoires bizarres si il a dépassé le mob
     
-    
     for (int i = enemis.size() - 1; i >= 0; i--){
       Mob mob = enemis.get(i);
-      if(can_detect(mob, fired_from_tower.detects_camo) && pierce>0 && collision(new float[] {mob.x, mob.y}, mob.size) && !already_dmged_mobs.contains(mob)){
+      if(can_detect(mob, fired_from_tower.detects_camo) && pierce>0 && collision(new float[] {mob.x, mob.y}, mob.size) && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){//si on a pas déjà tappé ce mob (ou ses parents) durant les dernieres frames
         if(explose){
           explosions.add(new Explosion(fired_from_tower, mob.x, mob.y, explosion_diameter, damage, pierce, damage_type, explosion_stuns, explosion_stun_duration));
           pierce=0;
@@ -146,7 +147,7 @@ class Projectile{
         }
         pos_of_enemi_hitted=new float[] {mob.x, mob.y};
         hit(mob);
-        pierce--;
+        if(!orbiting)  pierce--;
         hit_someone=true;
         if(pierce<=0)  break;
       }
@@ -158,7 +159,7 @@ class Projectile{
       Mob closest_mob=enemis.get(0);
       float dist_min=max_bounce_distance+1;    
       for(Mob mob : enemis){
-        if(can_detect(mob, fired_from_tower.detects_camo) && distance(new float[] {mob.x, mob.y}, new float[] {x, y})<dist_min && already_dmged_mobs.contains(mob)==false){
+        if(can_detect(mob, fired_from_tower.detects_camo) && distance(new float[] {mob.x, mob.y}, new float[] {x, y})<dist_min && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){
           closest_mob=mob;
           dist_min=distance(new float[] {mob.x, mob.y}, new float[] {x, y});
         }
@@ -182,6 +183,7 @@ class Projectile{
   
   
   void hit(Mob mob){
+    
     if(damage>0){
       int dmg_to_deal = damage;
       
@@ -195,7 +197,9 @@ class Projectile{
       dmg_done_this_frame+=layers_popped;
       
       for(Mob dmged_mob : mob.bloons_dmged()){
-        already_dmged_mobs.add(dmged_mob);
+        //already_dmged_mobs.add(dmged_mob);
+        dmged_mob.hurted_by_during_frame.add(this);
+        //dmged_mob.hurted_by_counter.append(0);
         if(blows_away){
           if(projectile_type.equals("tornado"))  dmged_mob.apply_effect("blow away far", 0.);
           else if(projectile_type.indexOf("shuriken")>=0){

@@ -23,8 +23,8 @@ class Joueur{
   }
 
   void speed_controller(){
-    if (speed_button==null){
-      speed_button = new Button(875, 650-80, 1000, 650, "speed : "+str(game_speed));
+    if(speed_button==null){
+      speed_button = new Button(875, 650-80, 1000, 650, "speed : "+str(game_speed), '*');
     }
     speed_button.show();
     
@@ -116,14 +116,14 @@ class Joueur{
 
   void tower_selection(){
     if(keyPressed){
-      if(key=='a' || key=='A')  placing_tower="dart monkey";
+      /*if(key=='a' || key=='A')  placing_tower="dart monkey";
       if(key=='z' || key=='Z')  placing_tower="wizard monkey";
       if(key=='e' || key=='E')  placing_tower="sniper";
       if(key=='r' || key=='R')  placing_tower="tack shooter";
       if(key=='t' || key=='T')  placing_tower="dartling gun";
       if(key=='y' || key=='Y')  placing_tower="boomerang thrower";
       if(key=='u' || key=='U')  placing_tower="ninja monkey";
-      if(key=='i' || key=='I')  placing_tower="spike factory";
+      if(key=='i' || key=='I')  placing_tower="spike factory";*/
       if(key==' ')  placing_tower="";
     }
   }

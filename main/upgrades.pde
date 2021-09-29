@@ -253,7 +253,7 @@ class Upgrades{
               if(i==1)  temp.angle_dep=PI;
               temp.deplacement();  //pour éviter qu'il y ait un prev_x sur la tour et déclancer des collisions qui ne doivent pas avoir lieu
               temp.deplacement();
-              boomerangs.add(temp);
+              projectiles.add(temp);
             }
             break;          
         }
@@ -268,8 +268,8 @@ class Upgrades{
             else if(tour.shoots_list.get(0).indexOf("glaive")>=0)  temp_shooting_type = "sonic glaive boomerang";
             change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les frozen
-            for(Boomerang boomer : boomerangs){
-              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.boomerang_type = "sonic glaive boomerang";
+            for(Projectile proj : projectiles){
+              if(proj.orbiting && proj.fired_from_tower == tour)  proj.projectile_type = "sonic glaive boomerang";
             }
             break;
           case 1:
@@ -279,8 +279,8 @@ class Upgrades{
             else if(tour.shoots_list.get(0).indexOf("glaive")>=0)  temp_shooting_type = "red hot glaive boomerang";
             change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les lead
-            for(Boomerang boomer : boomerangs){
-              if(boomer.orbiting && boomer.fired_from_tower == tour)  boomer.boomerang_type = "red hot glaive boomerang";
+            for(Projectile proj : projectiles){
+              if(proj.orbiting && proj.fired_from_tower == tour)  proj.projectile_type = "red hot glaive boomerang";
             }
             break;
           case 2:

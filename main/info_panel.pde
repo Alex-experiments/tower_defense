@@ -1,12 +1,6 @@
 class Panel{
 
-  Button sell_button;
-  Button upgrade_left;
-  Button upgrade_right;
-  Button priority_first;
-  Button priority_last;
-  Button priority_close;
-  Button priority_strong;
+  Button sell_button, upgrade_left, upgrade_right, priority_first, priority_last, priority_close, priority_strong;
   
   float top_left_x=0;
   float top_left_y=650;
@@ -95,9 +89,9 @@ class Panel{
     
     if(sell_button.is_cliqued()){
       joueur.argent+=selected_tower.price*sell_percent;                  //vendre une tour rapporte 80% de son prix
-      for (int i = boomerangs.size() - 1; i >= 0; i--){
-        Boomerang boomer = boomerangs.get(i);
-        if(boomer.orbiting && boomer.fired_from_tower == selected_tower)  boomerangs.remove(i);
+      for (int i = projectiles.size() - 1; i >= 0; i--){
+        Projectile proj = projectiles.get(i);
+        if(proj.orbiting && proj.fired_from_tower == selected_tower)  projectiles.remove(i);
       }
       if(selected_tower.linked_ability != null)  selected_tower.linked_ability.delete(selected_tower);
       if(selected_tower instanceof Dartling_gun && selected_tower.path_1_progression == 4){    //on vend un ray of doom
@@ -165,15 +159,15 @@ class Panel{
   
   void instantiate_all_buttons(Tower selected_tower){
     upgrades.get_possible_upgrades(selected_tower.type, selected_tower.path_1_progression, selected_tower.path_2_progression);
-    sell_button =     new Button(310, 650+5, 400, 650+50, "Sell\n"+str(int(selected_tower.price * sell_percent)));
-    upgrade_left =    new Button(410, 650+5, 640, 650+90, upgrades.name_1);    
-    upgrade_right =   new Button(645, 650+5, 875, 650+90, upgrades.name_2);
+    sell_button =     new Button(310, 650+5, 400, 650+50, "Sell\n"+str(int(selected_tower.price * sell_percent)), 's');
+    upgrade_left =    new Button(410, 650+5, 640, 650+90, upgrades.name_1, char(LEFT));    
+    upgrade_right =   new Button(645, 650+5, 875, 650+90, upgrades.name_2, char(RIGHT));
     if(upgrades.price_1 != -1)  upgrade_left.text+="\nPrice : "+str(upgrades.price_1);   //voir textLeading() pour l'interligne
     if(upgrades.price_2 != -1)  upgrade_right.text+="\nPrice : "+str(upgrades.price_2);
-    priority_first =  new Button(100, 650+57, 175, 650+95, "First");
-    priority_last =   new Button(178, 650+57, 252, 650+95, "Last");
-    priority_close =  new Button(254, 650+57, 329, 650+95, "Close");
-    priority_strong = new Button(331, 650+57, 406, 650+95, "Strong");
+    priority_first =  new Button(100, 650+57, 175, 650+95, "First", '&');
+    priority_last =   new Button(178, 650+57, 252, 650+95, "Last", 'é');
+    priority_close =  new Button(254, 650+57, 329, 650+95, "Close", '"');
+    priority_strong = new Button(331, 650+57, 406, 650+95, "Strong", '\'');
     
     if(selected_tower.priority=="first")  priority_first.selected=true;
     if(selected_tower.priority=="last")  priority_last.selected=true;
