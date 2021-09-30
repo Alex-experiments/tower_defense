@@ -269,7 +269,12 @@ class Upgrades{
             change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les frozen
             for(Projectile proj : projectiles){
-              if(proj.orbiting && proj.fired_from_tower == tour)  proj.projectile_type = "sonic glaive boomerang";
+              if(proj.orbiting && proj.fired_from_tower == tour){
+                proj.projectile_type = "sonic glaive boomerang";
+                proj.set_stats();
+                proj.speed = 5.;
+                proj.sprites_pos = get_sprites_pos(new StringList(proj.projectile_type));
+              }
             }
             break;
           case 1:
@@ -280,7 +285,12 @@ class Upgrades{
             change_shooting_type(tour, temp_shooting_type);
             //Si on a max left_path, les boomerangs orbitants doivent aussi pouvoir péter les lead
             for(Projectile proj : projectiles){
-              if(proj.orbiting && proj.fired_from_tower == tour)  proj.projectile_type = "red hot glaive boomerang";
+              if(proj.orbiting && proj.fired_from_tower == tour){
+                proj.projectile_type = "red hot glaive boomerang";
+                proj.set_stats();
+                proj.speed = 5.;
+                proj.sprites_pos = get_sprites_pos(new StringList(proj.projectile_type));
+              }
             }
             break;
           case 2:

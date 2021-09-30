@@ -145,16 +145,18 @@ class Projectile{
           pierce=0;
           return;
         }
-        pos_of_enemi_hitted=new float[] {mob.x, mob.y};
+        if(can_bounce){
+          pos_of_enemi_hitted=new float[] {mob.x, mob.y};
+          hit_someone=true;
+        }
         hit(mob);
         if(!orbiting)  pierce--;
-        hit_someone=true;
         if(pierce<=0)  break;
       }
     }
     
     
-    if(hit_someone && can_bounce && pierce>0 && enemis.size()>0){
+    if(can_bounce && hit_someone && pierce>0 && enemis.size()>0){
       //si on peut ricocher (capacité+touché qqn pendant ce déplacement) et qu'il reste des enemis
       Mob closest_mob=enemis.get(0);
       float dist_min=max_bounce_distance+1;    

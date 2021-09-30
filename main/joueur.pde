@@ -52,7 +52,7 @@ class Joueur{
       
       //on regarde si la hitbox rencontre celle d'une tour deja placée
       for(Tower tour : towers){            
-        if(distance(new float[] {tour.x, tour.y}, new float[] {mouseX, mouseY})<(tour.size+temp.size)/2){  
+        if(tour.selectable && distance(new float[] {tour.x, tour.y}, new float[] {mouseX, mouseY})<(tour.size+temp.size)/2){  
            can_place_tower=false;
            break;
         }

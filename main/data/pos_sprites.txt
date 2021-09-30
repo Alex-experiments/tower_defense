@@ -6,6 +6,9 @@
 //https://bloons.fandom.com/wiki/MOAB-Class_Bloon#BTD5
 // all bloons skins
 
+//https://www.spriters-resource.com/search/?q=bloons+tower+defense
+// icones de tours de btd5
+
 //https://basicallyaverage.com/all-btd5-towers-strategy/
 // all tower skins
 
@@ -114,6 +117,7 @@ bloontonium laser cannon : 25*59 a 1675, 1529
 
 hydra rocket : 23*33 a 1810, 1496
 hydra rocket flame : 22*31 a 1721, 1601
+///////
 rocket_droite : 22*37 a 1231, 745
 
 blade : 38*38 a 1332, 1428
@@ -163,7 +167,7 @@ ring of fire body : 38*73 a 1220, 1469 half
 ring of fire body_2 : 38*73 a 1293, 1395 half
 ring of fire body_3 : 38*73 a 1334, 1354 half
 ring of fire sorties flame : 10*13 a 651, 1795 offset 0; -42 eigth
-
+ring of fire sorties flame_2 : 10*12 a 1628, 470 offset 0; -42 eigth
 
 
 sniper monkey green hat : 47*34 a 755, 1661 offset 0; -4
@@ -193,16 +197,59 @@ boomerang shooter triple circle : 34*24 a 1447, 1479
 boomerang shooter cross : 30*26 a 1234, 1821 offset 0; -4
 boomerang shooter bionic arm : 27*50 a 1373, 1354 offset 26; -26
 boomerang shooter bionic arm_2 : 27*47 a 1893, 1274 offset 26; -24
-
 boomerang shooter bionic eye : 19*20 a 1759, 1697 offset 10; -20
 
+ninja monkey red body : 58*58 a 790, 1131 offset -1; 0
+ninja monkey black body : 58*59 a 640, 1256 offset -1; 0
+ninja monkey white body : 57*59 a 259, 1647 offset -1; 0
+ninja monkey white body suit : 56*60 a 1861, 40 offset -1; 0
+ninja monkey googles : 43*42 a 1165, 1353 offset 0; -10
+bandana blanc : 43*15 a 665, 1830 offset 0; -12
+bandana noir : 43*15 a 579, 1254 offset 0; -12
+bandana bleu : 43*15 a 63, 1833 offset 0; -12
+bandana violet : 43*15 a 1870, 421 offset 0; -12
 
-unknown dark bionic eye : 19*20 a 1874, 1580 offset 10; -20
+
+wizard monkey body : 32*57 a 1678, 1287 half
+wizard monkey google body : 32*57 a 1609, 1364 half
+wizard monkey hat : 32*60 a 1257, 1680 half
+wizard monkey blue hat : 32*60 a 1290, 1678 half
+wizard monkey socle nuage : 40*74 a 838, 1765 half
+wizard monkey socle solaire : 39*39 a 1220, 1429 quarter
+wizard monkey socle napalm flame : 16*21 a 1707, 1789 offset 0; -40 eigth
+wizard monkey red hat : 32*60 a 1325, 1621 half
+wizard monkey phoenix summoner body : 61*57 a 272, 1552
+wizard monkey tornado body : 61*57 a 578, 1271
+blue straight wand : 12*47 a 421, 1356
+blue bent wand : 17*47 a 1759, 1718
+red straight wand : 15*46 a 328, 828
+red bent wand : 17*47 a 1905, 1135
+
+
+dartling gun body : 57*60 a 318, 1647
+dartling gun red body : 57*60 a 251, 1707
+dartling gun green hat : 47*35 a 570, 1810 offset 0; -4
+dartling gun blue hat : 47*35 a 997, 1412 offset 0; -4
+dartling gun purple hat : 47*35 a 1298, 1112 offset 0; -4
+dartling gun red hat : 47*35 a 1352, 1058 offset 0; -4
+dartling gun ray of doom hat : 46*36 a 996, 1448 offset 0; -2
+dartling gun hat target : 14*21 a 879, 1827 offset 0; -4 half
+dartling gun barrels : 14*61 a 905, 910 offset 0; -77 half
+dartling gun rocket storm barrels : 20*11 a 1647, 115 offset 0; -103 half
+dartling gun basic gun : 26*74 a 1592, 1607 offset 0; -63 half
+dartling gun blue gun : 26*74 a 1621, 1022 offset 0; -63 half
+dartling gun purple gun : 26*74 a 1705, 1494 offset 0; -63 half
+dartling gun hydra rocket gun : 26*50 a 1409, 1784 offset 0; -51 half
+dartling gun rocket storm gun : 33*72 a 1482, 1448 offset 0; -62 half
+dartling gun laser canon gun : 26*55 a 1443, 1781 offset 0; -53 half
+dartling gun ray of doom gun : 26*101 a 1832, 1356 offset 0; -76 half
+
 
 
 
 
 818 1219
 
-googles : 43*42 a 1165, 1353
+
+unknown dark bionic eye : 19*20 a 1874, 1580 offset 10; -20
 

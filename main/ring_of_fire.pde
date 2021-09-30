@@ -1,39 +1,33 @@
-class Ring_of_fire{
-  float x, y;
-  int dmg_done_this_frame;
-  ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
-  int damage=1, pierce=60;
-  String damage_type = "normal";
-  ArrayList<int[]> sprites_pos;
+class Ring_of_fire extends Projectile{
+
   
   float max_ray, ray;
   static final float epaisseur = 20., expansion_rate = 10., sprite_size=108.;
-  Tower fired_from_tower;
-  
-  
+ 
   Ring_of_fire(Tower fired_from_tower){
-    this.x = fired_from_tower.x;
-    this.y = fired_from_tower.y;
-    sprites_pos = get_sprites_pos(new StringList("ring of fire"));
-    this.ray = int(fired_from_tower.size/2);
-    this.max_ray = int(fired_from_tower.range);
-    this.fired_from_tower = fired_from_tower;
+    super(fired_from_tower, fired_from_tower.x, fired_from_tower.y, 0., "ring of fire");
+    ray = int(fired_from_tower.size/2);
+    max_ray = int(fired_from_tower.range);
   }
   
-  public void core(){
-    for(int i = 0; i<joueur.game_speed; i++){
+  public void core(int i, int nb_proj){
+    for(int k = 0; k<joueur.game_speed; k++){
       if(ray>max_ray){
-        rings_of_fire.remove(this);
+        projectiles.remove(i);
         return;
       }
       ray += expansion_rate;
       if(pierce>0)  kill();        //sinon on le supprime pas, on continue de l'afficher comme pour ray of doom
-      //println(pierce, FAKE_TIME_ELAPSED);
     }
     show();
   }
   
-  private void show(){
+  void set_stats(){
+    damage = 1; pierce = 60;
+    damage_type = "normal";
+  }
+  
+  void show(){
     pushMatrix();
     translate(x, y);
     for(int[] pos_aff : sprites_pos){
@@ -47,36 +41,12 @@ class Ring_of_fire{
     }
     popMatrix();
   }
-  
-  private void kill(){
-    dmg_done_this_frame=0;
-    //on fait des degats aux enemis
+ 
+  boolean collision(float[] pos_mob, float size_mob){  //on prend ces params pour override
     
-    for (int i = enemis.size() - 1; i >= 0; i--){
-      Mob mob = enemis.get(i);
-      if(can_detect(mob, fired_from_tower.detects_camo) && pierce>0 && !already_dmged_mobs.contains(mob)){
-        float dist = distance(new float[] {mob.x, mob.y}, new float[] {fired_from_tower.x, fired_from_tower.y});
-        if( abs(dist-ray) < epaisseur/2.){
-          hit(mob);
-          pierce--;
-          if(pierce<=0)  break;
-        }
-      }
-    }
+    float dist = distance(pos_mob, new float[] {fired_from_tower.x, fired_from_tower.y});
     
-    fired_from_tower.add_pop_count(dmg_done_this_frame);
-  }
-  
-  private void hit(Mob mob){
-    int layers_popped=mob.pop_layers(damage, true, damage_type);      //on tappe le mob
-    dmg_done_this_frame+=layers_popped;
-    
-    for(Mob dmged_mob : mob.bloons_dmged()){
-      already_dmged_mobs.add(dmged_mob);
-    }
-    
-    
-    if(mob.layers<=0)  enemis.remove(mob);
+    return abs(dist-ray) < epaisseur/2.;
   }
   
 }

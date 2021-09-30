@@ -6,7 +6,7 @@ class Ray_of_doom{
   String damage_type = "normal";
   ArrayList<int[]> sprites_pos;
   
-  static final float EPAISSEUR = 30.;
+  static final float EPAISSEUR = 30., SHOW_OFFSET_y = -140.;
   float MAX_LEN_OF_RAY = sqrt(tower_panel.top_left_x * tower_panel.top_left_x + info_panel.top_left_y*info_panel.top_left_y);
   Tower fired_from_tower;
   
@@ -63,10 +63,10 @@ class Ray_of_doom{
   boolean collision(float[] pos_mob, float size_mob){
     //C'est pourquoi on recherche la distance entre le rayon et l'enemi. Pour pas se faire chier on prend un sengment de longueur max
     
-    myLine.x1=x;
-    myLine.x2=x+cos(direction)*MAX_LEN_OF_RAY;
-    myLine.y1=y;
-    myLine.y2=y+sin(direction)*MAX_LEN_OF_RAY;
+    myLine.x1=x+cos(direction) * abs(SHOW_OFFSET_y);
+    myLine.x2=x+cos(direction) * MAX_LEN_OF_RAY;
+    myLine.y1=y+sin(direction) * abs(SHOW_OFFSET_y);
+    myLine.y2=y+sin(direction) * MAX_LEN_OF_RAY;
     
     return myLine.getDistance(pos_mob[0], pos_mob[1]).z < (EPAISSEUR+size_mob)/2;    //Dans le cas des hitbox rondes
   }
@@ -77,7 +77,7 @@ class Ray_of_doom{
     translate(x, y);
     rotate(direction+HALF_PI);
     int[] pos_aff = sprites_pos.get(0);
-    image(all_sprites, pos_aff[4], pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    image(all_sprites, pos_aff[4], SHOW_OFFSET_y + pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
     //float y_offset = -pos_aff[5]-pos_aff[3];
     float y_offset = 15. - 51.;
     //float sin_direc = sin(direction), cos_direc = cos(direction);
@@ -89,7 +89,7 @@ class Ray_of_doom{
     for(float i=y_offset/pos_aff[3]; i<MAX_LEN_OF_RAY/pos_aff[3]; i++){    //141 iter
     //while(pos_x > - pos_aff[0] && pos_x < tower_panel.top_left_x + pos_aff[0] && pos_y > - pos_aff[1] && pos_y < info_panel.top_left_y + pos_aff[1]){
     //while(compteur<10){
-      image(all_sprites, 0, 2*y_offset - i * pos_aff[3], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+      image(all_sprites, 0, SHOW_OFFSET_y+2*y_offset - i * pos_aff[3], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
       //pos_y += sin_direc * pos_aff[3];
       //pos_x += cos_direc * pos_aff[2];
       //len += pos_aff[3];

@@ -7,7 +7,6 @@ class Dart_monkey extends Tower{
   void set_param_tower(){
     couleur=color(0, 0, 255);
     price=200;
-    size=base_size;
     range=128;
     
     shoots_list.append("dart");
@@ -47,7 +46,6 @@ class Super_monkey_fan extends Tower{
   void set_param_tower(){
     couleur=color(0, 0, 255);
     price=0;
-    size=base_size;
     //range=162;    //ca c'est le super monkey de base mais la on est a range de supermonkey x/1
     range=230;
     
@@ -110,7 +108,6 @@ class Sniper extends Tower{
     priority="strong";
     couleur=color(0, 128, 64);
     price=350;
-    size=base_size;
     range=24;                //c'est un sniper donc ca c'est juste pour la prévisu quand on sélectionne la tour
     
     shoots_list.append("bullet");
@@ -165,7 +162,6 @@ class Boomerang_thrower extends Tower{
   void set_param_tower(){
     couleur = color(255, 242, 0);
     price = 400;
-    size = base_size;
     range = 165;
     
     shoots_list.append("basic boomerang");
@@ -205,59 +201,46 @@ class Boomerang_thrower extends Tower{
   
 }
 
-class Dartling_gun extends Tower{
+class Ninja_monkey extends Tower{
 
-  Dartling_gun(String type, float x, float y){
+  Ninja_monkey(String type, float x, float y){
     super(type, x, y);
   }
   
   void set_param_tower(){
-    couleur = color(180, 230, 30);
-    price = 950;
-    size = base_size;
+    couleur = color(255, 0, 0);
+    price = 500;
+    range = 152;
     detects_camo=true;
-    max_dispersion = 0.4;   //en radians
-    range=44;    //seuleument pour le visuel
     
-    shoots_list.append("dart");
+    shoots_list.append("shuriken");
     deviation_list.append(0);
-    attack_speed_list.append(5);
+    attack_speed_list.append(1.67);
   }
   
-  void shoot(){
+  void set_sprites(){
+    sprites_names = new StringList();
     
-    if(round.waiting_next_round)  return;      //sinon lance un projectile parasite
-    
-    if(path_1_progression == 4)  return;    //on a deja un ray_of_doom
-    
-    FloatList directions_list=new FloatList();
-    for(int i=0; i<shoots_list.size(); i++){
-      String shoot_type = shoots_list.get(i);
-      float deviation = deviation_list.get(i);
-      float time_before_next_attack = time_before_next_attack_list.get(i);
-      float attack_speed = attack_speed_list.get(i);
-      
-      int compteur_dir=0;
-      while(time_before_next_attack<=0){
-        float direction=atan2(mouseY-y, mouseX-x);
-        if(i==0){
-          direction += random(-max_dispersion/2, max_dispersion/2);
-          directions_list.append(direction);
-        }
-        else{
-          direction=directions_list.get(compteur_dir);
-        }
-        projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));
-        
-        time_before_next_attack += 1 / attack_speed;      //affecter la valeur reste utile pour le while (sinon il faut remplacer par un _list.get(i)<=0 )
-        time_before_next_attack_list.set(i, time_before_next_attack);
-        
-        compteur_dir++;
-      }
+    if(path_1_progression == 0 && path_2_progression == 0)  sprites_names.append("ninja monkey red body");
+    else if(path_1_progression == 4)  sprites_names.append("ninja monkey white body suit");
+    else if(path_1_progression>=path_2_progression){
+      sprites_names.append("ninja monkey white body");
+      if(path_1_progression == 3)  sprites_names.append("bandana rouge");
+      else if(path_1_progression == 2)  sprites_names.append("bandana violet");
+      else if(path_1_progression == 1)  sprites_names.append("bandana noir");
     }
+    else if(path_1_progression < path_2_progression){
+      sprites_names.append("ninja monkey black body");
+      if(path_2_progression == 4)  sprites_names.append("ninja monkey googles");
+      else if(path_2_progression == 3)  sprites_names.append("bandana rouge");
+      else if(path_2_progression == 2)  sprites_names.append("bandana bleu");
+      else if(path_2_progression == 1)  sprites_names.append("bandana blanc");
+    }
+    
+    sprites_pos = get_sprites_pos(sprites_names);
   }
-  
 }
+
 
 class Wizard_monkey extends Tower{
 
@@ -268,12 +251,41 @@ class Wizard_monkey extends Tower{
   void set_param_tower(){
     couleur=color(209, 34, 234);
     price=550;
-    size=base_size*1.5;
     range=152;
     shoots_list.append("purple ball");
     deviation_list.append(0);
     attack_speed_list.append(0.91);
   }
+  
+  void set_sprites(){
+    sprites_names = new StringList();
+    if(max(path_1_progression, path_2_progression) == 0)  sprites_names.append("wizard monkey body");
+    else if(max(path_1_progression, path_2_progression) == 1)  sprites_names.append("wizard monkey google body");
+    else if(max(path_1_progression, path_2_progression) == 2)  sprites_names.append("wizard monkey hat");
+    else if(path_1_progression == 3){
+      sprites_names.append("wizard monkey blue hat");
+      sprites_names.append("blue straight wand");
+    }
+    else if(path_2_progression == 3){
+      sprites_names.append("wizard monkey red hat");
+      sprites_names.append("red straight wand");
+    }
+    else if(path_1_progression == 4){
+      sprites_names.append("wizard monkey socle nuage");
+      sprites_names.append("wizard monkey tornado body");
+      sprites_names.append("blue bent wand");
+    }
+    else if(path_2_progression == 4){
+      sprites_names.append("wizard monkey socle napalm flame");
+      sprites_names.append("wizard monkey socle solaire");
+      sprites_names.append("wizard monkey phoenix summoner body");
+      sprites_names.append("red bent wand");
+    }
+    
+    
+    sprites_pos = get_sprites_pos(sprites_names);
+  }
+  
 }
 
 class Phoenix extends Tower{
@@ -290,7 +302,6 @@ class Phoenix extends Tower{
   void set_param_tower(){
     couleur=color(209, 34, 234);
     price=0;
-    size=base_size;
     range=160;
     shoots_list.append("dragon's breath");
     deviation_list.append(0);
@@ -320,23 +331,100 @@ class Phoenix extends Tower{
 }
 
 
-class Ninja_monkey extends Tower{
+class Dartling_gun extends Tower{
 
-  Ninja_monkey(String type, float x, float y){
+  Dartling_gun(String type, float x, float y){
     super(type, x, y);
   }
   
   void set_param_tower(){
-    couleur = color(255, 0, 0);
-    price = 500;
-    size = base_size;
-    range = 152;
+    couleur = color(180, 230, 30);
+    price = 950;
     detects_camo=true;
+    max_dispersion = 0.4;   //en radians
+    range=44;    //seuleument pour le visuel
     
-    shoots_list.append("shuriken");
+    shoots_list.append("dart");
     deviation_list.append(0);
-    attack_speed_list.append(1.67);
+    attack_speed_list.append(5);
   }
+  
+  void set_sprites(){
+    sprites_names = new StringList();
+    
+    if(path_1_progression >= 3)  sprites_names.append("dartling gun red body");
+    else sprites_names.append("dartling gun body");
+    
+    
+    if(path_2_progression == 4){
+      sprites_names.append("dartling gun rocket storm barrels");
+      sprites_names.append("dartling gun rocket storm gun");
+      sprites_names.append("dartling gun red hat");
+    }
+    else{
+      sprites_names.append("dartling gun barrels");
+      if(path_2_progression == 3){
+        sprites_names.append("dartling gun hydra rocket gun");
+        sprites_names.append("dartling gun red hat");
+      }
+      else if(path_1_progression == 4)  sprites_names.append("dartling gun ray of doom gun");
+      else if(path_1_progression == 3)  sprites_names.append("dartling gun laser canon gun");
+      else if(path_2_progression == 2){
+        sprites_names.append("dartling gun purple gun");
+        sprites_names.append("dartling gun purple hat");
+      }
+      else if(path_1_progression == 2){
+        sprites_names.append("dartling gun blue gun");
+        sprites_names.append("dartling gun blue hat");
+      }
+      else if(max(path_1_progression, path_2_progression) <= 1){
+        sprites_names.append("dartling gun green hat");
+        if(max(path_1_progression, path_2_progression) == 1)  sprites_names.append("dartling gun hat target");
+        sprites_names.append("dartling gun basic gun");
+      }
+    }
+   
+    
+    
+    sprites_pos = get_sprites_pos(sprites_names);
+  }
+  
+  void shoot(){
+    
+    if(round.waiting_next_round)  return;      //sinon lance un projectile parasite
+    
+    float direction = atan2(mouseY-y, mouseX-x);
+    orientation = direction+HALF_PI;
+    
+    if(path_1_progression == 4)  return;    //on a deja un ray_of_doom
+    
+    FloatList directions_list=new FloatList();
+    
+    for(int i=0; i<shoots_list.size(); i++){
+      String shoot_type = shoots_list.get(i);
+      float deviation = deviation_list.get(i);
+      float time_before_next_attack = time_before_next_attack_list.get(i);
+      float attack_speed = attack_speed_list.get(i);
+      
+      int compteur_dir=0;
+      while(time_before_next_attack<=0){
+        if(i==0){
+          direction += random(-max_dispersion/2, max_dispersion/2);
+          directions_list.append(direction);
+        }
+        else{
+          direction=directions_list.get(compteur_dir);
+        }
+        projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));
+        
+        time_before_next_attack += 1 / attack_speed;      //affecter la valeur reste utile pour le while (sinon il faut remplacer par un _list.get(i)<=0 )
+        time_before_next_attack_list.set(i, time_before_next_attack);
+        
+        compteur_dir++;
+      }
+    }
+  }
+  
 }
 
 
@@ -349,7 +437,6 @@ class Spike_factory extends Tower{
   void set_param_tower(){
     couleur = color(0, 0, 0);
     price = 700;
-    size = base_size;
     range = 134;
     detects_camo=true;
     
@@ -385,7 +472,7 @@ class Tower{
   float x, y;
   float range;
   String priority="first";
-  float base_size=60, size;
+  float base_size=60, size = base_size;
   int pop_count=0;
   String type;
  
@@ -584,7 +671,7 @@ class Tower{
           lasers.add(new Laser(this, x, y, target));
         }
         else if(shoot_type.equals("ring of fire")){
-          rings_of_fire.add(new Ring_of_fire(this));
+          projectiles.add(new Ring_of_fire(this));
         }
         else if(shoot_type.indexOf("boomerang")>=0){
           if(set_orientation_when_shoot)  this.orientation = atan2(target.y-y, target.x-x)+HALF_PI;
