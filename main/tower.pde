@@ -17,7 +17,13 @@ class Dart_monkey extends Tower{
   void set_sprites(){
     sprites_names = new StringList();
     if(path_2_progression == 4)  sprites_names.append("super monkey fan club");
-    else if(path_1_progression<3 && path_2_progression<4)  sprites_names.append("dart monkey");
+    else if(path_1_progression >= 3){
+      sprites_names.append("spike o pult base");
+      sprites_names.append("spike o pult body");
+      sprites_names.append("spike o pult");
+      if(path_1_progression == 3)  sprites_names.append("dart ball resting");
+      else sprites_names.append("huge dart ball resting");
+    }
     else sprites_names.append("dart monkey");
         
     if(max(path_1_progression, path_2_progression)==1)  sprites_names.append("bandana vert");
@@ -396,7 +402,10 @@ class Dartling_gun extends Tower{
     float direction = atan2(mouseY-y, mouseX-x);
     orientation = direction+HALF_PI;
     
-    if(path_1_progression == 4)  return;    //on a deja un ray_of_doom
+    if(path_1_progression == 4){
+      associated_ray.core();
+      return;    //on a deja un ray_of_doom
+    }
     
     FloatList directions_list=new FloatList();
     
@@ -463,6 +472,17 @@ class Spike_factory extends Tower{
       }
     }  
   }
+  void set_sprites(){
+    sprites_names = new StringList();
+    
+    sprites_names.append("spike factory top gear");
+    sprites_names.append("spike factory side gear_2");
+    sprites_names.append("spike factory blue base");
+    sprites_names.append("spike factory green body");
+    sprites_names.append("spike factory small top");
+    
+    sprites_pos = get_sprites_pos(sprites_names);
+  }
 }
 
 
@@ -501,6 +521,8 @@ class Tower{
   boolean selectable = true;
   Tower summoner;
   boolean active = true;    //c'est par exemple quand une abilite remplace une tour par une autre temporairement : on update ni ne show() la tour remplacée
+  
+  Ray_of_doom associated_ray;
   
   Tower(String type, float x, float y){
     this.x=x;
@@ -548,6 +570,10 @@ class Tower{
         else if(pos_aff[6]==1){
           image(all_sprites, pos_aff[4]-pos_aff[2]/2, pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
           image(all_sprites, pos_aff[4]+pos_aff[2]/2, pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1], pos_aff[0], pos_aff[1]+pos_aff[3]);
+        }
+        else if(pos_aff[6]==4){  //mirror.
+          image(all_sprites, pos_aff[4]-pos_aff[2]/2, -pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+          image(all_sprites, -pos_aff[4]+pos_aff[2]/2, pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0]+pos_aff[2], pos_aff[1], pos_aff[0], pos_aff[1]+pos_aff[3]);
         }
         else  image(all_sprites, pos_aff[4], pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
       }

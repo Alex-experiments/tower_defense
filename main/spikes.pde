@@ -15,6 +15,8 @@ class Spikes{
   boolean deplacement_fini=false;
   boolean is_from_spike_storm = false;
   
+  boolean touche_enfonce = false;
+  
   int dmg_done_this_frame;
 
   StringList stronger_against = new StringList();;    //certains spikes ont de meilleurs dégats selon le type d'enemis. (pas pris en compte dans explosion)
@@ -54,7 +56,7 @@ class Spikes{
       spikes.remove(i);
       return;
     }
-    else if(nb_spikes-i<1200)  show();    //on affiche que les 1200 derniers crées pour éviter tout lag
+    else if(nb_spikes-i<1200)  show();    //on affiche que les 1200 derniers crées pour éviter tout lag*/
   }
   
   void verif_damage_type(){
@@ -85,7 +87,7 @@ class Spikes{
         }
       }
     }
-    else kill();
+    else  kill();
     
   }
   

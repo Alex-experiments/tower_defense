@@ -94,11 +94,7 @@ class Panel{
         if(proj.orbiting && proj.fired_from_tower == selected_tower)  projectiles.remove(i);
       }
       if(selected_tower.linked_ability != null)  selected_tower.linked_ability.delete(selected_tower);
-      if(selected_tower instanceof Dartling_gun && selected_tower.path_1_progression == 4){    //on vend un ray of doom
-        for(int i = rays_of_doom.size()-1; i>=0; i--){
-          if(rays_of_doom.get(i).fired_from_tower == selected_tower)  rays_of_doom.remove(i);
-        }
-      }
+
       towers.remove(selected_tower);
       joueur.selected_tower=null;
       return;

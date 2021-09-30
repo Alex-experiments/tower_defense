@@ -335,7 +335,7 @@ class Upgrades{
             change_shooting_type(tour, temp_shooting_type);
             break;
           case 3:
-            rays_of_doom.add(new Ray_of_doom(tour));
+            tour.associated_ray = new Ray_of_doom(tour);
             break;          
         }
       }

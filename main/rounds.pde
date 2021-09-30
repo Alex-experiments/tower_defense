@@ -3,7 +3,7 @@ class Rounds{
   //In Bloons TD 5, the speed multiplier can be calculated by this formula: max(6.6 * (waveNumber - 85) / (200 - 85),1)
   // voir part RAMPING https://bloons.fandom.com/wiki/Bloon : ya aussi la vie des mobs
   
-  int round_number=16;
+  int round_number=0;
   boolean finished;
   float initial_intervall=0.865, intervall;
   ArrayList<Mob> spawn_list=new ArrayList<Mob>();  

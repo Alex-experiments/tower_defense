@@ -18,7 +18,6 @@ ArrayList<Explosion> explosions = new ArrayList<Explosion>();
 ArrayList<Spikes> spikes = new ArrayList<Spikes>();
 ArrayList<Ability> abilities = new ArrayList<Ability>();
 ArrayList<Banana> bananas = new ArrayList<Banana>();
-ArrayList<Ray_of_doom> rays_of_doom = new ArrayList<Ray_of_doom>();
 
 Map map = new Map(2);
 Joueur joueur= new Joueur(200, 650);
@@ -48,12 +47,14 @@ void load_sprites(){
   int separateur_index;
   String name;
   int dx, dy, x, y, offset_x, offset_y;
-  int half, quarter, eigth;
+  int half, quarter, eigth, mirror;
+  
+  int nb_sprites = 0;
   
   for(String ligne : lines){
     space_index = ligne.indexOf(" : ");
     offset_index = ligne.indexOf(" offset ");
-    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter"); eigth = ligne.indexOf(" eigth");
+    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter"); eigth = ligne.indexOf(" eigth"); mirror = ligne.indexOf(" mirror");
     println(ligne);
       if(space_index!=-1){
         name = ligne.substring(0, space_index);
@@ -68,6 +69,7 @@ void load_sprites(){
           if(half>-1)  end = half;
           else if(quarter>-1)  end = quarter;
           else if(eigth>-1)  end = eigth;
+          else if(mirror>-1)  end = mirror;
           y=int(ligne.substring(separateur_index+2, end));
           offset_x=0;
           offset_y=0;
@@ -80,12 +82,16 @@ void load_sprites(){
           if(half>-1)  end = half;
           else if(quarter>-1)  end = quarter;
           else if(eigth>-1)  end = eigth;
+          else if(mirror>-1)  end = mirror;
           offset_y = int(ligne.substring(separateur_index+2, end));
         }
-        int last_param = half>-1 ? 1:0 + 2*(quarter>-1 ? 1:0) + 3*(eigth>-1 ? 1:0);  //vaut 1 si half, 2 si quarter et 3 si eigth
+        int last_param = half>-1 ? 1:0 + 2*(quarter>-1 ? 1:0) + 3*(eigth>-1 ? 1:0) + 4*(mirror>-1 ? 1:0);  //vaut 1 si half, 2 si quarter et 3 si eigth
         pos_coins_sprites.put(name, new int[] {x, y, dx, dy, offset_x, offset_y, last_param});
+        nb_sprites++;
      }
   }
+  
+  println(nb_sprites, "sprites repertories");
   
   bloons_sprites=loadImage("bloons_sprites_transp.png");
   String[] y_ordre = {"zebra", "lead", "white", "black", "pink", "yellow", "green", "blue", "red"};
@@ -185,6 +191,12 @@ void draw(){
   }
   
   map.hide();
+  
+  //On update tous les spikes    (avant les tours sinon ca se met par dessus le phoenix et tout
+  int nb_spikes = spikes.size();
+  for (int i = nb_spikes - 1; i >= 0; i--){
+    spikes.get(i).core(i, nb_spikes);
+  }
 
   for(Tower tour : towers){
     tour.core();
@@ -202,13 +214,6 @@ void draw(){
     projectiles.get(i).core(i, nb_proj);
   }
   
-  
-  //On update tous les spikes
-  int nb_spikes = spikes.size();
-  for (int i = nb_spikes - 1; i >= 0; i--){
-    spikes.get(i).core(i, nb_spikes);
-  }
-  
   for(int i=bananas.size()-1; i>=0; i--){
     bananas.get(i).core();
   }
@@ -216,10 +221,6 @@ void draw(){
   //On affiche toutes les explosions
   for (int i = explosions.size() - 1; i >= 0; i--){
     explosions.get(i).core();
-  }
-  
-  for(Ray_of_doom ray : rays_of_doom){
-    ray.core();
   }
   
   //On affiche toutes les pop_animations

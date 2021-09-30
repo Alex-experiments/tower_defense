@@ -6,7 +6,7 @@ class Ray_of_doom{
   String damage_type = "normal";
   ArrayList<int[]> sprites_pos;
   
-  static final float EPAISSEUR = 30., SHOW_OFFSET_y = -140.;
+  static final float EPAISSEUR = 30., SHOW_OFFSET_y = -96.;
   float MAX_LEN_OF_RAY = sqrt(tower_panel.top_left_x * tower_panel.top_left_x + info_panel.top_left_y*info_panel.top_left_y);
   Tower fired_from_tower;
   
