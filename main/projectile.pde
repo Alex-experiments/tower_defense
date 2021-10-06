@@ -25,10 +25,11 @@ class Projectile{
   StringList stronger_against = new StringList();    //certains projectiles ont de meilleurs dégats selon le type d'enemis. (pas pris en compte dans explosion)
   int stronger_against_damage;
   
-  color couleur;  
-  boolean rotate=false;
+  boolean rotate=false, always_show_vertically=false;
   float rotation_angle=0., rotation_speed=PI/16;
-  ArrayList<int[]> sprites_pos;
+  
+  ArrayList<Animator> sprites = new ArrayList<Animator>();
+  int anim_frame_per_sprite = 3;
   
   boolean orbiting=false;
   
@@ -43,8 +44,12 @@ class Projectile{
     this.projectile_type = projectile_type;
     
     set_stats();
-    sprites_pos = get_sprites_pos(new StringList(projectile_type));
-    if(sprites_pos.size()==0)  sprites_pos = get_sprites_pos(new StringList("dart"));    //pour avoir un sprite dart de base
+    
+   
+    for(String sprite_name : get_sprites_names()){
+      if(get_sprites_pos(new StringList(sprite_name)).size()==0)  sprites.add(new Animator("dart", anim_frame_per_sprite));    //pour avoir un sprite dart de base
+      else sprites.add(new Animator(sprite_name, anim_frame_per_sprite));
+    }
   }
   
   void core(int i, int nb_proj){
@@ -55,6 +60,7 @@ class Projectile{
       return;
     }
     if(nb_proj - i<500) this.show();   //on affiche que les 300 derniers crées pour éviter tout lag
+    for(Animator anim : sprites)  anim.update(true);
   }
     
   void verif_damage_type(){
@@ -63,15 +69,21 @@ class Projectile{
   }
   
   void show(){
-    //fill(couleur);
-    //noStroke();
-    //ellipse(x, y, size, size);
-    
+    if(always_show_vertically){
+      for(Animator anim : sprites){
+        int[] pos_aff = anim.get_pos();
+        image(all_sprites, x+pos_aff[4], y+pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+      }
+      return;
+    }
     if(rotate)   rotation_angle+=rotation_speed;
     pushMatrix();
     translate(x, y);
     rotate(direction+HALF_PI+rotation_angle);
-    for(int[] pos_aff : sprites_pos)    image(all_sprites, pos_aff[4], pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    for(Animator anim : sprites){
+      int[] pos_aff = anim.get_pos();
+      image(all_sprites, pos_aff[4], pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    }
     popMatrix();
 
   }
@@ -81,7 +93,7 @@ class Projectile{
     prev_y=y;
     if(is_seeking && enemis.size()>0){
       Mob target = get_closest_enemi();
-      if(target == null || distance(new float[] {target.x, target.y}, new float[] {x, y}) > seeking_max_distance){
+      if(target == null){
         x+=cos(direction)*speed * joueur.game_speed;  //on applique un déplacement normal si : target trop loin ou si on a deja tappe tous les mobs encore en vie et deja spawn
         y+=sin(direction)*speed * joueur.game_speed;
       }
@@ -100,10 +112,10 @@ class Projectile{
   }
   
   Mob get_closest_enemi(){
-    float dist, dist_min = Float.POSITIVE_INFINITY;
+    float dist, dist_min = seeking_max_distance;
     Mob closest_mob = null;
-    for(Mob mob : enemis){
-      dist = distance(new float[] {mob.x, mob.y}, new float[] {x, y});
+    for(Mob mob : grid.get_enemis_to_look_at(x, y, seeking_max_distance)){
+      dist = distance(mob.x, mob.y, x, y);
       if(dist < dist_min && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){
         closest_mob = mob;
         dist_min = dist;
@@ -113,7 +125,7 @@ class Projectile{
   }
   
   boolean out_of_map(){
-    if(has_max_range && distance(new float[] {x, y}, new float[] {fired_from_tower.x, fired_from_tower.y})>max_range)  return true;    //si on a excédé la max range
+    if(has_max_range && distance_sqred(x, y, fired_from_tower.x, fired_from_tower.y)>max_range*max_range)  return true;    //si on a excédé la max range
     return (x+size)/2<0 || (x-size)/2>width || (y+size)/2<0 || (y-size)/2>height;
   }
   
@@ -137,8 +149,13 @@ class Projectile{
     boolean hit_someone=false;
     float[] pos_of_enemi_hitted= new float[]{0, 0};    //ceci sert a repositionner le projectile pile la ou etait le mob pour éviter les trajectoires bizarres si il a dépassé le mob
     
-    for (int i = enemis.size() - 1; i >= 0; i--){
-      Mob mob = enemis.get(i);
+    
+    float pos_inter_x = (x + prev_x)/2, pos_inter_y = (y+prev_y)/2;    //le projectile s'étant déplacé, il faut check une collision en ligne
+    float dist_traveled = distance(x, y, prev_x, prev_y);
+    
+    ArrayList<Mob> enemis_to_look_at = grid.get_enemis_to_look_at(pos_inter_x, pos_inter_y, (dist_traveled+size)/2);
+    for (int i = enemis_to_look_at.size() - 1; i >= 0; i--){
+      Mob mob = enemis_to_look_at.get(i);
       if(can_detect(mob, fired_from_tower.detects_camo) && pierce>0 && collision(new float[] {mob.x, mob.y}, mob.size) && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){//si on a pas déjà tappé ce mob (ou ses parents) durant les dernieres frames
         if(explose){
           explosions.add(new Explosion(fired_from_tower, mob.x, mob.y, explosion_diameter, damage, pierce, damage_type, explosion_stuns, explosion_stun_duration));
@@ -160,17 +177,16 @@ class Projectile{
       //si on peut ricocher (capacité+touché qqn pendant ce déplacement) et qu'il reste des enemis
       Mob closest_mob=enemis.get(0);
       float dist_min=max_bounce_distance+1;    
-      for(Mob mob : enemis){
-        if(can_detect(mob, fired_from_tower.detects_camo) && distance(new float[] {mob.x, mob.y}, new float[] {x, y})<dist_min && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){
+      enemis_to_look_at = grid.get_enemis_to_look_at(pos_of_enemi_hitted[0], pos_of_enemi_hitted[1], max_bounce_distance);
+      for(Mob mob : enemis_to_look_at){
+        if(can_detect(mob, fired_from_tower.detects_camo) && distance_sqred(mob.x, mob.y, x, y)<dist_min*dist_min && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){
           closest_mob=mob;
-          dist_min=distance(new float[] {mob.x, mob.y}, new float[] {x, y});
+          dist_min=distance(new float[] {mob.x, mob.y}, pos_of_enemi_hitted);
         }
       }
       if(dist_min<max_bounce_distance){      //si dist_min n'a pas bougé, closest_mob sera enemis.get(0), or cela veut dire qu'on la deja tappé
         x=pos_of_enemi_hitted[0];
         y=pos_of_enemi_hitted[1];
-        //float[] collision_pos=map_1(closest_mob.avancement+closest_mob.speed);      //on vise la où la cible va etre  //INUTILE DE PREVOIR JUSTE UN COUP D'AVANCE
-        //direction=atan2(collision_pos[1]-y, collision_pos[0]-x);              //on se redirige vers le mob le plus proche
         direction=atan2(closest_mob.y-y, closest_mob.x-x);
       }
       else{
@@ -178,7 +194,7 @@ class Projectile{
       }
     }
     
-    if(hit_someone && can_bounce && enemis.size()==0)  pierce=0;    //pour faire disparaite les projectiles rebondissant
+    //if(hit_someone && can_bounce && enemis.size()==0)  pierce=0;    //pour faire disparaite les projectiles rebondissant
     
     fired_from_tower.add_pop_count(dmg_done_this_frame);
   }
@@ -199,9 +215,7 @@ class Projectile{
       dmg_done_this_frame+=layers_popped;
       
       for(Mob dmged_mob : mob.bloons_dmged()){
-        //already_dmged_mobs.add(dmged_mob);
         dmged_mob.hurted_by_during_frame.add(this);
-        //dmged_mob.hurted_by_counter.append(0);
         if(blows_away){
           if(projectile_type.equals("tornado"))  dmged_mob.apply_effect("blow away far", 0.);
           else if(projectile_type.indexOf("shuriken")>=0){
@@ -211,9 +225,10 @@ class Projectile{
         }
       }
       
-      if(mob.layers<=0)  enemis.remove(mob);
+      if(mob.layers<=0)   mob.delete();
+      
     }
-    else{  //c'est donc forcément qu'on blow_away avec une tornado qui fait 0 dégats
+    else{  //c'est donc forcément qu'on blow_away avec une whirlwind qui fait 0 dégats
       mob.apply_effect("blow away", 0.);
     }
   }
@@ -374,18 +389,20 @@ class Projectile{
         max_range = fired_from_tower.range;
         break;
       case "whirlwind":
-        speed = 10.; size = 30.;
+        speed = 10.; size = 40.;
         damage = 0; pierce = 25;
         damage_type = "normal";
         blows_away = true;
         has_max_range = true;
         max_range = fired_from_tower.range;    //dans le cas d'une whirlwind : on recule entre 40% et 70% de la longueur du track, contre 60% à 100% pour une tornado
+        always_show_vertically=true;
         break;
       case "tornado":
-        speed = 20.; size = 30.;
+        speed = 20.; size = 60.;
         damage = 1; pierce = 70;
         damage_type = "normal";
         blows_away = true;
+        always_show_vertically=true;
         break;
       case "shuriken":
         speed = 20.; size=27.;
@@ -426,6 +443,18 @@ class Projectile{
         println("ERROR : can't assign any projectile type with ", projectile_type);
         break;
     }  
+  }
+  
+  StringList get_sprites_names(){
+    
+    switch(projectile_type){
+      case "purple ball":
+        return new StringList("purple ball background", "purple ball");
+      case "huge purple ball":
+        return new StringList("huge purple ball background", "huge purple ball");
+      default:
+      return new StringList(projectile_type);
+    }
   }
   
 }

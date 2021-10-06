@@ -4,7 +4,9 @@ class Ray_of_doom{
   ArrayList<Mob> already_dmged_mobs=new ArrayList<Mob>();
   int damage=1, pierce, INIT_PIERCE=100;
   String damage_type = "normal";
-  ArrayList<int[]> sprites_pos;
+  ArrayList<Animator> sprites = new ArrayList<Animator>();
+ 
+  boolean dmg_this_frame = true;  //un ray of doom tappe une fois par frame sur la version normale qui est en 30 fps
   
   static final float EPAISSEUR = 30., SHOW_OFFSET_y = -96.;
   float MAX_LEN_OF_RAY = sqrt(tower_panel.top_left_x * tower_panel.top_left_x + info_panel.top_left_y*info_panel.top_left_y);
@@ -13,7 +15,8 @@ class Ray_of_doom{
   Ray_of_doom(Tower fired_from_tower){
     x = fired_from_tower.x;
     y = fired_from_tower.y;
-    sprites_pos = get_sprites_pos(new StringList("ray of doom 28px start", "ray of doom 28px"));
+    sprites.add(new Animator("ray of doom start", 5));
+    sprites.add(new Animator("ray of doom", 5));
     this.fired_from_tower = fired_from_tower;
   }
   
@@ -21,8 +24,10 @@ class Ray_of_doom{
     if(round.waiting_next_round)  return;
     for(int i=0; i<joueur.game_speed; i++){
       renew();
-      kill();
+      if(dmg_this_frame)  kill();
+      dmg_this_frame = !dmg_this_frame;
     }
+    for(Animator anim : sprites)  anim.update(true);
     show();
   }
   
@@ -57,7 +62,7 @@ class Ray_of_doom{
     }
     
     
-    if(mob.layers<=0)  enemis.remove(mob);
+    if(mob.layers<=0)  mob.delete();
   }
   
   boolean collision(float[] pos_mob, float size_mob){
@@ -76,14 +81,14 @@ class Ray_of_doom{
     pushMatrix();
     translate(x, y);
     rotate(direction+HALF_PI);
-    int[] pos_aff = sprites_pos.get(0);
+    int[] pos_aff = sprites.get(0).get_pos();
     image(all_sprites, pos_aff[4], SHOW_OFFSET_y + pos_aff[5], pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
     //float y_offset = -pos_aff[5]-pos_aff[3];
     float y_offset = 15. - 51.;
     //float sin_direc = sin(direction), cos_direc = cos(direction);
     //float pos_x = x;
     //float pos_y = y + sin_direc * (y_offset);
-    pos_aff = sprites_pos.get(1);
+    pos_aff = sprites.get(1).get_pos();
     //int compteur = 0;
     //float len = y_offset;
     for(float i=y_offset/pos_aff[3]; i<MAX_LEN_OF_RAY/pos_aff[3]; i++){    //141 iter

@@ -1,16 +1,18 @@
+static final int HALF_MAX_SIZE_MOB = ceil(25/2);  
+
 class Mob{
   float x, y;
   float avancement;
   float base_speed=1.45, speed=base_speed;
+  int cell_id; 
   int layers, type_max_layers;
-  float size=25.;
-  color couleur;
-  String type;      //important pasque whites et blacks ont le meme nb de layers mais pas les memes carac
+  float size=25.;                      //ATTENTION A CHANGER AUSSI DANS HALF_MAX_SIZE_MOB (pour la grid)
+  String type;      //important pasque whites et blacks ont le meme nb de layers mais pas les memes carac ATTENTION : type == couleur (le type d'un red est le même que celui d'un red camo)
   
   //ArrayList<Mob> enfants;
   StringList enfants;
   
-  boolean regrowth, camo;
+  boolean regrowth, camo, undirect_child_should_give_gold = true;
   boolean is_frozen=false, is_stunned=false, is_rooted=false, is_blown_away = false;    //stun est différent de rooted : quand on se fait tapper sous stun on repart, pas sous root
   float stun_time, stun_duration, root_time, root_duration;
   float blown_away_cos_dir, blown_away_sin_dir, blown_away_speed, blown_away_landing_avancement;
@@ -27,33 +29,34 @@ class Mob{
   String sprite_name;
  
   
-  Mob(String type, boolean regrowth, boolean camo){
-    x=10;
-    y=0;
-    avancement=0;
+  Mob(String type, boolean regrowth, boolean camo, float avancement){ 
+    this.avancement=avancement;
+    update_pos();
     this.type=type;
     this.regrowth=regrowth;
     this.camo=camo;
-    this.type=type;
     init_param_mob();
     init_regrowth();
     init_sprite_name();
   }
   
+  void add_to_grid(){
+    cell_id = grid.get_cell_id(x, y);
+      grid.add_new_mob(this, cell_id);
+  }
+  
   void init_sprite_name(){
     sprite_name = type;
     if(regrowth && camo){
-      sprite_name+="camo + regrowth";
+      sprite_name+=" camo regrowth";
     }
     else if(regrowth){
-      sprite_name+="regrowth";
+      sprite_name+=" regrowth";
     }
     else if(camo){
-      sprite_name+="camo";
+      sprite_name+=" camo";
     }
-    else{
-      sprite_name+="basic";
-    }
+    if(get_sprites_pos(new StringList(sprite_name)).size()==0)  sprite_name = "red";
   }
   
   void init_regrowth(){
@@ -67,8 +70,6 @@ class Mob{
   void show(){
     int[] pos_aff;
     pos_aff = pos_coins_sprites.get(sprite_name);
-    //pos_aff = pos_coins_sprites.get("redbasic");
-    
     image(bloons_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
   
@@ -117,78 +118,66 @@ class Mob{
       case "red":
         layers=1;
         speed=base_speed;
-        couleur=color(207, 0, 0);        
         break;
       case "blue":
         layers=1;
         speed=base_speed*1.4;
-        couleur=color(44, 147, 215);
         enfants.append("red");
         break;
       case "green":
         layers=1;
         speed=base_speed*1.8;
-        couleur=color(120, 182, 0);
         enfants.append("blue");
         break;
       case "yellow":
         layers=1;
         speed=base_speed*3.2;
-        couleur=color(255, 226, 0);
         enfants.append("green");
         break;
       case "pink":
         layers=1;
         speed=base_speed*3.5;
-        couleur=color(255, 96, 111);
         enfants.append("yellow");
         break;
       case "black":
         layers=1;
         speed=base_speed*1.8;
-        couleur=color(25, 25, 25);
         enfants.append("pink");
         enfants.append("pink");
         break;
       case "white":
         layers=1;
         speed=base_speed*2;
-        couleur=color(140, 239, 255);
         enfants.append("pink");
         enfants.append("pink");
         break;
       case "lead":
         layers=1;
         speed=base_speed*1;
-        couleur=color(123, 123, 123);
         enfants.append("black");
         enfants.append("black");
         break;
       case "zebra":
         layers=1;
         speed=base_speed*1.8;
-        couleur=color(190, 0, 190);              //modifier le design
         enfants.append("black");
         enfants.append("white");        
         break;
       case "rainbow":
         layers=1;
         speed=base_speed*2.2;
-        couleur=color(255, 128, 64);
         enfants.append("zebra");
         enfants.append("zebra");
         break;
       case "ceramic":
         layers=10;
         speed=base_speed*2.5;
-        couleur=color(189, 105, 24);
         enfants.append("rainbow");
         enfants.append("rainbow");
         break;
       case "MOAB":
         layers=200;
         speed=base_speed;
-        couleur=color(0, 0, 255);
         enfants.append("ceramic");
         enfants.append("ceramic");
         enfants.append("ceramic");
@@ -197,7 +186,6 @@ class Mob{
       case "BFB":
         layers=700;
         speed=base_speed * 0.25;
-        couleur=color(0, 0, 128);
         enfants.append("MOAB");
         enfants.append("MOAB");
         enfants.append("MOAB");
@@ -206,7 +194,6 @@ class Mob{
       case "ZOMG":
         layers=4000;
         speed=base_speed * 0.18;
-        couleur=color(0, 0, 64);
         enfants.append("BFB");
         enfants.append("BFB");
         enfants.append("BFB");
@@ -228,12 +215,22 @@ class Mob{
   void core(int i){
     update();
     if(track_ended()){
-      joueur.vies-=get_RBE();
-      enemis.remove(i);
+      joueur.hurt(get_RBE());
+      delete(i);
     }
     else{
       show();
     }
+  }
+  
+  void delete(int i){
+    grid.remove_mob(this, cell_id);
+    enemis.remove(i);
+  }
+  
+  void delete(){
+    grid.remove_mob(this, cell_id);
+    enemis.remove(this);
   }
   
   void update(){
@@ -254,6 +251,7 @@ class Mob{
             init_param_mob();                         //en faisant ca le ballon est direct au max de ses layers : ce n'est pas ce qu'on veut
             layers=1;                                 //on est du type d'au dessus avec juste une layer
             init_sprite_name();   
+            if(enfants.size()>1)  undirect_child_should_give_gold = false;  //on vient de passer à un type qui enfante deux ballons au moins
           }
         }
         else{                         //on est au type maximum donc on cap au max de layers
@@ -268,19 +266,36 @@ class Mob{
       if(FAKE_TIME_ELAPSED - stun_time > stun_duration)  is_stunned = false;
       else return;
     }
+    if(is_rooted){
+      if(FAKE_TIME_ELAPSED - root_time > root_duration)  is_rooted = false;
+      else return;
+    }
     if(is_blown_away){
-      x += blown_away_cos_dir * blown_away_speed;
-      y += blown_away_sin_dir * blown_away_speed;
-      if(distance(new float[] {x, y}, blown_away_landing_pos) < blown_away_speed){
-        x = blown_away_landing_pos[0];
-        y = blown_away_landing_pos[1];
-        is_blown_away = false;
-        avancement = blown_away_landing_avancement;
+      for(int i=0; i<joueur.game_speed; i++){
+        x += blown_away_cos_dir * blown_away_speed;
+        y += blown_away_sin_dir * blown_away_speed;
+        if(distance(new float[] {x, y}, blown_away_landing_pos) < blown_away_speed){
+          x = blown_away_landing_pos[0];
+          y = blown_away_landing_pos[1];
+          is_blown_away = false;
+          avancement = blown_away_landing_avancement;
+          break;
+        }
       }
+      update_cell_id();
       return;
     }
     avancement += speed * joueur.game_speed;
     update_pos();
+    update_cell_id();
+  }
+  
+  void update_cell_id(){
+    int new_cell_id = grid.get_cell_id(x, y);
+    if(new_cell_id != cell_id){
+      grid.change_cell(this, cell_id, new_cell_id);
+      cell_id = new_cell_id;
+    }
   }
   
   void update_pos(){
@@ -314,8 +329,36 @@ class Mob{
       float dir = atan2(blown_away_landing_pos[1] - y, blown_away_landing_pos[0]-x);
       blown_away_cos_dir = cos(dir);
       blown_away_sin_dir = sin(dir);
+      
+      if(distance(new float[] {x, y}, blown_away_landing_pos) <= blown_away_speed)   is_blown_away = false;  //sinon ca provoque des blown away quand un ballon est à 0, 0 et ca le fait parti n'imp avec le atan2
+      
     }
     else  println("ERROR : effect", effect, "not implemented yet");
+  }
+  
+  void transmit_effect(Mob parent, int fils_numero){
+    if(parent.is_stunned){
+      is_stunned = true;
+      stun_duration = parent.stun_duration;
+      stun_time = parent.stun_time;
+    }
+     
+    if(parent.is_rooted){
+      is_rooted = true;
+      root_duration = parent.root_duration;
+      root_time = parent.root_time;
+    }
+    
+    if(parent.is_blown_away){
+      is_blown_away = true;
+      blown_away_landing_avancement = parent.blown_away_landing_avancement;
+      blown_away_landing_pos = new float[] {parent.blown_away_landing_pos[0], parent.blown_away_landing_pos[1]};
+      blown_away_speed = parent.blown_away_speed;
+      blown_away_cos_dir = parent.blown_away_cos_dir;
+      blown_away_sin_dir = parent.blown_away_sin_dir;
+      x = parent.x + fils_numero * blown_away_cos_dir;
+      y = parent.y + fils_numero * blown_away_sin_dir;
+    }
   }
   
   
@@ -325,7 +368,7 @@ class Mob{
   
   void add_one_gold(){
     //Différent du nombre de layers pop : on ne gagne 1 de gold qu'a chaque fois qu'un ballon change de type (ex céramic à rainbow)
-    if( !regrowth || get_RBE() <= min_RBE_reached)    joueur.argent++;
+    if( !regrowth || get_RBE() <= min_RBE_reached)    joueur.gain(1);
   }
   
   int pop_layers(int nb_layers_to_pop, boolean initial_hit, String damage_type){
@@ -335,7 +378,6 @@ class Mob{
     
     
     if(initial_hit){
-      if(can_damage(this, damage_type))  pop_animations.add(new Pop_animation(x, y, size));
       list_of_bloons_dmged=new ArrayList<Mob>();
       list_of_bloons_dmged.add(this);  //on ajoute meme les mobs qu'on ne peut pas tapper pour éviter de gaspiller tout son pierce dessus en cas de rebonds possibles
     }
@@ -368,12 +410,12 @@ class Mob{
       
       if(enfants!=null){      //pourquoi pas faire en sorte de séparer les dégats sur les ballons sortants
         for(int i=0; i<enfants.size(); i++){
-          Mob fils = new Mob(enfants.get(i), regrowth, camo);;
-          fils.avancement = avancement + 5*i;
-          fils.update_pos();                        //pour permettre aux autres de le tapper si il est dans leur range sans attendre la frame suivante pour update leur pos
+          Mob fils = new Mob(enfants.get(i), regrowth, camo, avancement + 5*i);    //on l'ajoute direct à la grid
+          fils.transmit_effect(this, i);
           if(regrowth){
             fils.past_types=ArrayList_of_string_copy(past_types);
             fils.min_RBE_reached=min( min_RBE_reached, fils.get_RBE());      // la RBE minimum consiste en le min entre celle atteinte et la RBE actuelle du fils
+            if(!undirect_child_should_give_gold && i>=1)  fils.min_RBE_reached = -1;  //on empeche le regrow farming
           }
           if( !damage_type.equals("laser")){    //un laser ne peut tuer les enfants d'un ballon
             int temp=fils.pop_layers(nb_layers_to_pop, false, damage_type);    //pas besoin de créer de nouvelles explosions car on l'a deja fait
@@ -381,11 +423,15 @@ class Mob{
             nb_layers_to_pop -= temp;
           }
           
-          if(fils.layers>0)  enemis.add(fils);
+          if(fils.layers>0){
+            fils.add_to_grid();
+            enemis.add(fils);
+          }
         }
       }
       
       if(initial_hit){        
+        pop_animations.add(new Pop_animation(x, y, size));
         for(int i=enemis_size; i<enemis.size(); i++){    //on ajoute tous les ballons enfantés qui ne sont pas morts    si aucun ballon enfanté (enemis_size==enemis.size() ) ca ne fait pas la boucle
           list_of_bloons_dmged.add(enemis.get(i));
           for(int index=0; index<hurted_by_during_frame.size(); index++){
@@ -395,6 +441,9 @@ class Mob{
       }
       
       add_one_gold();      //le ballon est passé à 0 layers : on gagne un de gold
+      
+      stat_manager.increment_stat(sprite_name, "bloons");
+      stat_manager.increment_stat("Bloons popped", "overview");
       
       return layers_popped;
     }

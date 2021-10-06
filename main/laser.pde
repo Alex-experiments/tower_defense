@@ -58,15 +58,15 @@ class Laser{
     Mob latest_target=initial_target;
     
     for(int i=1; i<max_targets; i++){
-      Mob closest_mob=enemis.get(0);
+      Mob closest_mob=null;
       float dist_min=width*height;    //on initialise a une distance impossible dans la map si jamais on a justement deja tappé enemis.get(0)
       for(Mob mob : enemis){
-        if(can_detect(mob, fired_from_tower.detects_camo) && distance(new float[] {mob.x, mob.y}, new float[] {latest_target.x, latest_target.y})<dist_min && list.contains(mob)==false){
+        if(can_detect(mob, fired_from_tower.detects_camo) && distance_sqred(mob.x, mob.y, latest_target.x, latest_target.y)<dist_min*dist_min && list.contains(mob)==false){
           closest_mob=mob;
-          dist_min=distance(new float[] {mob.x, mob.y}, new float[] {latest_target.x, latest_target.y});
+          dist_min=distance(mob.x, mob.y, latest_target.x, latest_target.y);
         }
       }
-      if(list.contains(closest_mob)){      //cela signifie qu'on a deja tappé tous les mobs
+      if(closest_mob == null){      //cela signifie qu'on a deja tappé tous les mobs
         return list;
       }
       else{                                //on a trouvé un mob pas encore touché
@@ -98,7 +98,7 @@ class Laser{
       already_dmged_mobs.add(dmged_mob);
     }
         
-    if(mob.layers<=0)  enemis.remove(mob);
+    if(mob.layers<=0)  mob.delete();
   }
 
 

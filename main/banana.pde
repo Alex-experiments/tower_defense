@@ -18,7 +18,7 @@ class Banana{
     this.value = value;
     this.type = type;
     set_rayon();
-    this.total_distance = distance(new float[] {init_x, init_y}, new float[] {dest_x, dest_y});
+    this.total_distance = distance(init_x, init_y, dest_x, dest_y);
     if(total_distance == 0)  deplacement_fini = true;
     else direction=atan2(dest_y-init_y, dest_x-init_x);
   }
@@ -40,12 +40,12 @@ class Banana{
   private void update(){
     if(!deplacement_fini){
       for(int i=0; i<joueur.game_speed; i++){    //on itère plusieurs fois pour faire des petits pas et ne pas dépasser de trop la destination
-        float dist = distance(new float[] {x, y}, new float[] {dest_x, dest_y});
+        float dist = distance(x, y, dest_x, dest_y);
         speed=(0.5-initial_speed)*(total_distance-dist)/total_distance+initial_speed;
         //on commence à s = init_s et on arrive a s=0.5 lors de l'arrivée
         x+=speed*cos(direction);
         y+=speed*sin(direction);
-        if(distance(new float[] {x, y}, new float[] {dest_x, dest_y}) < speed){
+        if(distance(x, y, dest_x, dest_y) < speed){
           x=dest_x;
           y=dest_y;
           deplacement_fini=true;
@@ -54,14 +54,14 @@ class Banana{
         }
       }
     }
-    else if(!being_collected && distance(new float[] {x, y}, new float[] {mouseX, mouseY}) < rayon) being_collected = true;
+    else if(!being_collected && distance_sqred(x, y, mouseX, mouseY) < rayon*rayon) being_collected = true;
     else if(being_collected && !collected){
       for(int i=0; i<joueur.game_speed; i++){    //on itère plusieurs fois pour faire des petits pas et ne pas dépasser de trop la destination
         speed++;
         direction=atan2(mouseY-y, mouseX-x);
         x+=speed*cos(direction);
         y+=speed*sin(direction);
-        if(distance(new float[] {x, y}, new float[] {mouseX, mouseY}) < speed){
+        if(distance_sqred(x, y, mouseX, mouseY) < speed*speed){
           collected=true;
           collect();
           break;
@@ -72,7 +72,8 @@ class Banana{
   
   private void show(){
     if(collected){
-      text(str(value), x, y - (FAKE_TIME_ELAPSED - collect_time)*60);;
+      fill(255, 225, 0);
+      text("$"+str(value), x, y - (FAKE_TIME_ELAPSED - collect_time)*60);
     }
     else if(pos_coins_sprites.containsKey(type)){
       int[] pos_aff = pos_coins_sprites.get(type);
@@ -83,7 +84,8 @@ class Banana{
   
   
   private void collect(){
-    joueur.argent += value;
+    if(type.equals("supply drop"))  stat_manager.increment_stat(value, "Money collected", "supply drop");
+    joueur.gain(value);
     collect_time = FAKE_TIME_ELAPSED;
   }
   

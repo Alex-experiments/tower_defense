@@ -251,7 +251,7 @@ class Map{
         //Pour calculer la distance à un arc de cercle : on regarde la distance au cercle si on est dans le bon angle
         //sinon on calcule la distance aux deux points extremaux
         Cercle temp = liste_cercles.get(compteur_nb_cercle);
-        if( abs( distance(new float[] {x, y}, new float[] {temp.centre_x, temp.centre_y}) - temp.radius ) < (epaisseur+size)/2 ){ //on est dans le cas ou on est trop proche du cercle complet : il va falloir étudier l'angle
+        if( abs( distance(x, y, temp.centre_x, temp.centre_y) - temp.radius ) < (epaisseur+size)/2 ){ //on est dans le cas ou on est trop proche du cercle complet : il va falloir étudier l'angle
           float angle = -atan2(y-temp.centre_y, x-temp.centre_x);  //compris entre -PI et PI
           
           float angle_debut = temp.angle_dep;

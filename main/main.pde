@@ -1,9 +1,14 @@
-//police de charactère ravie ?
+//police de charactère ravie ?, BerlinSansFB-Reg-48, Chiller-Regular-48, ForteMT-48, GoudyStout-48, MaturaMTScriptCapitals-48, ShowcardGothic-Reg-48, SnapITC-Regular-48
+
+//ajout de sprites, fix bug tornade, completion anti regrow farming method, ray of doom appelle kill() 30 fois par seconde (et non plus 60), spatial grid implemented, distance(float float float float) implemented
+//stats, lost_menu, init_game(), la range de la selected tower s'affiche mtn bien par dessus tout
+
+
+//reste à faire : napalm, visu napalm + stun (root ?), images ability, images panels, sprites spike factory, shooting offset, menu principal
+
 
 boolean auto_pass_levels=true;
-boolean god_mode=true;
-
-//Problème : les boomerangs touchent un ballon et peuvent faire demi tour pour toucher ses fils //semble pas etre le cas en fait
+boolean god_mode=false;
 
 float FAKE_TIME_ELAPSED;//à chaque frame c'est une constante
 
@@ -19,42 +24,41 @@ ArrayList<Spikes> spikes = new ArrayList<Spikes>();
 ArrayList<Ability> abilities = new ArrayList<Ability>();
 ArrayList<Banana> bananas = new ArrayList<Banana>();
 
+Spatial_grid grid = new Spatial_grid(HALF_MAX_SIZE_MOB);
+
 Map map = new Map(2);
 Joueur joueur= new Joueur(200, 650);
 Rounds round= new Rounds();
 Panel info_panel= new Panel();
 Tower_panel tower_panel;
 Upgrades upgrades = new Upgrades();
+Stat_manager stat_manager;
+Lost_menu lost_menu;
 
 HashMap<String,Integer> force_list = new HashMap<String,Integer>();
 HashMap<String,int[]> pos_coins_sprites = new HashMap<String,int[]>();
 
-ArrayList<int[]> pos_coins_clous = new ArrayList<int[]>();
-ArrayList<int[]> size_box_clous = new ArrayList<int[]>();
 
 void load_sprites(){
   coin_sprite = loadImage("coin_sprite.png");
   coeur_sprite = loadImage("coeur_sprite.png");
   background=loadImage("map_3.png");
-  
   all_sprites=loadImage("sprites_all.png");
   
   String[] lines = loadStrings("pos_sprites.txt");
-  
-  //peut etre pour les clous vu qu'ils doivent etre aligné ajouter 2 coord de centre histoire de pouvoir extraire la bonne pos
-  
+    
   int space_index, offset_index;
   int separateur_index;
   String name;
   int dx, dy, x, y, offset_x, offset_y;
-  int half, quarter, eigth, mirror;
+  int half, quarter, eigth, hor_mirror, vert_mirror;
   
   int nb_sprites = 0;
   
   for(String ligne : lines){
     space_index = ligne.indexOf(" : ");
     offset_index = ligne.indexOf(" offset ");
-    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter"); eigth = ligne.indexOf(" eigth"); mirror = ligne.indexOf(" mirror");
+    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter"); eigth = ligne.indexOf(" eigth"); hor_mirror = ligne.indexOf(" horizontal mirror"); vert_mirror = ligne.indexOf(" vertical mirror");
     println(ligne);
       if(space_index!=-1){
         name = ligne.substring(0, space_index);
@@ -69,7 +73,8 @@ void load_sprites(){
           if(half>-1)  end = half;
           else if(quarter>-1)  end = quarter;
           else if(eigth>-1)  end = eigth;
-          else if(mirror>-1)  end = mirror;
+          else if(hor_mirror>-1)  end = hor_mirror;
+          else if(vert_mirror>-1)  end = vert_mirror;
           y=int(ligne.substring(separateur_index+2, end));
           offset_x=0;
           offset_y=0;
@@ -82,10 +87,11 @@ void load_sprites(){
           if(half>-1)  end = half;
           else if(quarter>-1)  end = quarter;
           else if(eigth>-1)  end = eigth;
-          else if(mirror>-1)  end = mirror;
+          else if(hor_mirror>-1)  end = hor_mirror;
+          else if(vert_mirror>-1)  end = vert_mirror;
           offset_y = int(ligne.substring(separateur_index+2, end));
         }
-        int last_param = half>-1 ? 1:0 + 2*(quarter>-1 ? 1:0) + 3*(eigth>-1 ? 1:0) + 4*(mirror>-1 ? 1:0);  //vaut 1 si half, 2 si quarter et 3 si eigth
+        int last_param = half>-1 ? 1:0 + 2*(quarter>-1 ? 1:0) + 3*(eigth>-1 ? 1:0) + 4*(hor_mirror>-1 ? 1:0) + 5*(vert_mirror>-1 ? 1:0);  //vaut 1 si half, 2 si quarter et 3 si eigth
         pos_coins_sprites.put(name, new int[] {x, y, dx, dy, offset_x, offset_y, last_param});
         nb_sprites++;
      }
@@ -95,7 +101,7 @@ void load_sprites(){
   
   bloons_sprites=loadImage("bloons_sprites_transp.png");
   String[] y_ordre = {"zebra", "lead", "white", "black", "pink", "yellow", "green", "blue", "red"};
-  String[] x_ordre = {"basic", "regrowth", "camo", "camo + regrowth"};
+  String[] x_ordre = {"", " regrowth", " camo", " camo regrowth"};
   
   //pour les normaux, la box est de 24x32 avec un offset de 13, 9 a chaque fois
   // regrow : 33x34 avec offset de 9, 8
@@ -109,10 +115,10 @@ void load_sprites(){
     for(int b=0; b<x_ordre.length; b++){
       name = y_ordre[a] + x_ordre[b];
       
-      if( (x_ordre[b].equals("basic") || x_ordre[b].equals("camo")) && (y_ordre[a].equals("white") || y_ordre[a].equals("black"))){
+      if( (x_ordre[b].equals("") || x_ordre[b].equals(" camo")) && (y_ordre[a].equals("white") || y_ordre[a].equals("black"))){
         pos_coins_sprites.put(name, new int[] {50*b + 17, 50*a + 14, 16, 20});
       }
-      else if(x_ordre[b].equals("basic") || x_ordre[b].equals("camo")){
+      else if(x_ordre[b].equals("") || x_ordre[b].equals(" camo")){
         pos_coins_sprites.put(name, new int[] {50*b + 13, 50*a + 9, 24, 32});
       }
       else{
@@ -138,63 +144,132 @@ ArrayList<int[]> get_sprites_pos(StringList sprites_names){
 void setup(){
   load_sprites();
   tower_panel = new Tower_panel();    //ne pas le mettre avant car quand tower panel crée ses boutons il a besoin des sprites
+  stat_manager = new Stat_manager();  //ne pas le mettre en dehors de setup car appel un fichier et avant setup, le path n'est pas défini
   imageMode(CENTER);
   frameRate(60);
-  surface.setResizable(true);
-  //surface.setSize(map.map_size_x, map.map_size_y);
   surface.setSize(1000, 750);
   surface.setLocation(300, 100);
   
-  joueur.game_pop_count=0;
-
-  force_list.put("red", 1);
-  force_list.put("blue", 2);
-  force_list.put("green", 3);
-  force_list.put("yellow", 4);
-  force_list.put("pink", 5);
-  force_list.put("black", 6);
-  force_list.put("white", 6);
-  force_list.put("lead", 7);
-  force_list.put("zebra", 8);
-  force_list.put("rainbow", 9);
-  force_list.put("ceramic", 10);
-  force_list.put("MOAB", 11);
-  force_list.put("BFB", 12);
-  force_list.put("ZOMG", 13);
-  force_list.put("DDT", 14);
-  force_list.put("BAD", 15);
+  StringList bloons_names = new StringList("red", "blue", "green", "yellow", "pink", "black", "white", "lead", "zebra", "rainbow", "ceramic", "MOAB", "BFB", "ZOMG");
+  int black_seen = 0;
+  for(int i = 0; i<bloons_names.size(); i++){
+    force_list.put(bloons_names.get(i), i+1-black_seen);
+    if(black_seen == 0 && bloons_names.get(i).equals("black"))  black_seen=1;
+  }
   
   ellipseMode(CENTER);
   rectMode(CORNERS);
+  
+  /*randomSeed(1111);
+  
+  for(int i = 0; i<10000; i++){
+    Mob temp = new Mob("red", false, false, random(map.longueur_map));
+    //temp.avancement = ;
+    enemis.add(temp);
+  }
+  
+  for(int i =0; i<100; i++){
+    towers.add(new Dart_monkey("dart monkey", random(875), random(650)));
+  }
+  noLoop();*/
+  
+  println(grid.n_cell_x, grid.n_cell_y);
+  
+  lost_menu = new Lost_menu(1);
+  lost_menu.active = false;
+  
+  PFont font = createFont("FONT.TTF", 12);
+  textFont(font);
+  textLeading(13);
+  
 }
 
-void draw(){  
-  FAKE_TIME_ELAPSED = get_fake_time_elapsed(FAKE_TIME_ELAPSED);    //ATTENTION : NE PAS COMPTER LE TEMPS ENTRE LES ROUNDS
-  background(255);    //fond blanc
-  image(background, 875/2, 650/2);  
-  //map.show();
+
+void draw(){ 
+  //float t = millis();    //résultats autour de 5400, 5550, 5300 //on passe & 4500 !
+  //for(int iter=0; iter<100; iter++){
+  
+  
+  if(lost_menu.active){
+    lost_menu.core();
+    if(lost_menu.ended()){
+      //gravity.mult(-1);  //faut pas oublier de la remettre normale
+      gravity = new PVector(0, .1);
+      lost_menu.active = false;
+      //if(lost_menu.go_to_menu)  menu_principal.active = true;
+      init_new_game();
+    }
+  }
+  else  game();
+  
+  //}
+  //float t_end = millis();
+  //println(t_end - t);
+}
+
+void init_new_game(){
+  FAKE_TIME_ELAPSED=0.;
+  
+  enemis=new ArrayList<Mob>();
+  projectiles=new ArrayList<Projectile>();
+  lasers=new ArrayList<Laser>();
+  towers=new ArrayList<Tower>();
+  pop_animations=new ArrayList<Pop_animation>();
+  explosions = new ArrayList<Explosion>();
+  spikes = new ArrayList<Spikes>();
+  abilities = new ArrayList<Ability>();
+  bananas = new ArrayList<Banana>();
+  
+  grid = new Spatial_grid(HALF_MAX_SIZE_MOB);
+  
+  map = new Map(2);
+  joueur= new Joueur(200, 650);
+  round= new Rounds();
+  info_panel= new Panel();
+  tower_panel = new Tower_panel();
+}
+
+void game(){
+  
+  if(keyPressed && key == '^')      god_mode = true;
   
   if(god_mode){
     joueur.vies=100;
     joueur.argent=max(joueur.argent, 1000000);
   }
   else if(joueur.vies<=0){
-    stop();
+    stat_manager.increment_stat("Games lost", "overview");
+    stat_manager.save_all();
+    lost_menu = new Lost_menu(round.round_number);
+    lost_menu.bg = get();
+    return;
   }
+  //joueur.vies-=10;
+  
+  FAKE_TIME_ELAPSED = get_fake_time_elapsed(FAKE_TIME_ELAPSED);    //ATTENTION : NE PAS COMPTER LE TEMPS ENTRE LES ROUNDS
+  background(255);    //fond blanc A ENLEVER DES QUE LES PANNEAUX ONT UN SPRITE
+  image(background, 875/2, 650/2);  
+  //map.show();
+  stat_manager.display("overview");
+  
+  //if(enemis.size() != grid.get_nb_enemis_stored())  println(round.round_number, enemis.size(), grid.get_nb_enemis_stored());
   
   round.update();
   round.spawn();
   
+  grid.reset_pop_counter();
+  
   //On update tous les enemis
-  for (int i = enemis.size() - 1; i >= 0; i--){
+  for (int i = enemis.size() - 1; i >= 0; i--){    //a faire avant les proj
     enemis.get(i).core(i);
   }
-  
+
   map.hide();
   
-  //On update tous les spikes    (avant les tours sinon ca se met par dessus le phoenix et tout
+  //On update tous les spikes    (avant les tours sinon ca se met par dessus le phoenix et tout)
   int nb_spikes = spikes.size();
   for (int i = nb_spikes - 1; i >= 0; i--){
+    //spikes.get(i).verif_damage_type();
     spikes.get(i).core(i, nb_spikes);
   }
 
@@ -210,7 +285,7 @@ void draw(){
   //On update tous les projectiles tirés
   int nb_proj = projectiles.size();
   for (int i = nb_proj - 1; i >= 0; i--){
-    projectiles.get(i).verif_damage_type();
+    //projectiles.get(i).verif_damage_type();
     projectiles.get(i).core(i, nb_proj);
   }
   
@@ -218,14 +293,14 @@ void draw(){
     bananas.get(i).core();
   }
   
-  //On affiche toutes les explosions
-  for (int i = explosions.size() - 1; i >= 0; i--){
-    explosions.get(i).core();
-  }
-  
   //On affiche toutes les pop_animations
   for (int i = pop_animations.size() - 1; i >= 0; i--){
     pop_animations.get(i).core();
+  }
+  
+  //On affiche toutes les explosions
+  for (int i = explosions.size() - 1; i >= 0; i--){
+    explosions.get(i).core();
   }
   
   
@@ -234,18 +309,17 @@ void draw(){
     abi.core();
   }
   
-  tower_panel.show();
-  tower_panel.interact();
   
-  joueur.show_infos();
-  joueur.speed_controller();
-  joueur.tower_selection();
+  tower_panel.interact();
+  joueur.show_fps();
   joueur.interactions();
   joueur.select_existing_tower();
+  joueur.show_selected_tower_range();
+  
+  tower_panel.show();    //permet d'afficher la selected_tower en dessous du tower panel
   
   info_panel.interact(joueur.selected_tower);
   info_panel.show(joueur.selected_tower);
- 
 }
 
 
@@ -259,6 +333,14 @@ float get_fake_time_elapsed(float last_time){    //va surement y avoir des erreu
 
 float distance(float[] pos1, float[] pos2){
   return sqrt( pow(pos1[0]-pos2[0], 2) + pow(pos1[1]-pos2[1], 2));
+}
+
+float distance(float x1, float y1, float x2, float y2){
+  return sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
+}
+
+float distance_sqred(float x1, float y1, float x2, float y2){
+  return  (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) ;
 }
 
 float[] find_intersection_cercles(float cercle1_x, float cercle1_y, float cercle1_rayon, float cercle2_x, float cercle2_y, float cercle2_rayon){

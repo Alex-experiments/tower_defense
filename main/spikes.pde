@@ -30,12 +30,13 @@ class Spikes{
     this.y=fired_from_tower.y;
     this.destination_x=destination_x;
     this.destination_y=destination_y;
-    this.total_distance = distance(new float[] {x, y}, new float[] {destination_x, destination_y});
+    this.total_distance = distance(x, y, destination_x, destination_y);
     if(total_distance == 0){
       deplacement_fini = true;
       landing_time = FAKE_TIME_ELAPSED;
     }
     else direction=atan2(destination_y-fired_from_tower.y, destination_x-fired_from_tower.x);
+    
     
     int index_spike_storm = spike_type.indexOf(" spike storm");    //si c'est un pic de spike storm, on le note mais on ne change pas le type car les sprites et dmg sont les memes
     if(index_spike_storm>=0){
@@ -73,12 +74,12 @@ class Spikes{
   void update(){
     if(!deplacement_fini){
       for(int i=0; i<joueur.game_speed; i++){    //on itère plusieurs fois pour faire des petits pas et ne pas dépasser de trop la destination
-        float dist = distance(new float[] {x, y}, new float[] {destination_x, destination_y});
+        float dist = distance(x, y, destination_x, destination_y);
         speed=(0.5-initial_speed)*(total_distance-dist)/total_distance+initial_speed;
         //on commence à s = init_s et on arrive a s=0.5 lors de l'arrivée
         x+=speed*cos(direction);
         y+=speed*sin(direction);
-        if(distance(new float[] {x, y}, new float[] {destination_x, destination_y}) < speed){
+        if(distance(x, y, destination_x, destination_y) < speed){
           x=destination_x;
           y=destination_y;
           deplacement_fini=true;
@@ -95,9 +96,10 @@ class Spikes{
     dmg_done_this_frame=0;
     //on fait des degats aux enemis    
     
-    for (int i = enemis.size() - 1; i >= 0; i--){
-      Mob mob = enemis.get(i);
-      if(can_detect(mob, true) && pierce>0 && distance(new float[] {mob.x, mob.y}, new float[] {x, y}) < rayon+ mob.size/2){
+    ArrayList<Mob> enemis_to_look_at = grid.get_enemis_to_look_at(x, y, rayon);
+    for (int i = enemis_to_look_at.size() - 1; i >= 0; i--){
+      Mob mob = enemis_to_look_at.get(i);
+      if(can_detect(mob, true) && pierce>0 && distance(mob.x, mob.y, x, y) < rayon+ mob.size/2){
         
         if(is_from_spike_storm)    duration = 10.;  //un spike storm ne dure que 5sec, mais si il touche un enemi, il dure 5sec de plus
 
@@ -122,7 +124,7 @@ class Spikes{
     int layers_popped=mob.pop_layers(dmg_to_deal, true, damage_type);      //on tappe le mob
     dmg_done_this_frame+=layers_popped;
     
-    if(mob.layers<=0)  enemis.remove(mob);
+    if(mob.layers<=0)  mob.delete();
   }
   
   void set_stats(){
@@ -170,7 +172,7 @@ class Spikes{
         break;
       case "hot MOAB-SHREDR Spikes":
         damage = 1; pierce = 40;
-        damage_type = "sharp";
+        damage_type = "normal";
         stronger_against = new StringList("MOAB", "BFB", "DDT", "ZOMG");
         stronger_against_damage = 4;
         sprite_name = "hot spike";

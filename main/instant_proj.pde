@@ -20,7 +20,7 @@ class Instant_projectile{
     int nb_layers_popped=target.pop_layers(damage, true, damage_type);
     fired_from_tower.add_pop_count(nb_layers_popped);
     if(target.layers<=0){
-      enemis.remove(target);
+      target.delete();
     }
     else if(roots){
       target.apply_effect("root", get_root_time(target));

@@ -1,4 +1,4 @@
-//il faut un * comme séparateur pour la dim
+﻿//il faut un * comme séparateur pour la dim
 //une virgule pour la pos
 //un point virgule pour l'offset
 
@@ -11,6 +11,16 @@
 
 //https://basicallyaverage.com/all-btd5-towers-strategy/
 // all tower skins
+
+red bloon : 24*32 a 302, 13
+blue bloon : 25*34 a 328, 12
+green bloon : 27*36 a 355, 11
+yellow bloon : 29*38 a 383, 10
+pink bloon : 30*39 a 413, 9
+black bloon : 18*24 a 444, 16
+lead bloon : 29*38 a 463, 10
+white bloon : 17*23 a 494, 18
+
 
 pop animation : 84*87 a 1715, 573
 
@@ -67,19 +77,33 @@ fireball_3 : 26*44 a 1768, 1426
 fireball_4 : 26*43 a 1802, 1400
 
 purple ball : 25*25 a 1645, 1602
-purple ball_background : 44*44 a 1403, 1036
+purple ball background : 44*44 a 1403, 1030
 huge purple ball : 31*31 a 757, 1572
-huge purple ball_background : 52*57 a 843, 1378
+huge purple ball background : 52*57 a 843, 1378
 huge purple ball_2 : 31*31 a 1358, 1659
-huge purple ball_2_background : 52*57 a 1022, 1194
-dragon's breath : 64*59 a 72, 1582
+huge purple ball background_2 : 52*57 a 1022, 1194
+dragon's breath_3 : 64*59 a 72, 1582
 dragon's breath_2 : 70*56 a 150, 1419
-dragon's breath_3 : 55*58 a 535, 1545
+dragon's breath : 55*58 a 535, 1545
+whirlwind_2 : 119*114 a 994, 401 offset 0; -40;
+whirlwind_3 : 119*114 a 1409, 0 offset 0; -40;
+whirlwind : 114*114 a 1486, 127 offset 0; -40;
+tornado_2 : 165*167 a 178, 673 offset 0; -60;
+tornado_3 : 166*158 a 178, 511 offset 0; -60;
+tornado : 158*158 a 345, 511 offset 0; -60;
 
 phoenix body : 33*138 a 1518, 1406 half
-phoenix wing : 150*93 a 504, 594 half
+phoenix wing : 150*93 a 504, 594 offset -6; 0 horizontal mirror
+phoenix wing_2 : 147*70 a 810, 114 offset -6; 6 horizontal mirror
+phoenix wing_3 : 123*66 a 0, 951 offset -10; 6 horizontal mirror
+phoenix wing_4 : 89*64 a 1694, 245 offset -8; 4 horizontal mirror
+phoenix wing_5 : 87*77 a 1450, 478 offset -6; 8 horizontal mirror
+phoenix wing_6 : 124*92 a 1119, 134 offset -4; 12 horizontal mirror
+phoenix wing_7 : 137*101 a 310, 911 offset -4; 10 horizontal mirror
+phoenix wing_8 : 142*104 a 661, 507 offset -4; 4 horizontal mirror
+phoenix wing_9 : 149*101 a 158, 911 half
 
-napalm flame_1 : 16*21 a 1707, 1789
+napalm flame : 16*21 a 1707, 1789
 napalm flame_2 : 16*21 a 1777, 1718
 napalm flame_3 : 16*21 a 1798, 1693
 napalm flame_4 : 16*21 a 1868, 1629
@@ -124,13 +148,40 @@ blade : 38*38 a 1332, 1428
 maelstrom blade : 38*38 a 1332, 1428
 ring of fire : 108*108 a 920, 770 quarter
 
-ray of doom 28px : 28*8 a 534, 1213
-ray of doom 28px start : 38*51 a 1360, 1232 offset 0; -7
-ray of doom 32px : 32*8 a 371, 1356
-ray of doom 32px start : 40*51 a 1225, 1296 offset 0; -7
+ray of doom : 28*8 a 534, 1213
+ray of doom start : 38*51 a 1360, 1232 offset 0; -7
+ray of doom_2 : 32*8 a 371, 1356
+ray of doom start_2 : 40*51 a 1225, 1296 offset 0; -7
+ray of doom_3 : 28*8 a 1497, 115
+ray of doom start_3 : 40*51 a 1606, 968 offset 0; -7
+ray of doom_4 : 32*8 a 1235, 119
+ray of doom start_4 : 40*51 a 1272, 1242 offset 0; -7
+ray of doom_5 : 28*8 a 974, 758
+ray of doom start_5 : 40*51 a 988, 1580 offset 0; -7
+ray of doom_6 : 32*8 a 376, 1285 offset 0; -7
+ray of doom start_6 : 40*51 a 1851, 658 offset 0; -7
 
 
 laser eyes : 38*39 a 1304, 896
+
+explosion claire : 54*57 a 358, 1768
+explosion sombre : 54*57 a 422, 1713
+explosion claire_2 : 85*87 a 1343, 669
+explosion sombre_2 : 85*87 a 1128, 903
+explosion claire_3 : 116*122 a 1243, 259
+explosion sombre_3 : 116*122 a 1367, 129
+explosion claire_4 : 109*114 a 934, 643
+explosion sombre_4 : 109*115 a 1647, 0
+
+fumee claire_2 : 78*81 a 0, 1018
+fumee sombre_2 : 78*81 a 1690, 928
+fumee claire : 44*45 a 1560, 940
+fumee sombre : 44*45 a 1336, 1186
+fumee claire_3 : 115*117 a 1114, 491
+fumee sombre_3 : 115*117 a 573, 904
+fumee claire_4 : 117*126 a 1529, 0
+fumee sombre_4 : 117*126 a 994, 516
+
 
 
 unknown purple ball : 20*20 a 1472, 1785
@@ -150,11 +201,11 @@ super monkey fan club : 62*66 a 434, 1337
 carquois : 48*25 a 531, 1719 offset -6; 7
 spike o pult body : 57*60 a 318, 1647 offset -30; 30
 spike o pult : 30*79 a 1290, 1739 offset 0; 8
-spike o pult_2 : 30*54 a 1892, 713 offset 0; -4
-spike o pult_3 : 30*59 a 958, 126 offset 0; -48
+spike o pult shooting : 30*54 a 1892, 713 offset 0; -4
+spike o pult shooting_2 : 30*59 a 958, 126 offset 0; -48
 spike o pult base : 67*69 a 301, 1296
-dart ball resting : 28*28 a 1582, 1553 offset 0; 32
-huge dart ball resting : 72*72 a 461, 1021 offset 0; 32
+spike o pult dart ball resting : 28*28 a 1582, 1553 offset 0; 32
+spike o pult huge dart ball resting : 72*72 a 461, 1021 offset 0; 32
 
 tack shooter body : 28*54 a 1658, 435 half
 blade shooter body : 53*53 a 413, 1771
@@ -175,6 +226,7 @@ ring of fire body_2 : 38*73 a 1293, 1395 half
 ring of fire body_3 : 38*73 a 1334, 1354 half
 ring of fire sorties flame : 10*13 a 651, 1795 offset 0; -42 eigth
 ring of fire sorties flame_2 : 10*12 a 1628, 470 offset 0; -42 eigth
+ring of fire sorties flame_3 : 10*8 a 1270, 119 offset 0; -41 eigth
 
 sniper monkey green hat : 47*34 a 755, 1661 offset 0; -4
 sniper monkey red hat : 47*34 a 701, 1711 offset 0; -4
@@ -187,10 +239,15 @@ sniper monkey green camo : 66*63 a 532, 1100 offset -2; -1
 sniper monkey googles : 40*22 a 1030, 1632 offset 0; -17
 
 sniper monkey gun : 11*38 a 158, 868 offset -10; -37
+sniper monkey gun shooting : 11*38 a 158, 868 offset -10; -32
 sniper monkey gachette : 7*6 a 1423, 1664 offset -18; -28
+sniper monkey gachette shooting : 7*6 a 1423, 1664 offset -18; -23
 sniper monkey green ray : 5*85 a 1220, 609 offset -10; -77
+sniper monkey green ray shooting : 5*85 a 1220, 609 offset -10; -72
 sniper monkey silencieux : 8*10 a 518, 498 offset -10; -60
+sniper monkey silencieux shooting : 8*10 a 518, 498 offset -10; -55
 sniper monkey grand silencieux : 11*20 a 1547, 940 offset -10; -66
+sniper monkey grand silencieux shooting : 11*20 a 1547, 940 offset -10; -61
 
 boomerang shooter body : 57*59 a 419, 1554
 boomerang shooter red body : 57*59 a 912, 1022
@@ -202,7 +259,7 @@ boomerang shooter circle : 35*19 a 1429, 913 offset 0; -3
 boomerang shooter triple circle : 34*24 a 1447, 1479
 boomerang shooter cross : 30*26 a 1234, 1821 offset 0; -4
 boomerang shooter bionic arm : 27*50 a 1373, 1354 offset 26; -26
-boomerang shooter bionic arm_2 : 27*47 a 1893, 1274 offset 26; -24
+boomerang shooter bionic arm shooting : 27*47 a 1893, 1274 offset 26; -24
 boomerang shooter bionic eye : 19*20 a 1759, 1697 offset 10; -20
 
 ninja monkey red body : 58*58 a 790, 1131 offset -1; 0
@@ -220,10 +277,15 @@ wizard monkey body : 32*57 a 1678, 1287 half
 wizard monkey google body : 32*57 a 1609, 1364 half
 wizard monkey hat : 32*60 a 1257, 1680 half
 wizard monkey blue hat : 32*60 a 1290, 1678 half
+wizard monkey red hat : 32*60 a 1325, 1621 half
+wizard monkey hat signs : 26*25 a 868, 1352 offset 0; 5
 wizard monkey socle nuage : 40*74 a 838, 1765 half
+//cest le meme wizard monkey socle nuage_2 : 40*74 a 1252, 1354 half
 wizard monkey socle solaire : 39*39 a 1220, 1429 quarter
 wizard monkey socle napalm flame : 16*21 a 1707, 1789 offset 0; -40 eigth
-wizard monkey red hat : 32*60 a 1325, 1621 half
+wizard monkey socle napalm flame_2 : 16*21 a 1777, 1718 offset 0; -40 eigth
+wizard monkey socle napalm flame_3 : 16*21 a 1798, 1693 offset 0; -40 eigth
+wizard monkey socle napalm flame_4 : 16*21 a 1868, 1629 offset 0; -40 eigth
 wizard monkey phoenix summoner body : 61*57 a 272, 1552
 wizard monkey tornado body : 61*57 a 578, 1271
 blue straight wand : 12*47 a 421, 1356 offset 35; -10
@@ -242,6 +304,7 @@ dartling gun ray of doom hat : 46*36 a 996, 1448 offset 0; 42
 dartling gun hat target : 14*21 a 879, 1827 offset 0; 40 half
 dartling gun barrels : 14*61 a 905, 910 offset 0; -33 half
 dartling gun rocket storm barrels : 20*11 a 1647, 115 offset 0; -59 half
+//UNKNOW BARRELS : 20*11 a 1005, 758 half
 dartling gun basic gun : 26*74 a 1592, 1607 offset 0; -19 half
 dartling gun blue gun : 26*74 a 1621, 1022 offset 0; -19 half
 dartling gun purple gun : 26*74 a 1705, 1494 offset 0; -19 half
@@ -268,32 +331,32 @@ spike factory yellow top_4 : 31*59 a 1323, 1682 half
 spike factory yellow top_5 : 31*59 a 1771, 1291 half
 
 spike factory small spike top : 37*37 a 1610, 1196
-spike factory small spike top_2 : 37*37 a 1298, 1508
-spike factory small spike top_3 : 37*37 a 1337, 1467
-spike factory small spike top_5 : 37*37 a 1110, 1702
+spike factory small spike top shooting : 37*37 a 1298, 1508
+spike factory small spike top shooting_2 : 37*37 a 1337, 1467
+spike factory small spike top shooting_3 : 37*37 a 1110, 1702
 spike factory small top : 37*37 a 1657, 1141
-spike factory small top_2 : 37*37 a 1216, 1582
-spike factory small top_3 : 37*37 a 1371, 1428
-spike factory small top_5 : 37*37 a 1849, 952
+spike factory small top shooting : 37*37 a 1216, 1582
+spike factory small top shooting_2 : 37*37 a 1371, 1428
+spike factory small top shooting_3 : 37*37 a 1849, 952
 spike factory small mine top : 18*37 a 1904, 1202 half
-spike factory small mine top_2 : 20*37 a 1832, 1559 half
-spike factory small mine top_4 : 20*37 a 1587, 1807 half
-spike factory small mine top_5 : 18*37 a 1691, 1710 half
+spike factory small mine top shooting : 20*37 a 1832, 1559 half
+spike factory small mine top shooting_2 : 20*37 a 1587, 1807 half
+spike factory small mine top shooting_3 : 18*37 a 1691, 1710 half
 
-spike factory yellow base : 28*78 a 1464, 1662 offset -10; 0 mirror
-spike factory blue base : 28*78 a 1773, 1347 offset -10; 0 mirror
-spike factory red base : 28*78 a 1864, 1262 offset -10; 0 mirror
-spike factory purple base : 28*78 a 1494, 1620 offset -10; 0 mirror
-spike factory black base : 28*78 a 1535, 1582 offset -10; 0 mirror
+spike factory yellow base : 28*78 a 1464, 1662 offset -10; 0 horizontal mirror
+spike factory blue base : 28*78 a 1773, 1347 offset -10; 0 horizontal mirror
+spike factory red base : 28*78 a 1864, 1262 offset -10; 0 horizontal mirror
+spike factory purple base : 28*78 a 1494, 1620 offset -10; 0 horizontal mirror
+spike factory black base : 28*78 a 1535, 1582 offset -10; 0 horizontal mirror
 
-spike factory side gear : 25*25 a 1888, 1359 offset -18; 0 mirror
-spike factory side gear_2 : 25*25 a 1619, 1636 offset -18; 0 mirror
-spike factory top gear : 25*25 a 1888, 1359 offset 12; -30 mirror
-spike factory top gear_2 : 25*25 a 1619, 1636 offset 12; -30 mirror
+spike factory side gear : 25*25 a 1888, 1359 offset -18; 0 horizontal mirror
+spike factory side gear shooting : 25*25 a 1619, 1636 offset -18; 0 horizontal mirror
+spike factory top gear : 25*25 a 1888, 1359 offset 0; -18 vertical mirror
+spike factory top gear shooting : 25*25 a 1619, 1636 offset 0; -18 vertical mirror
 
 
 spike factory sortie : 20*38 a 1766, 1621 half
-spike factory sortie_2 : 20*38 a 1881, 1507 half
+spike factory sortie shooting : 20*38 a 1881, 1507 half
 
 spike factory diaphragme_2 : 34*34 a 976, 1781
 spike factory diaphragme_3 : 34*34 a 1851, 915
@@ -302,6 +365,12 @@ spike factory diaphragme_4 : 34*34 a 1691, 1076
 
 spike factory separateur : 44*44 a 1304, 1024
 spike factory tuyaux : 20*31 a 1608, 1808
+
+
+super monkey body : 33*52 a 1644, 1285 half
+super monkey cape : 24*33 a 1732, 1541 offset 0; 18 half
+super monkey green cape : 24*33 a 332, 1610 offset 0; 18 half
+super monkey sign : 21*15 a 1881, 1491 offset 0; 25
 
 
 818 1219

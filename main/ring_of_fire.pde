@@ -20,6 +20,7 @@ class Ring_of_fire extends Projectile{
       if(pierce>0)  kill();        //sinon on le supprime pas, on continue de l'afficher comme pour ray of doom
     }
     show();
+    for(Animator anim : sprites)  anim.update(true);
   }
   
   void set_stats(){
@@ -30,7 +31,8 @@ class Ring_of_fire extends Projectile{
   void show(){
     pushMatrix();
     translate(x, y);
-    for(int[] pos_aff : sprites_pos){
+    for(Animator anim : sprites){
+      int[] pos_aff = anim.get_pos();
       float scale = ray/sprite_size;
       float size = pos_aff[2] * scale;
       

@@ -20,8 +20,12 @@ class Boomerang extends Projectile{
   void core(int i, int nb_proj){
     deplacement();
     kill();
-    if(!orbiting && (ended_circle() || pierce<=0))  projectiles.remove(i);
-    else  show();    //on show tj les boomerangs
+    if(!orbiting && (ended_circle() || pierce<=0)){
+      projectiles.remove(i);
+      return;
+    }
+    show();    //on show tj les boomerangs
+    for(Animator anim : sprites)  anim.update(true);
   }
   
   boolean ended_circle(){

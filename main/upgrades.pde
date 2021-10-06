@@ -82,8 +82,6 @@ class Upgrades{
             }
             break;
           case 3:
-            //implémenter CORRECTEMENT les abilities
-            
             boolean already_have_one = false;
             for(Ability abi : abilities){
               if(abi instanceof Super_monkey_fan_club){
@@ -273,7 +271,8 @@ class Upgrades{
                 proj.projectile_type = "sonic glaive boomerang";
                 proj.set_stats();
                 proj.speed = 5.;
-                proj.sprites_pos = get_sprites_pos(new StringList(proj.projectile_type));
+                proj.sprites = new ArrayList<Animator>();
+                proj.sprites.add(new Animator(proj.projectile_type, proj.anim_frame_per_sprite));
               }
             }
             break;
@@ -289,7 +288,8 @@ class Upgrades{
                 proj.projectile_type = "red hot glaive boomerang";
                 proj.set_stats();
                 proj.speed = 5.;
-                proj.sprites_pos = get_sprites_pos(new StringList(proj.projectile_type));
+                proj.sprites = new ArrayList<Animator>();
+                proj.sprites.add(new Animator(proj.projectile_type, proj.anim_frame_per_sprite));
               }
             }
             break;
@@ -401,7 +401,7 @@ class Upgrades{
           case 2:
             //Whirlwinds and Tornadoes cannot blow away Lead Bloons but the Tornadoes from Tempest Tornado Monkey Apprentices can pop Lead Bloons.
             //Sprite sur le site
-            // removes ice and glue from the bloons.
+            // removes ice and glue from the bloons.                  A FAIRE
             tour.shoots_list.append("whirlwind");
             tour.deviation_list.append(0);
             tour.attack_speed_list.append(0.31);
@@ -433,7 +433,7 @@ class Upgrades{
             tour.detects_camo=true;
             break;
           case 2:
-            //FIRE ATTACKS UNFREEZE BALLONS
+            //FIRE ATTACKS UNFREEZE BALLONS                A FAIRE
             tour.shoots_list.append("dragon's breath");
             tour.deviation_list.append(0);
             tour.attack_speed_list.append(10);
@@ -495,7 +495,6 @@ class Upgrades{
       if(path_to_upgrade==2){
         switch(tour.path_2_progression){
           case 0:
-                                //change to do on seeking shuriken ?
             if(tour.shoots_list.get(0).indexOf("sharp")>=0)  change_shooting_type(tour, "seeking sharp shuriken");
             else change_shooting_type(tour, "seeking shuriken");
             break;
@@ -545,10 +544,10 @@ class Upgrades{
             change_shooting_type(tour, temp_shooting_type);
             break;
           case 2:
-            change_shooting_type(tour, "spike ball");    //ajouter le fait que ca fasse 3* les degats aux ceramics
+            change_shooting_type(tour, "spike ball");
             break;
           case 3:
-            change_attack_speed(tour, 2.325);
+            change_attack_speed(tour, 2.325);                              //A FAIRE 
             change_shooting_type(tour, "spike mine");    //explosion donne un effet napalm  The napalm pops bloons every 2 seconds for 6 seconds. The explosions pop 4 layers
             break;          
         }
@@ -593,14 +592,18 @@ class Upgrades{
     if(path_to_upgrade==1){
       tour.price+=price_1;
       tour.path_1_progression++;
-      joueur.argent-=price_1;
+      joueur.pay(price_1);
+      stat_manager.increment_stat("Upgrade "+str(tour.path_1_progression)+"/x bought", tour.type);
     }
     else{
       tour.price+=price_2;
       tour.path_2_progression++;
-      joueur.argent-=price_2;
+      joueur.pay(price_2);
+      stat_manager.increment_stat("Upgrade x/"+str(tour.path_2_progression)+" bought", tour.type);
     }
-    tour.set_sprites();
+    tour.set_anim();
+    stat_manager.increment_stat("Upgraded", tour.type);
+    stat_manager.increment_stat("Upgrades bought", "overview");
     
   }
   
@@ -645,7 +648,7 @@ class Upgrades{
         case 1:
           name_2 = "Razor Sharp Shots";
           price_2= 170;
-          descr_2= "Can pop 2 extra bloons per shot (4 in total).";
+          descr_2= "Can pop 2 extra bloons per shot.";
           break;
           
         case 2:

@@ -10,11 +10,16 @@ class Ability{
   boolean global_cooldown = false;
   private float smallest_cd = -1.;
   
-  Ability(Tower enabled_by_tower, float cooldown_duration, float duration){
+  String ability_name;
+  
+  Ability(Tower enabled_by_tower, float cooldown_duration, float duration, String ability_name){
     this.cooldown_duration = cooldown_duration;
     this.duration = duration;
     this.show_slot = abilities.size();    //l'instance est crée juste avant d'etre ajoutée à la liste abilities
     this.towers_having_this_ability.add(enabled_by_tower);
+    this.ability_name = ability_name;
+    stat_manager.increment_stat("Bought", ability_name);
+    stat_manager.increment_stat("Abilities bought", "overview");
   }
   
   public void core(){
@@ -22,6 +27,8 @@ class Ability{
       Tower tour_used = get_tour_to_use();
       this.use(tour_used);  //le bouton sera non cliquable si aucune tour n'est utilisable (uses_available==0)
       tour_used.ability_use_time = FAKE_TIME_ELAPSED;
+      stat_manager.increment_stat("Used", ability_name);
+      stat_manager.increment_stat("Abilities used", "overview");
       if(!global_cooldown){
         tour_used.ability_cooldown_timer = FAKE_TIME_ELAPSED;
         if(smallest_cd < 0)  smallest_cd = FAKE_TIME_ELAPSED;
@@ -96,7 +103,10 @@ class Ability{
   
   public void add_one_use(boolean max_use_too){
     this.uses_available++;
-    if(max_use_too)  this.max_uses_available++;
+    if(max_use_too){
+      this.max_uses_available++;
+      stat_manager.increment_stat("Bought", ability_name);  
+    }
     this.bouton.text="";
     this.bouton.unclickable=false;
   }
@@ -160,12 +170,11 @@ class Super_monkey_fan_club extends Ability{
   //ainsi le ability_casted_by_tour associé à un super monkey fan sera toujours à jour
   
   Super_monkey_fan_club(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "super monkey fan club");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
-  ArrayList<Tower> get_closest_dart_monkeys(Tower tour_used){
-    float dist_min=Float.POSITIVE_INFINITY;
+  ArrayList<Tower> get_closest_dart_monkeys(int number, Tower tour_used, boolean get_already_impacted_towers){
     ArrayList<Tower> closest_dart_monkeys = new ArrayList<Tower>();
     
     Tower tower_to_replace=null;
@@ -174,23 +183,27 @@ class Super_monkey_fan_club extends Ability{
     for(Tower tour : towers){    //on va créer une arrayList des 10 dart monkeys towers les plus proches (dont celle qui a lancée l'ability)
             
       if(tour.type.equals("dart monkey")){
+        if(get_already_impacted_towers){
+          if(tour.active)  continue;    //tour pas déjà impactée par un super monkey fan club
+        }
+        else if(!tour.active)  continue;    //tour deja impactee par un super monkey fan club
         
-        float dist = distance(new float[] {tour_used.x, tour_used.y}, new float[] {tour.x, tour.y});
+        float dist = distance(tour_used.x, tour_used.y, tour.x, tour.y);
         
-        if(closest_dart_monkeys.size()<10){    //si on a pas encore récup 10 tours, on ajoute
+        if(closest_dart_monkeys.size()<number){    //si on a pas encore récup 10 tours, on ajoute
           closest_dart_monkeys.add(tour);
           if(dist>dist_tower_to_replace){
             dist_tower_to_replace = dist;
             tower_to_replace = tour;
           } 
         }
-        else if(dist<dist_min){    //la on vire la plus loin pour la remplacer par celle la
+        else if(dist<dist_tower_to_replace){    //la on vire la plus loin pour la remplacer par celle la
           closest_dart_monkeys.remove(tower_to_replace);
           closest_dart_monkeys.add(tour);
           
           dist_tower_to_replace=-1.;            //il faut maintenant re parcourir notre liste pour savoir laquelle est la nouvelle plus loin
           for(Tower t : closest_dart_monkeys){
-            dist = distance(new float[] {tour_used.x, tour_used.y}, new float[] {t.x, t.y});
+            dist = distance(tour_used.x, tour_used.y, t.x, t.y);
             if(dist>dist_tower_to_replace){
               dist_tower_to_replace = dist;
               tower_to_replace = t;
@@ -203,7 +216,15 @@ class Super_monkey_fan_club extends Ability{
   }
 
   void use(Tower tour_used){
-    ArrayList<Tower> closest_dart_monkeys = get_closest_dart_monkeys(tour_used);
+    ArrayList<Tower> closest_dart_monkeys = get_closest_dart_monkeys(10, tour_used, false);
+    
+    if(closest_dart_monkeys.size()<10){
+      ArrayList<Tower> closest_impacted_dart_monkeys = get_closest_dart_monkeys(10-closest_dart_monkeys.size(), tour_used, true);
+      for(Tower tour : closest_impacted_dart_monkeys){
+        closest_dart_monkeys.add(tour);
+      }
+      
+    }
     
     for(Tower tour : closest_dart_monkeys){
       boolean has_already_a_smf_linked = false;
@@ -246,7 +267,7 @@ class Blade_maelstrom extends Ability{
   //Each of the blades have unlimited pierce
   
   Blade_maelstrom(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "blade maelstrom");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
@@ -271,7 +292,7 @@ class Turbo_charge extends Ability{
   //increases the firing speed of the tower by 5x (hypersonic) for 10 seconds.
     
   Turbo_charge(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "turbo charge");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
 
@@ -297,7 +318,7 @@ class Turbo_charge extends Ability{
 class Supply_drop extends Ability{
 
   Supply_drop(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "supply drop");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
     initial_cd(enabled_by_tower);
   }
@@ -314,7 +335,7 @@ class Rocket_storm extends Ability{
   static final float time_beetween_shoots = 2.;
 
   Rocket_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "rocket storm");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
@@ -341,7 +362,7 @@ class Spike_storm extends Ability{
   //on va dire 200 spikes sur le terrain
   
   Spike_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "spike storm");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
@@ -356,7 +377,7 @@ class Spike_storm extends Ability{
 class Summon_phoenix extends Ability{
 
   Summon_phoenix(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "summon phoenix");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
@@ -379,7 +400,7 @@ class Summon_phoenix extends Ability{
 class Sabotage_supply_lines extends Ability{
   
   Sabotage_supply_lines(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration);
+    super(enabled_by_tower, cooldown_duration, duration, "sabotage supply lines");
     this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
   }
   
