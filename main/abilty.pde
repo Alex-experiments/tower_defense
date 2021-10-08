@@ -4,7 +4,7 @@ class Ability{
   Tower tower_actually_in_cd;
   
   float cooldown_duration, duration;    //en secondes
-  int show_slot;
+  int show_slot, spacing = 2;
   int uses_available=1, max_uses_available=1;
   Button bouton;
   boolean global_cooldown = false;
@@ -12,12 +12,17 @@ class Ability{
   
   String ability_name;
   
-  Ability(Tower enabled_by_tower, float cooldown_duration, float duration, String ability_name){
+  Ability(Tower enabled_by_tower, float cooldown_duration, float duration, String ability_name, String ability_descr){
     this.cooldown_duration = cooldown_duration;
     this.duration = duration;
     this.show_slot = abilities.size();    //l'instance est crée juste avant d'etre ajoutée à la liste abilities
     this.towers_having_this_ability.add(enabled_by_tower);
     this.ability_name = ability_name;
+    this.bouton = new Button((40+spacing)*show_slot, 610, 40+(40+spacing)*show_slot, 650, "", '²');
+    bouton.pos_aff = pos_coins_sprites.get(ability_name+" ability icon");
+    bouton.descr = ability_name.toUpperCase()+"\n"+ability_descr;
+    println(ability_name);
+    bouton.width_descr = 200;
     stat_manager.increment_stat("Bought", ability_name);
     stat_manager.increment_stat("Abilities bought", "overview");
   }
@@ -126,13 +131,19 @@ class Ability{
   
   
   private void show(){
+    
+    this.bouton.show_ability();
     if(this.uses_available==0){
-      if(global_cooldown)  this.bouton.text=str(ceil(this.cooldown_duration - FAKE_TIME_ELAPSED + tower_actually_in_cd.ability_cooldown_timer));
-      else this.bouton.text=str(ceil(this.cooldown_duration - FAKE_TIME_ELAPSED + smallest_cd));
+      String cd;
+      bouton.show_cooldown(cooldown_duration - FAKE_TIME_ELAPSED + smallest_cd, cooldown_duration);
+      if(global_cooldown)  cd=str(ceil(this.cooldown_duration - FAKE_TIME_ELAPSED + tower_actually_in_cd.ability_cooldown_timer));
+      else cd=str(ceil(this.cooldown_duration - FAKE_TIME_ELAPSED + smallest_cd));
+  
+      textAlign(CENTER, CENTER); // centre le texte horizontalement et verticalement
+      outline_text(cd, (bouton.top_left_x+bouton.bottom_right_x)/2, (bouton.top_left_y + bouton.bottom_right_y)/2, color(0), color(255), 1);
       this.bouton.unclickable = true;
     }
-    this.bouton.show();
-    text(str(this.uses_available), 48*show_slot, 600, 48*(show_slot+.4), 616);
+    outline_text(str(this.uses_available), 40*(show_slot+.15)+spacing*show_slot, 620, color(255), color(0), 1);
   }
   
   public void delete(Tower tour_to_be_deleted){
@@ -170,8 +181,7 @@ class Super_monkey_fan_club extends Ability{
   //ainsi le ability_casted_by_tour associé à un super monkey fan sera toujours à jour
   
   Super_monkey_fan_club(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "super monkey fan club");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "super monkey fan club", "Converts up to 10 nearby dart monkeys into Super Monkeys for 15 seconds.");
   }
   
   ArrayList<Tower> get_closest_dart_monkeys(int number, Tower tour_used, boolean get_already_impacted_towers){
@@ -267,8 +277,7 @@ class Blade_maelstrom extends Ability{
   //Each of the blades have unlimited pierce
   
   Blade_maelstrom(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "blade maelstrom");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "blade maelstrom", "Covers the area in an unstoppable storm of blades.");
   }
   
   void use(Tower tour_used){
@@ -292,8 +301,7 @@ class Turbo_charge extends Ability{
   //increases the firing speed of the tower by 5x (hypersonic) for 10 seconds.
     
   Turbo_charge(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "turbo charge");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "turbo charge", "Increases attack speed to hypersonic for 10 seconds.");
   }
 
   void use(Tower tour_used){
@@ -318,8 +326,7 @@ class Turbo_charge extends Ability{
 class Supply_drop extends Ability{
 
   Supply_drop(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "supply drop");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "supply drop", "Drops a crate giving between $500 and $1500.");
     initial_cd(enabled_by_tower);
   }
   
@@ -335,8 +342,7 @@ class Rocket_storm extends Ability{
   static final float time_beetween_shoots = 2.;
 
   Rocket_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "rocket storm");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "rocket storm", "Rocket Storm shoots out a missile towards the first 100 bloons on screen.");
   }
   
   void use(Tower tour_used){
@@ -362,8 +368,7 @@ class Spike_storm extends Ability{
   //on va dire 200 spikes sur le terrain
   
   Spike_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "spike storm");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "spike storm", "Lays a thick carpet of spikes over the whole track. Spikes last 5 seconds (10 if reacted upon).");
   }
   
   void use(Tower tour_used){
@@ -377,8 +382,7 @@ class Spike_storm extends Ability{
 class Summon_phoenix extends Ability{
 
   Summon_phoenix(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "summon phoenix");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "summon phoenix", "Creates a super powerful flying phoenix that flies around wreaking bloon havoc for 20 seconds.");
   }
   
   void use(Tower tour_used){
@@ -400,8 +404,7 @@ class Summon_phoenix extends Ability{
 class Sabotage_supply_lines extends Ability{
   
   Sabotage_supply_lines(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "sabotage supply lines");
-    this.bouton = new Button(48*show_slot, 600, 48*(show_slot+1), 648, "", '²');
+    super(enabled_by_tower, cooldown_duration, duration, "sabotage supply lines", "Sabotage the bloons supply lines for 15 seconds. During the sabotage, all bloons are crippled to half speed.");
   }
   
   void use(Tower tour_used){
@@ -413,5 +416,5 @@ class Sabotage_supply_lines extends Ability{
     round.nb_of_sabotage_in_use--;
     if(round.nb_of_sabotage_in_use==0)  round.spawn_at_half_speed = false;
     tour_used.ability_use_time = -1;
-  }
+  } 
 }

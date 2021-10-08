@@ -866,7 +866,7 @@ class Upgrades{
         case 3:
           name_2 = "Bloon Area Denial System";
           price_2 = 20000;
-          descr_2 = "The BADS covers a wide area with each shot. Enables the Rocket Storm Ability: Rocket Storm shoots out a missile towards the nearest 100 bloons on screen. Ouch.";
+          descr_2 = "The BADS covers a wide area with each shot. Enables the Rocket Storm Ability: Rocket Storm shoots out a missile towards the first 100 bloons on screen. Ouch.";
           break; 
       }
     }

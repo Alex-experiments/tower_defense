@@ -12,17 +12,69 @@
 //https://basicallyaverage.com/all-btd5-towers-strategy/
 // all tower skins
 
-red bloon : 24*32 a 302, 13
-blue bloon : 25*34 a 328, 12
-green bloon : 27*36 a 355, 11
-yellow bloon : 29*38 a 383, 10
-pink bloon : 30*39 a 413, 9
-black bloon : 18*24 a 444, 16
-lead bloon : 29*38 a 463, 10
-white bloon : 17*23 a 494, 18
+
+//ABILITIES
+super monkey fan club ability icon : 40*40 a 0, 0
+blade maelstrom ability icon : 40*40 a 40, 0
+turbo charge ability icon : 40*40 a 80, 0
+supply drop ability icon : 40*40 a 120, 0
+rocket storm ability icon : 40*40 a 160, 0
+spike storm ability icon : 40*40 a 200, 0
+summon phoenix ability icon : 40*40 a 240, 0
+sabotage supply lines ability icon : 40*40 a 280, 0
+
+
+red bloon : 42*56 a 320, 10
+blue bloon : 42*56 a 363, 10
+green bloon : 42*56 a 406, 10
+yellow bloon : 42*56 a 449, 10
+pink bloon : 42*56 a 492, 10
+black bloon : 42*56 a 535, 10
+white bloon : 42*56 a 1446, 1121
+lead bloon : 42*56 a 1209, 1353
+zebra bloon : 42*56 a 1268, 1297
+rainbow bloon : 42*56 a 1849, 713
+ceramic bloon : 42*56 a 795, 1742
+ceramic bloon_2 : 42*56 a 1560, 986
+ceramic bloon_3 : 42*56 a 1091, 1460
+ceramic bloon_4 : 42*56 a 1135, 1419
+ceramic bloon_5 : 42*56 a 1315, 1235
+
+red regrowth bloon : 62*59 a 310, 70
+blue regrowth bloon : 62*59 a 375, 70
+green regrowth bloon : 62*59 a 440, 70
+yellow regrowth bloon : 62*59 a 505, 70
+pink regrowth bloon : 62*59 a 570, 70
+black regrowth bloon : 62*59 a 635, 70
+white regrowth bloon : 62*59 a 753, 1011
+lead regrowth bloon : 62*59 a 515, 1269
+zebra regrowth bloon : 62*59 a 729, 1071
+rainbow regrowth bloon : 62*59 a 596, 1194
+ceramic regrowth bloon : 62*59 a 357, 1415
+ceramic regrowth bloon_2 : 62*59 a 134, 1642
+ceramic regrowth bloon_3 : 62*59 a 0, 1778
+ceramic regrowth bloon_4 : 62*59 a 208, 1576
+ceramic regrowth bloon_5 : 62*59 a 289, 1492
+
+camo overlay : 41*51 a 1490, 1107
+glue overlay : 43*43 a 748, 1780
+frozen overlay : 47*59 a 948, 1446
+camo regrowth overlay : 61*53 a 1158, 609
+regrowth glue overlay : 63*41 a 208, 1531
+regrowth frozen overlay : 67*62 a 602, 1022
+//rentrer off
+
+MOAB bloon : 55*220 a 911, 1136 offset 0; 20 horizontal mirror
+BFB bloon : 78*307 a 1770, 663 offset 0; 20 horizontal mirror
+ZOMG bloon : 82*306 a 1607, 661 offset 0; 20 horizontal mirror
+
+
+
 
 
 pop animation : 84*87 a 1715, 573
+
+poubelle : 81*87 a 1801, 446
 
 spike_10 : 61*47 a 0, 1729
 spike_9 : 61*47 a 434, 1288
@@ -88,7 +140,7 @@ dragon's breath : 55*58 a 535, 1545
 whirlwind_2 : 119*114 a 994, 401 offset 0; -40;
 whirlwind_3 : 119*114 a 1409, 0 offset 0; -40;
 whirlwind : 114*114 a 1486, 127 offset 0; -40;
-tornado_2 : 165*167 a 178, 673 offset 0; -60;
+tornado_2 : 165*158 a 178, 673 offset 0; -60;
 tornado_3 : 166*158 a 178, 511 offset 0; -60;
 tornado : 158*158 a 345, 511 offset 0; -60;
 

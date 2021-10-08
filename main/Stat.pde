@@ -1,4 +1,4 @@
-static final StringList ability_names = new StringList("super monkey fan club", "blade maelstrom", "turbo charge", "supply drop", "spike storm", "summon phoenix", "sabotage supply lines");
+static final StringList ability_names = new StringList("super monkey fan club", "blade maelstrom", "turbo charge", "supply drop", "rocket storm", "spike storm", "summon phoenix", "sabotage supply lines");
 static final StringList tower_names = new StringList("dart monkey", "super monkey fan", "tack shooter", "sniper", "boomerang thrower", "ninja monkey", "wizard monkey", "phoenix", "dartling gun", "spike factory");
 
 
@@ -69,9 +69,9 @@ class Stat_manager{
     saveStrings("/data/stats.txt", save);
   }
   
-  void display(String name){
+  void display(String name, float x, float y, int interligne){
     textAlign(LEFT, CENTER);
-    stats.get(indexes.get(name)).display();
+    stats.get(indexes.get(name)).display(x, y, interligne);
   }
   
 }
@@ -100,7 +100,7 @@ class Stat{
                                     //ALL OK      
     }
     else if(name.equals("bloons")){
-      stats_names = new StringList("red", "blue", "green", "yellow", "pink", "black", "white", "lead",  "zebra", "rainbow", "ceramic", "MOAB", "BFB", "ZOMG");
+      stats_names = new StringList("red", "blue", "green", "yellow", "pink", "black", "white", "lead", "zebra", "rainbow", "ceramic", "MOAB", "BFB", "ZOMG");
       int temp_len = stats_names.size()-3;
       for(int i = 0; i<3; i++){
         for(int index = 0; index<temp_len; index++){
@@ -133,9 +133,37 @@ class Stat{
     stats_numbers.set(stat_name, stats_numbers.get(stat_name) + number);
   }
   
-  void display(){
-    for(int i=0; i<stats_names.size(); i++){
-      text(stats_names.get(i) + " : " + str(stats_numbers.get(stats_names.get(i))) + ( needs_suffix[i] ? " times":""), width/2, (i+1)*10);
+  void display(float x, float y, int interligne){
+    if(!name.equals("bloons")){
+      for(int i=0; i<stats_names.size(); i++){
+        String txt = str(stats_numbers.get(stats_names.get(i)));
+        float txt_w = textWidth(txt), txt_off = textWidth(stats_names.get(i) + " : ");
+        
+        //outline_text(stats_names.get(i) + " : " + txt + ( needs_suffix[i] ? " times":""), x, y+i*interligne, color(255), color(0), 1);
+        outline_text(stats_names.get(i) + " : ", x, y+i*interligne, color(255), color(0), 1);
+        fill(color(255));
+        text(txt, x + txt_off, y+i*interligne);
+        if(needs_suffix[i])  outline_text(" times", x+txt_off+txt_w, y+i*interligne, color(255), color(0), 1);
+      }
+    }
+    else{
+      float col_width = 125;
+      outline_text("Total", x+col_width, y, color(0), color(255), 1);
+      outline_text("Camo", x+2*col_width, y, color(0), color(255), 1);
+      outline_text("Regrowth", x+3*col_width, y, color(0), color(255), 1);
+      outline_text("Camo regrowth", x+4*col_width, y, color(0), color(255), 1);
+      int line=2, col=0;
+      for(int i=0; i<stats_names.size(); i++){
+        String bloon_name = stats_names.get(i);
+        if(bloon_name.indexOf("red")>-1){
+          col++;
+          line = 2;
+        }
+        if(col==1)  outline_text(bloon_name + " : ", x, y + interligne * line, color(255), color(0), 1);
+        fill(255);
+        text(str(stats_numbers.get(bloon_name)), x + col_width*col, y + interligne * line);
+        line++;
+      }
     }
   }
   

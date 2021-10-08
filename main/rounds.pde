@@ -15,7 +15,7 @@ class Rounds{
   
 
   void init_intervall_time(){
-    intervall = initial_intervall * (1- 2*atan(float(round_number-1)/10)/PI);
+    intervall = initial_intervall * (1- 2*atan((round_number-1.)/10.)/PI);
   }
   
   void init_spawn_list(){
@@ -426,13 +426,13 @@ class Rounds{
     int decalage=0;
     while(spawn_list.size()>0 && FAKE_TIME_ELAPSED-last_spawn_time > intervall){    //le while est la si jamais on doit spawn plusieurs enemis a la meme frame
       Mob mob = spawn_list.get(0);
-      mob.avancement -= 2*decalage;
+      mob.avancement -= decalage*mob.speed;
       mob.update_pos();
       mob.add_to_grid();
       if(spawn_at_half_speed)  mob.speed /= 2.;
       enemis.add(mob);
       spawn_list.remove(0);
-      last_spawn_time+=intervall;
+      last_spawn_time+=intervall * intervall_multiplier.get(mob.type);
       decalage++;
     }
   }

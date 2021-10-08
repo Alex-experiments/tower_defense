@@ -8,6 +8,8 @@ class Banana{
   boolean deplacement_fini=false, being_collected = false, collected = false;
   float collect_time, text_on_screen_time = .5;
   
+  int[] pos_aff;
+  
   //en gros yaura quatres états : en déplacement vers la pos, en attente de collecte, being_collected ou on se rapproche du curseur, collected ou on affiche la value
 
   Banana(float init_x, float init_y, float dest_x, float dest_y, int value, String type){
@@ -21,12 +23,14 @@ class Banana{
     this.total_distance = distance(init_x, init_y, dest_x, dest_y);
     if(total_distance == 0)  deplacement_fini = true;
     else direction=atan2(dest_y-init_y, dest_x-init_x);
+    if(pos_coins_sprites.containsKey(type))   pos_aff = pos_coins_sprites.get(type);
+    else pos_aff = pos_coins_sprites.get("supply drop");
   }
   
   
   public void core(){
     update();
-    if(collected && FAKE_TIME_ELAPSED - collect_time > text_on_screen_time){
+    if(collected && FAKE_TIME_ELAPSED - collect_time > text_on_screen_time){      //NORMALEMENT YA AUSSI UNE DUREE DE VIE
       bananas.remove(this);
       return;
     }
@@ -72,14 +76,12 @@ class Banana{
   
   private void show(){
     if(collected){
-      fill(255, 225, 0);
-      text("$"+str(value), x, y - (FAKE_TIME_ELAPSED - collect_time)*60);
+      //fill(255, 225, 0);
+      textFont(font_18px);
+      outline_text("$"+str(value), x, y - (FAKE_TIME_ELAPSED - collect_time)*60, color(0), color(240, 255, 0), 1);
+      textFont(font);
     }
-    else if(pos_coins_sprites.containsKey(type)){
-      int[] pos_aff = pos_coins_sprites.get(type);
-      image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
-    }
-    else ellipse(x, y, rayon, rayon);
+    else image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
   
   

@@ -1,4 +1,4 @@
-class Panel{
+class Info_panel{
 
   Button sell_button, upgrade_left, upgrade_right, priority_first, priority_last, priority_close, priority_strong;
   
@@ -8,24 +8,27 @@ class Panel{
   float bottom_right_y=750;
   
   Tower last_selected_tower;
+  PImage bg = loadImage("info_panel_background.png");
 
   void show(Tower selected_tower){
         
-    stroke(0);
-    strokeWeight(1);
+    //stroke(0);
+    //strokeWeight(1);
     //noFill();
-    fill(255);
-    rect(top_left_x-1, top_left_y, bottom_right_x, bottom_right_y);
+    //fill(255);
+    //rect(top_left_x-1, top_left_y, bottom_right_x, bottom_right_y);
+    
+    image(bg, (top_left_x+bottom_right_x)/2, (top_left_y+bottom_right_y)/2);
     
     if(selected_tower==null){
       textAlign(LEFT, TOP);
       fill(0);
-      text("Total pop count : "+str(joueur.game_pop_count), 106, 653);
+      outline_text("Total pop count : "+str(joueur.game_pop_count), 106, 653, color(255), color(0), 1);
     }
     else{
       textAlign(LEFT, TOP);
       fill(0);
-      text("Pop Count "+str(selected_tower.pop_count), 106, 653);
+      outline_text("Pop Count "+str(selected_tower.pop_count), 106, 653, color(255), color(0), 1);
       
       upgrades.get_possible_upgrades(selected_tower.type, selected_tower.path_1_progression, selected_tower.path_2_progression);
       upgrade_left.unclickable = !(upgrades.can_purchase_1 && joueur.argent>=upgrades.price_1);

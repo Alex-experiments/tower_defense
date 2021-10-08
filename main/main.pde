@@ -1,10 +1,7 @@
 //police de charactère ravie ?, BerlinSansFB-Reg-48, Chiller-Regular-48, ForteMT-48, GoudyStout-48, MaturaMTScriptCapitals-48, ShowcardGothic-Reg-48, SnapITC-Regular-48
 
-//ajout de sprites, fix bug tornade, completion anti regrow farming method, ray of doom appelle kill() 30 fois par seconde (et non plus 60), spatial grid implemented, distance(float float float float) implemented
-//stats, lost_menu, init_game(), la range de la selected tower s'affiche mtn bien par dessus tout
 
-
-//reste à faire : napalm, visu napalm + stun (root ?), images ability, images panels, sprites spike factory, shooting offset, menu principal
+//reste à faire : napalm, visu napalm + stun (root ?), sprites spike factory, shooting offset, menu principal
 
 
 boolean auto_pass_levels=true;
@@ -12,7 +9,7 @@ boolean god_mode=false;
 
 float FAKE_TIME_ELAPSED;//à chaque frame c'est une constante
 
-PImage background, all_sprites, bloons_sprites, coin_sprite, coeur_sprite;
+PImage background, all_sprites, bloons_sprites, ability_sprites, coin_sprite, coeur_sprite;
 
 ArrayList<Mob> enemis=new ArrayList<Mob>();
 ArrayList<Projectile> projectiles=new ArrayList<Projectile>();
@@ -29,14 +26,18 @@ Spatial_grid grid = new Spatial_grid(HALF_MAX_SIZE_MOB);
 Map map = new Map(2);
 Joueur joueur= new Joueur(200, 650);
 Rounds round= new Rounds();
-Panel info_panel= new Panel();
+Info_panel info_panel;
 Tower_panel tower_panel;
 Upgrades upgrades = new Upgrades();
 Stat_manager stat_manager;
 Lost_menu lost_menu;
+Stat_menu stat_menu;
 
 HashMap<String,Integer> force_list = new HashMap<String,Integer>();
+HashMap<String,Integer> intervall_multiplier = new HashMap<String,Integer>();
 HashMap<String,int[]> pos_coins_sprites = new HashMap<String,int[]>();
+
+PFont font, font_18px, font_32px, font_huge;
 
 
 void load_sprites(){
@@ -44,6 +45,7 @@ void load_sprites(){
   coeur_sprite = loadImage("coeur_sprite.png");
   background=loadImage("map_3.png");
   all_sprites=loadImage("sprites_all.png");
+  ability_sprites=loadImage("ability_sprites.png");
   
   String[] lines = loadStrings("pos_sprites.txt");
     
@@ -143,7 +145,8 @@ ArrayList<int[]> get_sprites_pos(StringList sprites_names){
 
 void setup(){
   load_sprites();
-  tower_panel = new Tower_panel();    //ne pas le mettre avant car quand tower panel crée ses boutons il a besoin des sprites
+  tower_panel = new Tower_panel(875, 0, 1000, 750, false);    //ne pas le mettre avant car quand tower panel crée ses boutons il a besoin des sprites
+  info_panel = new Info_panel();
   stat_manager = new Stat_manager();  //ne pas le mettre en dehors de setup car appel un fichier et avant setup, le path n'est pas défini
   imageMode(CENTER);
   frameRate(60);
@@ -152,9 +155,16 @@ void setup(){
   
   StringList bloons_names = new StringList("red", "blue", "green", "yellow", "pink", "black", "white", "lead", "zebra", "rainbow", "ceramic", "MOAB", "BFB", "ZOMG");
   int black_seen = 0;
+  int mult = 1;
   for(int i = 0; i<bloons_names.size(); i++){
     force_list.put(bloons_names.get(i), i+1-black_seen);
-    if(black_seen == 0 && bloons_names.get(i).equals("black"))  black_seen=1;
+    if(i<=6)  intervall_multiplier.put(bloons_names.get(i), 1);
+    else if(i<=10)  intervall_multiplier.put(bloons_names.get(i), i-5);
+    else if(i==11)  intervall_multiplier.put(bloons_names.get(i), 30);
+    else if(i==12)  intervall_multiplier.put(bloons_names.get(i), 60);
+    else if(i==13)  intervall_multiplier.put(bloons_names.get(i), 90);
+    
+    if(bloons_names.get(i).equals("black"))  black_seen=1;
   }
   
   ellipseMode(CENTER);
@@ -175,13 +185,13 @@ void setup(){
   
   println(grid.n_cell_x, grid.n_cell_y);
   
-  lost_menu = new Lost_menu(1);
-  lost_menu.active = false;
+  font = createFont("FONT.TTF", 12); font_18px = createFont("FONT.TTF", 18);  font_32px = createFont("FONT.TTF", 32); 
   
-  PFont font = createFont("FONT.TTF", 12);
+  lost_menu = new Lost_menu();  
+  stat_menu = new Stat_menu(25, 25, 975, 725);
+  
+  
   textFont(font);
-  textLeading(13);
-  
 }
 
 
@@ -189,15 +199,21 @@ void draw(){
   //float t = millis();    //résultats autour de 5400, 5550, 5300 //on passe & 4500 !
   //for(int iter=0; iter<100; iter++){
   
-  
-  if(lost_menu.active){
+  if(stat_menu.active){
+    stat_menu.core();
+  }
+  else if(lost_menu.active){
     lost_menu.core();
     if(lost_menu.ended()){
       //gravity.mult(-1);  //faut pas oublier de la remettre normale
       gravity = new PVector(0, .1);
       lost_menu.active = false;
-      //if(lost_menu.go_to_menu)  menu_principal.active = true;
-      init_new_game();
+      if(lost_menu.go_to_menu){
+        stat_menu.active = true;
+        stat_menu.screen = get();
+        //menu_principal.active = true;
+      }
+      else  init_new_game();
     }
   }
   else  game();
@@ -225,13 +241,15 @@ void init_new_game(){
   map = new Map(2);
   joueur= new Joueur(200, 650);
   round= new Rounds();
-  info_panel= new Panel();
-  tower_panel = new Tower_panel();
+  info_panel= new Info_panel();
+  tower_panel = new Tower_panel(875, 0, 1000, 750, false);
+  
+  textFont(font);
 }
 
 void game(){
   
-  if(keyPressed && key == '^')      god_mode = true;
+  if(keyPressed && key == '$')      god_mode = true;
   
   if(god_mode){
     joueur.vies=100;
@@ -240,17 +258,16 @@ void game(){
   else if(joueur.vies<=0){
     stat_manager.increment_stat("Games lost", "overview");
     stat_manager.save_all();
-    lost_menu = new Lost_menu(round.round_number);
-    lost_menu.bg = get();
+    lost_menu.init();
     return;
   }
-  //joueur.vies-=10;
+  joueur.vies-=10;
   
   FAKE_TIME_ELAPSED = get_fake_time_elapsed(FAKE_TIME_ELAPSED);    //ATTENTION : NE PAS COMPTER LE TEMPS ENTRE LES ROUNDS
   background(255);    //fond blanc A ENLEVER DES QUE LES PANNEAUX ONT UN SPRITE
   image(background, 875/2, 650/2);  
   //map.show();
-  stat_manager.display("overview");
+  stat_manager.display("overview", width/2, 0, 15);
   
   //if(enemis.size() != grid.get_nb_enemis_stored())  println(round.round_number, enemis.size(), grid.get_nb_enemis_stored());
   
@@ -293,6 +310,7 @@ void game(){
     bananas.get(i).core();
   }
   
+  
   //On affiche toutes les pop_animations
   for (int i = pop_animations.size() - 1; i >= 0; i--){
     pop_animations.get(i).core();
@@ -329,6 +347,17 @@ float get_fake_time_elapsed(float last_time){    //va surement y avoir des erreu
   }
   return last_time + joueur.game_speed/60;
 }
+
+void outline_text(String text, float x, float y, color back_color, color font_color, int off){
+    fill(back_color);
+    for(float i = x-off; i<=x+off; i+=off){
+      for(float j = y-off; j<=y+off; j+=off){
+        text(text, i, j);
+      }
+    }    
+    fill(font_color);
+    text(text, x, y);
+  }
 
 
 float distance(float[] pos1, float[] pos2){

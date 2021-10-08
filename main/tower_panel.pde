@@ -1,26 +1,24 @@
 class Tower_panel{
 
-  Button dart_monkey;
-  Button wizard_monkey;
-  Button sniper_monkey;
-  Button tack_shooter;
-  Button dartling_gun;
-  Button boomerang_thrower;
-  Button ninja_monkey;
-  Button spike_factory;
+  Button dart_monkey, wizard_monkey, sniper_monkey, tack_shooter, dartling_gun, boomerang_thrower, ninja_monkey, spike_factory;
   
-  Button unselect_tower;
+  Button unselect_tower, speed_button;
   
-  Button speed_button;
+  ArrayList<Button> buttons;
   
-  float top_left_x=875;
-  float top_left_y=0;
-  float bottom_right_x=1000;
-  float bottom_right_y=750;
+  float top_left_x=875, top_left_y=0, bottom_right_x=1000, bottom_right_y=750;
+  
+  PImage bg = loadImage("tower_panel_bg.png");
+  boolean for_stat_menu;
   
   
   
-  Tower_panel(){
+  Tower_panel(float top_left_x, float top_left_y, float bottom_right_x, float bottom_right_y, boolean for_stat_menu){
+    this.top_left_x=top_left_x;
+    this.top_left_y=top_left_y;
+    this.bottom_right_x=bottom_right_x;
+    this.bottom_right_y=bottom_right_y;
+    this.for_stat_menu = for_stat_menu;
     instantiate_all_buttons();
   }
   
@@ -29,79 +27,53 @@ class Tower_panel{
     fill(0, 102, 153);
     textAlign(LEFT, TOP);
     image(coin_sprite, 893, 18);
-    text(str(joueur.argent), 910, 10); 
+    textFont(font_18px);
+    outline_text(str(joueur.argent), 910, 8, color(0), color(255), 1); 
     image(coeur_sprite, 893, 48);
-    text(str(max(0, joueur.vies)), 910, 40);
+    outline_text(str(max(0, joueur.vies)), 910, 38, color(0), color(255), 1); 
+    textFont(font);
   }
   
   void show(){
-    stroke(0);
-    strokeWeight(1);
-    fill(255);
-    rect(top_left_x, top_left_y-1, bottom_right_x, bottom_right_y);
+    //stroke(0);
+    //strokeWeight(1);
+    //fill(255);
+    //rect(top_left_x, top_left_y-1, bottom_right_x, bottom_right_y);
     
-    update_clickability();
-        
+    if(!for_stat_menu){
+      image(bg, (top_left_x+bottom_right_x)/2, (top_left_y+bottom_right_y)/2);
     
-    dart_monkey.show();
-    tack_shooter.show();
-    sniper_monkey.show();
-    boomerang_thrower.show();
-    ninja_monkey.show();
-    wizard_monkey.show();
-    dartling_gun.show();
-    spike_factory.show();
+      update_clickability();
+    }
     
-    speed_button.show();
-    show_infos();  
+    for(Button button : buttons){
+      //ce bouton n'est pas dans la liste si for_stat_menu == true
+      if(button == unselect_tower && joueur.placing_tower != null)   unselect_tower.show_image_from_pos_aff(unselect_tower.mouse_on_button()? 1.1 : 1);
+      else if(button != unselect_tower)  button.show();
+    }
+    
+    if(!for_stat_menu)    show_infos();
   }
   
   void update_clickability(){
-    dart_monkey.unclickable = joueur.argent<get_tower_price("dart monkey");
-    tack_shooter.unclickable = joueur.argent<get_tower_price("tack shooter");
-    sniper_monkey.unclickable = joueur.argent<get_tower_price("sniper");
-    boomerang_thrower.unclickable = joueur.argent<get_tower_price("boomerang thrower");
-    ninja_monkey.unclickable = joueur.argent<get_tower_price("ninja monkey");
-    wizard_monkey.unclickable = joueur.argent<get_tower_price("wizard monkey");
-    dartling_gun.unclickable = joueur.argent<get_tower_price("dartling gun");
-    spike_factory.unclickable = joueur.argent<get_tower_price("spike factory");
+    for(Button button : buttons){
+      if(button.associated_tower != null)   button.unclickable = joueur.argent < get_tower_price(button.associated_tower.type);
+    }
   }
   
   void interact(){
     String tower_type=null;
     
-    if(dart_monkey.is_cliqued()){
-      tower_type = "dart monkey";
-    }
-    else if(tack_shooter.is_cliqued()){
-      tower_type = "tack shooter";
-    }
-    else if(sniper_monkey.is_cliqued()){
-      tower_type = "sniper";
-    }
-    else if(boomerang_thrower.is_cliqued()){
-      tower_type = "boomerang thrower";
-    }
-    else if(ninja_monkey.is_cliqued()){
-      tower_type = "ninja monkey";
-    }
-    else if(wizard_monkey.is_cliqued()){
-      tower_type = "wizard monkey";
-    }
-    else if(dartling_gun.is_cliqued()){
-      tower_type = "dartling gun";
-    }
-    else if(spike_factory.is_cliqued()){
-      tower_type = "spike factory";
-    }
-    else if(unselect_tower.is_cliqued()){
-      tower_type = "";
-    }
-    
-    if(speed_button.is_cliqued()){
-      joueur.game_speed*=2;
-      if(joueur.game_speed>joueur.max_game_speed)  joueur.game_speed=1;
-      speed_button.text = "speed : "+str(int(joueur.game_speed));
+    for(Button button : buttons){
+      if(button.is_cliqued()){
+        if(button == speed_button){
+          joueur.game_speed*=2;
+          if(joueur.game_speed>joueur.max_game_speed)  joueur.game_speed=1;
+          speed_button.text = "speed : "+str(int(joueur.game_speed));
+        }
+        else if(button == unselect_tower)  tower_type = "";
+        else  tower_type = button.associated_tower.type;
+      }
     }
     
     if(tower_type != null){
@@ -109,39 +81,86 @@ class Tower_panel{
       else joueur.placing_tower = get_new_tower(tower_type, mouseX, mouseY);
     }
     
+  }
+  
+  void update_selection(){
+    //for stat_menu only
+    for(Button button : buttons){
+      if(button.is_cliqued()){
+        for(Button temp : buttons){
+          temp.selected = temp == button;
+        }
+      }
+    }
+  }
+  
+  String get_selected_tower_name(){
+    //for stat_menu only
+    
+    for(Button button : buttons){
+      if(button.selected)  return button.associated_tower.type;
+    }
+    return "NO TOWER NAME FOUND : PROBLEM";
     
   }
   
   void instantiate_all_buttons(){
-    dart_monkey =       new Button(875, 94, 875+62, 156, "", 'q');
-    dart_monkey.associated_tower = get_new_tower("dart monkey", 906, 125);
-    tack_shooter =      new Button(938, 94, 1000, 156, "", 'r');
-    tack_shooter.associated_tower = get_new_tower("tack shooter", 969, 125);
+    buttons = new ArrayList<Button>();
+    
+    dart_monkey =       new Button(top_left_x, top_left_y+94, top_left_x+62, top_left_y+156, "", 'q');
+    dart_monkey.associated_tower = get_new_tower("dart monkey", top_left_x+31, top_left_y+125);
+    tack_shooter =      new Button(top_left_x+63, top_left_y+94, bottom_right_x, top_left_y+156, "", 'r');
+    tack_shooter.associated_tower = get_new_tower("tack shooter", bottom_right_x-31, top_left_y+125);
     tack_shooter.associated_tower.show_scale = .75;
-    sniper_monkey =     new Button(875, 157, 875+62, 157+62, "", 'z');
-    sniper_monkey.associated_tower = get_new_tower("sniper", 902, 196);
+    sniper_monkey =     new Button(top_left_x, top_left_y+157, top_left_x+62, top_left_y+157+62, "", 'z');
+    sniper_monkey.associated_tower = get_new_tower("sniper", top_left_x+27, top_left_y+196);
     sniper_monkey.associated_tower.show_scale = .7;
     sniper_monkey.associated_tower.orientation = QUARTER_PI;
-    boomerang_thrower = new Button(938, 157, 1000, 157+62, "", 'w');
-    boomerang_thrower.associated_tower = get_new_tower("boomerang thrower", 969, 188);
-    ninja_monkey =      new Button(875, 220, 875+62, 282, "", 'd');
-    ninja_monkey.associated_tower = get_new_tower("ninja monkey", 906, 251);
+    boomerang_thrower = new Button(top_left_x+63, top_left_y+157, bottom_right_x, top_left_y+157+62, "", 'w');
+    boomerang_thrower.associated_tower = get_new_tower("boomerang thrower", bottom_right_x-31, top_left_y+188);
+    ninja_monkey =      new Button(top_left_x, top_left_y+220, top_left_x+62, top_left_y+282, "", 'd');
+    ninja_monkey.associated_tower = get_new_tower("ninja monkey", top_left_x+31, top_left_y+251);
     //canon
     //ice
     //glue
     //boat
     //plane
     //superman
-    wizard_monkey =     new Button(938, 220, 1000, 282, "", 'a');
-    wizard_monkey.associated_tower = get_new_tower("wizard monkey", 969, 251);
-    dartling_gun =      new Button(875, 283, 875+62, 283+62, "", 'm');
-    dartling_gun.associated_tower = get_new_tower("dartling gun", 906, 314);
+    wizard_monkey =     new Button(top_left_x+63, top_left_y+220, bottom_right_x, top_left_y+282, "", 'a');
+    wizard_monkey.associated_tower = get_new_tower("wizard monkey", bottom_right_x-31, top_left_y+251);
+    dartling_gun =      new Button(top_left_x, top_left_y+283, top_left_x+62, top_left_y+283+62, "", 'm');
+    dartling_gun.associated_tower = get_new_tower("dartling gun", top_left_x+31, top_left_y+314);
     dartling_gun.associated_tower.show_scale = .5;
     dartling_gun.associated_tower.orientation = QUARTER_PI;
-    spike_factory =     new Button(938, 283, 1000, 283+62, "", 'j');
-    spike_factory.associated_tower = get_new_tower("spike factory", 969, 314);
+    spike_factory =     new Button(top_left_x+63, top_left_y+283, bottom_right_x, top_left_y+283+62, "", 'j');
+    spike_factory.associated_tower = get_new_tower("spike factory", bottom_right_x-31, top_left_y+314);
     spike_factory.associated_tower.show_scale = .7;
+   
     
+    buttons.add(dart_monkey);
+    buttons.add(tack_shooter);
+    buttons.add(sniper_monkey);
+    buttons.add(boomerang_thrower);
+    buttons.add(ninja_monkey);
+    buttons.add(wizard_monkey);
+    buttons.add(dartling_gun);
+    buttons.add(spike_factory);
+    
+    if(for_stat_menu){
+      dart_monkey.selected = true;
+      for(Button button : buttons){
+        button.couleur = color(255, 255, 255, 40);
+        button.use_shortcut_key = false;
+      }
+      
+      /*Button smf = new Button(top_left_x, top_left_y + 346, top_left_x + 62, top_left_y+346+62, "", char(-1)); 
+      smf.associated_tower = get_new_tower("super monkey fan", top_left_x + 31, top_left_y + 377);
+      buttons.add(smf);
+      Button phoenix = new Button(top_left_x + 63, top_left_y + 346, bottom_right_x, top_left_y+346+62, "", char(-1));
+      phoenix.associated_tower = get_new_tower("phoenix", bottom_right_x - 31, top_left_y + 377);
+      buttons.add(phoenix);*/
+      return;
+    }
     
     dart_monkey.descr = "Dart Monkey\n"+str(get_tower_price("dart monkey"));
     wizard_monkey.descr = "Wizard Monkey\n"+str(get_tower_price("wizard monkey"));
@@ -161,9 +180,12 @@ class Tower_panel{
     ninja_monkey.show_descr_above=false;
     spike_factory.show_descr_above=false;
     
-    unselect_tower = new Button(0, 0, 0, 0, "", ' ');
+    unselect_tower = new Button(875-91, 650-97, 875-10, 650-10, "", ' ');
+    unselect_tower.pos_aff = pos_coins_sprites.get("poubelle");
+    buttons.add(unselect_tower);
     
     speed_button = new Button(875, 650-80, 1000, 650, "speed : "+str(int(joueur.game_speed)), '*');
+    buttons.add(speed_button);
   }
 }
 

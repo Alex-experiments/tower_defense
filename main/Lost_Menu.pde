@@ -9,12 +9,26 @@ class Lost_menu extends Menu_pancarte{
   float x, y, w, h;
   PImage bg, panneau = loadImage("wooden sign avec attaches metal.png");
   
-  boolean freeze = false, active = true, choice_made=false, go_to_menu = false, go_replay = false, transition = false;
+  int round_number;
+  
+  boolean freeze = false, active = false, choice_made=false, go_to_menu = false, go_replay = false, transition = false;
   
   Point top_left;
   
-  Lost_menu(int round_number){
-    super(1, 348, -350, 200, 304, 150);
+  Lost_menu(){
+    super();
+  }
+  
+  void init(){
+    points = new ArrayList<Point>();
+    links = new ArrayList<Link>();
+    ropes_extremity_links = new IntList();
+    buttons_top_left_corner = new ArrayList<Point>();
+    
+    active = true; freeze = false; choice_made=false; go_to_menu = false; go_replay = false; transition = false;
+    bg = get();
+    round_number = round.round_number;
+    create_pancarte(1, 348, -350, 200, 304, 150);
     h=150;
     w = 305;
     top_left = links.get(ropes_extremity_links.get(1)).ptA;
@@ -23,6 +37,8 @@ class Lost_menu extends Menu_pancarte{
     menu.associated_image = loadImage("menu button.png");
     replay = new Button(x + replay_offset_x, y + replay_offset_y, x + replay_offset_x + replay_w, y + replay_offset_y + replay_h, "", 'R');
     replay.associated_image = loadImage("replay button.png");
+    textAlign(CENTER, CENTER);
+    textFont(font_32px);
   }
   
   void core(){
@@ -77,8 +93,9 @@ class Lost_menu extends Menu_pancarte{
     for(Link zelda : links){
       zelda.show();
     }*/
-    menu.show();
-    replay.show();
+    menu.show_associated_image();
+    replay.show_associated_image();
+    outline_text("GAME OVER\nLost on round "+str(round_number), x+w/2, y+60, color(255), color(0), 1);
   }
 }
 
@@ -94,10 +111,6 @@ class Menu_pancarte{
   ArrayList<Point> buttons_top_left_corner = new ArrayList<Point>();
   
   PImage maillon_face = loadImage("chainon metal face.png"), maillon_side = loadImage("chainon metal side.png");
-  
-  Menu_pancarte(int nb_box, float x, float y, float distance_inter_box, int width_box, int height_box){
-    create_pancarte(nb_box, x, y, distance_inter_box, width_box, height_box);
-  }
   
   void update(){
     for(Point pt : points){

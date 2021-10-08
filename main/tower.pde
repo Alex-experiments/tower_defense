@@ -43,7 +43,8 @@ class Super_monkey_fan extends Tower{
     selectable = false;
     summoner = linked_tower;
     this.ability_casted_by_tour = ability_casted_by_tour;
-    detects_camo = summoner.detects_camo;  //obligé de le faire la est pas dans set_param_tower() car super() appelle set_param_tower()
+    if(summoner != null)  detects_camo = summoner.detects_camo;  //obligé de le faire la est pas dans set_param_tower() car super() appelle set_param_tower()
+    //le if(summoner != null)  est dans le cas ou on regarde cette tour depuis le tower panel du stat menu (on a juste besoin du sprite)
   }
   
   void set_param_tower(){

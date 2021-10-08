@@ -1,12 +1,11 @@
-static final int HALF_MAX_SIZE_MOB = ceil(25/2);  
+static final int HALF_MAX_SIZE_MOB = ceil(42*1./2);  
 
 class Mob{
-  float x, y;
+  float x, y, px, py;
   float avancement;
   float base_speed=1.45, speed=base_speed;
   int cell_id; 
   int layers, type_max_layers;
-  float size=25.;                      //ATTENTION A CHANGER AUSSI DANS HALF_MAX_SIZE_MOB (pour la grid)
   String type;      //important pasque whites et blacks ont le meme nb de layers mais pas les memes carac ATTENTION : type == couleur (le type d'un red est le même que celui d'un red camo)
   
   //ArrayList<Mob> enfants;
@@ -26,7 +25,10 @@ class Mob{
   
   ArrayList<Projectile> hurted_by_during_frame = new ArrayList<Projectile>();    //on va garder en mémoire tous les projectiles qui nous ont tappé durant cette frame
   
-  String sprite_name;
+  ArrayList<Animator> sprites = new ArrayList<Animator>();
+  boolean freeze_rotation = true;
+  float show_scale = 1., orientation;
+  float size=42. * show_scale;                      //ATTENTION A CHANGER AUSSI DANS HALF_MAX_SIZE_MOB (pour la grid)
  
   
   Mob(String type, boolean regrowth, boolean camo, float avancement){ 
@@ -37,7 +39,7 @@ class Mob{
     this.camo=camo;
     init_param_mob();
     init_regrowth();
-    init_sprite_name();
+    set_sprites();
   }
   
   void add_to_grid(){
@@ -45,18 +47,19 @@ class Mob{
       grid.add_new_mob(this, cell_id);
   }
   
-  void init_sprite_name(){
-    sprite_name = type;
-    if(regrowth && camo){
-      sprite_name+=" camo regrowth";
+  void set_sprites(){
+    StringList sprites_names = new StringList();
+    if(regrowth){
+      sprites_names.append(type+" regrowth bloon");
+      if(camo)  sprites_names.append("camo regrowth overlay");
     }
-    else if(regrowth){
-      sprite_name+=" regrowth";
+    else{
+      sprites_names.append(type+" bloon");
+      if(camo)  sprites_names.append("camo overlay");
     }
-    else if(camo){
-      sprite_name+=" camo";
+    for(String sprite_name : sprites_names){
+      sprites.add(new Animator(sprite_name, 1));
     }
-    if(get_sprites_pos(new StringList(sprite_name)).size()==0)  sprite_name = "red";
   }
   
   void init_regrowth(){
@@ -68,9 +71,34 @@ class Mob{
   }
   
   void show(){
-    int[] pos_aff;
+    /*int[] pos_aff;
     pos_aff = pos_coins_sprites.get(sprite_name);
     image(bloons_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    */
+    if(!freeze_rotation){
+      pushMatrix();
+      translate(x, y);
+      rotate(orientation+HALF_PI);
+      for(Animator anim : sprites){
+        int[] pos_aff = anim.get_pos();
+        if(pos_aff[6]==4){  //side mirror
+          image(all_sprites, (pos_aff[4]-pos_aff[2]/2)*show_scale,   pos_aff[5],              pos_aff[2]*show_scale, pos_aff[3]*show_scale, pos_aff[0],            pos_aff[1],            pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+          image(all_sprites, (-pos_aff[4]+pos_aff[2]/2)*show_scale,  pos_aff[5],              pos_aff[2]*show_scale, pos_aff[3]*show_scale, pos_aff[0]+pos_aff[2], pos_aff[1],            pos_aff[0],            pos_aff[1]+pos_aff[3]);
+        }
+        else  image(all_sprites, pos_aff[4]*show_scale, pos_aff[5]*show_scale, pos_aff[2]*show_scale, pos_aff[3]*show_scale, pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+      }
+      popMatrix();
+    }
+    else{
+      for(Animator anim : sprites){
+        int[] pos_aff = anim.get_pos();
+        if(pos_aff[6]==4){  //side mirror
+          image(all_sprites, x+(pos_aff[4]-pos_aff[2]/2)*show_scale,   y+pos_aff[5],              pos_aff[2]*show_scale, pos_aff[3]*show_scale, pos_aff[0],            pos_aff[1],            pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+          image(all_sprites, x+(-pos_aff[4]+pos_aff[2]/2)*show_scale,  y+pos_aff[5],              pos_aff[2]*show_scale, pos_aff[3]*show_scale, pos_aff[0]+pos_aff[2], pos_aff[1],            pos_aff[0],            pos_aff[1]+pos_aff[3]);
+        }
+        else  image(all_sprites, x+pos_aff[4]*show_scale, y+pos_aff[5]*show_scale, pos_aff[2]*show_scale, pos_aff[3]*show_scale, pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+      }
+    }
   }
   
   int get_RBE(){
@@ -111,7 +139,7 @@ class Mob{
     }
     return 1;    //pasque il faut bien return qqch
   }
-  
+   
   void init_param_mob(){
     enfants=new StringList();
     switch(type){
@@ -182,6 +210,8 @@ class Mob{
         enfants.append("ceramic");
         enfants.append("ceramic");
         enfants.append("ceramic");
+        freeze_rotation = false;
+        show_scale = .6;
         break;
       case "BFB":
         layers=700;
@@ -190,6 +220,8 @@ class Mob{
         enfants.append("MOAB");
         enfants.append("MOAB");
         enfants.append("MOAB");
+        freeze_rotation = false;
+        show_scale = .6;
         break;
       case "ZOMG":
         layers=4000;
@@ -198,6 +230,8 @@ class Mob{
         enfants.append("BFB");
         enfants.append("BFB");
         enfants.append("BFB");
+        freeze_rotation = false;
+        show_scale = .6;
         break;
       case "DDT":
         break;
@@ -250,7 +284,7 @@ class Mob{
             past_types.remove(type);
             init_param_mob();                         //en faisant ca le ballon est direct au max de ses layers : ce n'est pas ce qu'on veut
             layers=1;                                 //on est du type d'au dessus avec juste une layer
-            init_sprite_name();   
+            set_sprites();   
             if(enfants.size()>1)  undirect_child_should_give_gold = false;  //on vient de passer à un type qui enfante deux ballons au moins
           }
         }
@@ -269,7 +303,7 @@ class Mob{
     if(is_rooted){
       if(FAKE_TIME_ELAPSED - root_time > root_duration)  is_rooted = false;
       else return;
-    }
+    }    
     if(is_blown_away){
       for(int i=0; i<joueur.game_speed; i++){
         x += blown_away_cos_dir * blown_away_speed;
@@ -285,9 +319,16 @@ class Mob{
       update_cell_id();
       return;
     }
+    if(!freeze_rotation){
+      px = x;
+      py = y;
+    }
     avancement += speed * joueur.game_speed;
     update_pos();
     update_cell_id();
+    if(!freeze_rotation){
+      orientation = atan2(y-py, x-px);
+    }
   }
   
   void update_cell_id(){
@@ -394,6 +435,9 @@ class Mob{
         min_RBE_reached = min( get_RBE(), min_RBE_reached);
         last_dmg_taken_time=FAKE_TIME_ELAPSED;
       }
+      if(type.equals("ceramic")){
+        sprites.get(0).frame_count = -(ceil(layers/2.)-5);    //le 2. est important sinon div entiere !
+      }
       return nb_layers_to_pop;
     }
     else{
@@ -425,6 +469,7 @@ class Mob{
           
           if(fils.layers>0){
             fils.add_to_grid();
+            fils.orientation = orientation;
             enemis.add(fils);
           }
         }
@@ -442,7 +487,8 @@ class Mob{
       
       add_one_gold();      //le ballon est passé à 0 layers : on gagne un de gold
       
-      stat_manager.increment_stat(sprite_name, "bloons");
+      stat_manager.increment_stat(type+ (camo ? " camo":"") + (regrowth ? " regrowth":""), "bloons");
+      if(camo || regrowth)  stat_manager.increment_stat(type, "bloons");    //on augmente aussi le compteur général (genre +1 red (dont camo +1))
       stat_manager.increment_stat("Bloons popped", "overview");
       
       return layers_popped;

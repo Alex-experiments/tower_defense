@@ -32,7 +32,7 @@ class Joueur{
   }
   
   void show_fps(){
-    fill(0, 102, 153);
+    fill(0);
     textAlign(LEFT, TOP);
     text(str(round(frameRate)), 0, -3);
   }
@@ -120,8 +120,14 @@ Tower get_new_tower(String tower_type, float x, float y){
       case "dart monkey":
         temp = new Dart_monkey(tower_type, x, y);
         break;
+      case "super monkey fan":
+        temp = new Super_monkey_fan(null, null, tower_type, x, y);  //si on l'appelle ici c'est qu'on vient du tower panel et donc qu'on a juste besoin du sprite
+        break;
       case "wizard monkey":
         temp = new Wizard_monkey(tower_type, x, y);
+        break;
+      case "phoenix":
+        temp = new Phoenix(null);  //si on l'appelle ici c'est qu'on vient du tower panel et donc qu'on a juste besoin du sprite
         break;
       case "sniper":
         temp = new Sniper(tower_type, x, y);

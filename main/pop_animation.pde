@@ -6,6 +6,8 @@ class Pop_animation{
   boolean must_show = true;
   
   static final int MAX_POP_PER_CELL = 1;    //permet d'éviter d'en afficher 500 par frame au meme endroit...
+  
+  int pos_aff[];
 
   Pop_animation(float x, float y, float diametre){
     
@@ -15,9 +17,10 @@ class Pop_animation{
     
     this.x=x;
     this.y=y;
-    if(x==0 && y == 0) println("couille");
     this.diametre=5*diametre;
     pop_time = FAKE_TIME_ELAPSED;
+    
+    pos_aff = pos_coins_sprites.get("pop animation");
   }
   
   void core(){
@@ -32,7 +35,7 @@ class Pop_animation{
   }
   
   void show(){
-    int[] pos_aff = pos_coins_sprites.get("pop animation");
+    
     image(all_sprites, x, y, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
     
     /*float intensity= 255*(FAKE_TIME_ELAPSED-pop_time)/DURATION;   
