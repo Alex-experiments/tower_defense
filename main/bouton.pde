@@ -63,11 +63,13 @@ class Button{
     if(mouse_on_button() && descr != null){
       textAlign(CENTER, CENTER); // centre le texte horizontalement et verticalement
       if(show_descr_above){     //cela sera le cas pour les boutons de l'info panel (upgrades)
-        float x1 = max(0, (top_left_x+bottom_right_x-width_descr)/2);
+        float x1 = max(0, (top_left_x+bottom_right_x-width_descr)/2);      //on veut que ca sorte pas d'au dessus de l'info panel
+        if(x1 + width_descr > tower_panel.top_left_x)   x1 = tower_panel.top_left_x-width_descr-5;  //laisser comme ca pour avoir une marge de 5px
+        float y1 = min(top_left_y-110, 545);
         fill(0, 0, 0, 200);
-        rect(x1, top_left_y-110, x1+width_descr, top_left_y-10, 5, 5, 5, 5);
+        rect(x1, y1, x1+width_descr, y1+100, 5, 5, 5, 5);
         fill(255);
-        text(descr, x1, top_left_y-110, x1+width_descr, top_left_y-10);
+        text(descr, x1, y1, x1+width_descr, y1+100);
       }
       else{     //cela sera le cas pour les boutons du tower panel
         fill(255);
@@ -82,11 +84,10 @@ class Button{
     
   }
   
-  void show_as_tab(){
+  void show_as_tab(color color_1, color color_2){
     
     if(!selected){
-      fill(255, 255, 255, 180);
-      //fill(0, 0, 0, 150);
+      fill(color_1);
       rect(top_left_x, top_left_y, bottom_right_x, bottom_right_y);
       fill(0);
       if(!text.equals("")){
@@ -95,7 +96,7 @@ class Button{
       }
     }
     else{
-      fill(0, 0, 0, 220);
+      fill(color_2);
       rect(top_left_x, top_left_y, bottom_right_x, bottom_right_y);
       fill(255);
       if(!text.equals("")){
@@ -111,13 +112,18 @@ class Button{
     //unclickable
     return;
   }
+  void show_associated_image(float scale){
+    image(associated_image, (top_left_x + bottom_right_x)/2, (top_left_y + bottom_right_y)/2, associated_image.width*scale, associated_image.height*scale);
+    //unclickable
+    return;
+  }
   void show_image_from_pos_aff(float scale){
     image(all_sprites, (top_left_x + bottom_right_x)/2, (top_left_y + bottom_right_y)/2, pos_aff[2]*scale, pos_aff[3]*scale, pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
   
-  void show_ability(){
+  void show_ability(float scale){
     show();
-    image(ability_sprites, (top_left_x + bottom_right_x)/2, (top_left_y + bottom_right_y)/2, pos_aff[2], pos_aff[3], pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+    image(ability_sprites, (top_left_x + bottom_right_x)/2, (top_left_y + bottom_right_y)/2, pos_aff[2]*scale, pos_aff[3]*scale, pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
   }
   
   void show_cooldown(float time_left, float total_cd){

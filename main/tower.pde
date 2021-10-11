@@ -16,6 +16,10 @@ class Dart_monkey extends Tower{
     StringList sprites_names = new StringList();
     if(path_2_progression == 4)  sprites_names.append("super monkey fan club");
     else if(path_1_progression >= 3){
+      
+      init_proj_offset = 0.;
+      init_proj_offset_angle = 0.;
+      
       sprites_names.append("spike o pult base");
       sprites_names.append("spike o pult body");
       sprites_names.append("spike o pult");
@@ -178,29 +182,34 @@ class Boomerang_thrower extends Tower{
   StringList get_sprites_names(){
     StringList sprites_names = new StringList();
     
-    if(path_2_progression>=3)  sprites_names.append("boomerang shooter bionic arm");
+    if(path_2_progression>=3){
+      if(path_1_progression < 2)  sprites_names.append("boomerang thrower red hot boomerang resting");
+      else sprites_names.append("boomerang thrower red hot glaive resting");
+      sprites_names.append("boomerang thrower bionic arm");
+    }
     
-    if(path_1_progression <= 1 && path_2_progression <= 2)  sprites_names.append("boomerang shooter body");
+    if(path_1_progression <= 1 && path_2_progression <= 2)  sprites_names.append("boomerang thrower body");
     else if(path_2_progression>=3)  sprites_names.append("dart monkey");
-    else if(path_1_progression == 2)  sprites_names.append("boomerang shooter red body");
-    else if(path_1_progression == 3)  sprites_names.append("boomerang shooter purple body");
+    else if(path_1_progression == 2)  sprites_names.append("boomerang thrower red body");
+    else if(path_1_progression == 3)  sprites_names.append("boomerang thrower purple body");
     else if(path_1_progression == 4){
       sprites_names.append("dart monkey");
-      sprites_names.append("boomerang shooter white suit");
+      sprites_names.append("boomerang thrower white suit");
     }
     
-    if(path_2_progression>=3)  sprites_names.append("boomerang shooter bionic eye");
+    if(path_2_progression>=3)  sprites_names.append("boomerang thrower bionic eye");
     
     if(path_1_progression == 0){
-      if(path_2_progression==0)  sprites_names.append("boomerang shooter triangle");
-      else if(path_2_progression == 1)  sprites_names.append("boomerang shooter circle");
-      else if(path_2_progression == 2)  sprites_names.append("boomerang shooter cross");
+      if(path_2_progression==0)  sprites_names.append("boomerang thrower triangle");
+      else if(path_2_progression == 1)  sprites_names.append("boomerang thrower circle");
+      else if(path_2_progression == 2)  sprites_names.append("boomerang thrower cross");
     }
     else if(path_1_progression == 1){
-      if(path_2_progression==0)  sprites_names.append("boomerang shooter triple triangle");
-      else if(path_2_progression == 1)  sprites_names.append("boomerang shooter triple circle");
-      else if(path_2_progression == 2)  sprites_names.append("boomerang shooter cross");
+      if(path_2_progression==0)  sprites_names.append("boomerang thrower triple triangle");
+      else if(path_2_progression == 1)  sprites_names.append("boomerang thrower triple circle");
+      else if(path_2_progression == 2)  sprites_names.append("boomerang thrower cross");
     }
+    
    
     return sprites_names;
   }
@@ -220,6 +229,11 @@ class Ninja_monkey extends Tower{
     shoots_list.append("shuriken");
     deviation_list.append(0);
     attack_speed_list.append(1.67);
+  }
+  
+  void set_init_proj_offset(){
+    init_proj_offset_angle = 0.;
+    init_proj_offset = size/2.;
   }
   
   StringList get_sprites_names(){
@@ -257,6 +271,11 @@ class Wizard_monkey extends Tower{
     shoots_list.append("purple ball");
     deviation_list.append(0);
     attack_speed_list.append(0.91);
+  }
+  
+  void set_init_proj_offset(){
+    init_proj_offset_angle = 0.;
+    init_proj_offset = size/2.;
   }
   
   StringList get_sprites_names(){
@@ -313,6 +332,11 @@ class Phoenix extends Tower{
     detects_camo = true;
   }
   
+  void set_init_proj_offset(){    //comme sa rotation est pas liée à la direction c'est chiant
+    init_proj_offset_angle = 0.;
+    init_proj_offset = 0.;
+  }
+  
   StringList get_sprites_names(){
     anim_frame_per_sprite = 10;
     StringList sprites_names = new StringList();
@@ -352,6 +376,11 @@ class Dartling_gun extends Tower{
     shoots_list.append("dart");
     deviation_list.append(0);
     attack_speed_list.append(5);
+  }
+  
+  void set_init_proj_offset(){
+    init_proj_offset = 65.;
+    init_proj_offset_angle = 0.;
   }
   
   StringList get_sprites_names(){
@@ -416,13 +445,12 @@ class Dartling_gun extends Tower{
       while(time_before_next_attack<=0){
         trigger_attack_anim = true;
         if(i==0){
-          direction += random(-max_dispersion/2, max_dispersion/2);
-          directions_list.append(direction);
-        }
-        else{
-          direction=directions_list.get(compteur_dir);
-        }
-        projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));
+          direction += random(-max_dispersion/2, max_dispersion/2);  
+          directions_list.append(direction);    //en gros comme en x/4 on tire les missiles 3 par 3, on détermine la dispersion uniquement sur un des trois
+        }                                       //et on applique la déviation sur les deux autres
+        else  direction=directions_list.get(compteur_dir);
+ 
+        projectiles.add(new Projectile(this, x + cos(direction-init_proj_offset_angle) * init_proj_offset, y + sin(direction-init_proj_offset_angle) * init_proj_offset, direction+deviation, shoot_type));
         
         time_before_next_attack += 1 / attack_speed;      //affecter la valeur reste utile pour le while (sinon il faut remplacer par un _list.get(i)<=0 )
         time_before_next_attack_list.set(i, time_before_next_attack);
@@ -438,7 +466,20 @@ class Dartling_gun extends Tower{
 class Spike_factory extends Tower{
 
   Spike_factory(String type, float x, float y){
-    super(type, x, y);
+    super(type, x, y);    
+  }
+  
+  void set_on_track_pos(){
+    on_track_pos = new ArrayList<float[]>();
+    int pas = 5;
+    
+    for(float a=x-range; a<=x+range; a+=pas){
+      for(float b=y-range; b<=y+range; b+=pas){
+        if(map.is_on_track(a, b, 0) && distance_sqred(a, b, x, y) <= range*range){
+          on_track_pos.add(new float[] {a, b});
+        }
+      }
+    }
   }
   
   void set_param_tower(){
@@ -449,6 +490,11 @@ class Spike_factory extends Tower{
     shoots_list.append("spike");
     deviation_list.append(0);
     attack_speed_list.append(0.43);
+  }
+  
+  void set_init_proj_offset(){    //pas utilisé sur cette tour mais on sait jamais
+    init_proj_offset=0;
+    init_proj_offset_angle=0;
   }
   
   void shoot(){
@@ -474,11 +520,61 @@ class Spike_factory extends Tower{
   StringList get_sprites_names(){
     StringList sprites_names = new StringList();
     
-    sprites_names.append("spike factory top gear");
-    sprites_names.append("spike factory side gear");
-    sprites_names.append("spike factory blue base");
-    sprites_names.append("spike factory green body");
-    sprites_names.append("spike factory small top");
+    if(path_1_progression>=2)  sprites_names.append("spike factory black base");
+    
+    if(path_1_progression == 0 && path_2_progression == 0){
+      sprites_names.append("spike factory yellow base");
+      sprites_names.append("spike factory white body");
+      sprites_names.append("spike factory sortie");
+    }
+    else if(path_1_progression == 4){
+      sprites_names.append("spike factory tuyaux");
+      if(path_2_progression == 2)  sprites_names.append("spike factory orange body");
+      else  sprites_names.append("spike factory red body");
+      sprites_names.append("spike factory small mine top");
+    }
+    else if(path_1_progression == 3){
+      sprites_names.append("spike factory side gear");
+      if(path_2_progression == 2)  sprites_names.append("spike factory orange body");
+      else  sprites_names.append("spike factory red body");
+      sprites_names.append("spike factory diaphragme");
+    }
+    else if(path_2_progression >= 3 ){
+      if(path_1_progression < 2)  sprites_names.append("spike factory yellow base");
+      if(path_2_progression == 4)  sprites_names.append("spike factory top gear");
+      sprites_names.append("spike factory side gear");
+      if(path_1_progression == 2)  sprites_names.append("spike factory green body");
+      else sprites_names.append("spike factory blue body");
+     if(path_2_progression == 4)   sprites_names.append("spike factory small spike top");
+     else sprites_names.append("spike factory small top");
+    }
+    else if(path_2_progression == 2){
+      sprites_names.append("spike factory side gear");
+      if(path_1_progression == 2) sprites_names.append("spike factory purple body");
+      else {
+        sprites_names.append("spike factory yellow base");
+        sprites_names.append("spike factory blue body");
+      }
+      sprites_names.append("spike factory sortie");
+    }
+    else if(path_1_progression == 2){      //ici je me suis un peu écarté de leur graphismes car je trouve la version rouge plus swag
+      //reste que p_2 == 0 ou p_2 == 1
+      if(path_2_progression == 1){
+        sprites_names = new StringList();
+        sprites_names.append("spike factory purple base");
+      }
+      sprites_names.append("spike factory red body");
+      sprites_names.append("spike factory sortie");
+    }
+    else{
+      if(path_1_progression == 1 && path_2_progression == 1) sprites_names.append("spike factory purple base");
+      else if(path_2_progression == 1)  sprites_names.append("spike factory blue base");
+      else sprites_names.append("spike factory red base");
+      sprites_names.append("spike factory white body");
+      sprites_names.append("spike factory sortie");
+    }
+    
+    
     
     return sprites_names;
   }
@@ -508,6 +604,7 @@ class Tower{
   StringList shoots_list;     
   FloatList deviation_list, attack_speed_list, time_before_next_attack_list;
   ArrayList<float[]> on_track_pos;      //sert uniquement aux spikes factory
+  float init_proj_offset, init_proj_offset_angle;
   
   float ability_use_time, ability_cooldown_timer;
   int ability_state;
@@ -523,6 +620,7 @@ class Tower{
   Tower summoner;
   boolean active = true;    //c'est par exemple quand une abilite remplace une tour par une autre temporairement : on update ni ne show() la tour remplacée
   
+  
   Ray_of_doom associated_ray;
   
   Tower(String type, float x, float y){
@@ -532,6 +630,7 @@ class Tower{
     price = get_tower_price(type);
     init_param_tower();
     set_param_tower();
+    set_init_proj_offset();
     init_time_before_next_attack_list();
     set_anim();   
   }
@@ -549,7 +648,14 @@ class Tower{
   
   //subclasses func
   void set_param_tower(){}
+  void set_on_track_pos(){} //uniquement pour les spikes factory
   StringList get_sprites_names(){return null;}
+  
+  
+  void set_init_proj_offset(){    //Avec un angle de 0, le proj part dans la bonne direction, on peut se permettre un offset plus elevé
+    init_proj_offset = size/8.;
+    init_proj_offset_angle = -HALF_PI;    //ici on décale la trajectoire du proj (de manière parallèle) donc attention à pas mettre un trop gros offset
+  }
   
   void set_anim(){
     sprites = new ArrayList<Animator>();
@@ -656,7 +762,7 @@ class Tower{
  
   Mob get_target(ArrayList<Mob> detected_mobs){
     //donne la cible selon la priorité, necessite de détecter au moins un mob
-    Mob target= detected_mobs.get(0);
+    Mob target = null;
     if(priority.equals("first")){
       float avancement_max=0;
       for(Mob mob : detected_mobs){
@@ -757,7 +863,7 @@ class Tower{
             float direction=atan2(target.y-y, target.x-x);
             if(set_orientation_when_shoot)  this.orientation = direction+HALF_PI;
             
-            projectiles.add(new Projectile(this, x, y, direction+deviation, shoot_type));
+            projectiles.add(new Projectile(this, x + cos(direction-init_proj_offset_angle) * init_proj_offset, y + sin(direction-init_proj_offset_angle) * init_proj_offset, direction+deviation, shoot_type));
           }
         }
         time_before_next_attack += 1 / attack_speed;      //affecter la valeur reste utile pour le while (sinon il faut remplacer par un _list.get(i)<=0 )

@@ -22,12 +22,14 @@ class Info_panel{
     
     if(selected_tower==null){
       textAlign(LEFT, TOP);
-      fill(0);
       outline_text("Total pop count : "+str(joueur.game_pop_count), 106, 653, color(255), color(0), 1);
+      textFont(font_18px);
+      outline_text("Round : "+str(round.round_number + (round.waiting_next_round?1:0)), 106, 725, color(255), color(0), 1);
+      outline_text("Difficulty : "+game.difficulty, 306, 725, color(255), color(0), 1);
+      textFont(font);
     }
     else{
       textAlign(LEFT, TOP);
-      fill(0);
       outline_text("Pop Count "+str(selected_tower.pop_count), 106, 653, color(255), color(0), 1);
       
       upgrades.get_possible_upgrades(selected_tower.type, selected_tower.path_1_progression, selected_tower.path_2_progression);
@@ -93,7 +95,7 @@ class Info_panel{
     }
     if(selected_tower.uses_priority){
       if(priority_first.is_cliqued()){
-        selected_tower.priority="first";
+        selected_tower.priority.equals("first");
         priority_first.selected=true;
         priority_last.selected=false;
         priority_close.selected=false;
@@ -101,21 +103,21 @@ class Info_panel{
         
       }
       if(priority_last.is_cliqued()){
-        selected_tower.priority="last";
+        selected_tower.priority.equals("last");
         priority_first.selected=false;
         priority_last.selected=true;
         priority_close.selected=false;
         priority_strong.selected=false;
       }
       if(priority_close.is_cliqued()){
-        selected_tower.priority="close";
+        selected_tower.priority.equals("close");
         priority_first.selected=false;
         priority_last.selected=false;
         priority_close.selected=true;
         priority_strong.selected=false;
       }
       if(priority_strong.is_cliqued()){
-        selected_tower.priority="strong";
+        selected_tower.priority.equals("strong");
         priority_first.selected=false;
         priority_last.selected=false;
         priority_close.selected=false;
@@ -160,10 +162,10 @@ class Info_panel{
       priority_close =  new Button(254, 650+57, 329, 650+95, "Close", '"');
       priority_strong = new Button(331, 650+57, 406, 650+95, "Strong", '\'');
       
-      if(selected_tower.priority=="first")  priority_first.selected=true;
-      if(selected_tower.priority=="last")  priority_last.selected=true;
-      if(selected_tower.priority=="close")  priority_close.selected=true;
-      if(selected_tower.priority=="strong")  priority_strong.selected=true;
+      if(selected_tower.priority.equals("first"))  priority_first.selected=true;
+      if(selected_tower.priority.equals("last"))  priority_last.selected=true;
+      if(selected_tower.priority.equals("close"))  priority_close.selected=true;
+      if(selected_tower.priority.equals("strong"))  priority_strong.selected=true;
     }
   }
 

@@ -3,7 +3,7 @@ static final int HALF_MAX_SIZE_MOB = ceil(42*1./2);
 class Mob{
   float x, y, px, py;
   float avancement;
-  float base_speed=1.45, speed=base_speed;
+  float base_speed=1.45 * round.speed_multiplier, speed=base_speed;
   int cell_id; 
   int layers, type_max_layers;
   String type;      //important pasque whites et blacks ont le meme nb de layers mais pas les memes carac ATTENTION : type == couleur (le type d'un red est le même que celui d'un red camo)
@@ -26,6 +26,7 @@ class Mob{
   ArrayList<Projectile> hurted_by_during_frame = new ArrayList<Projectile>();    //on va garder en mémoire tous les projectiles qui nous ont tappé durant cette frame
   
   ArrayList<Animator> sprites = new ArrayList<Animator>();
+  Animator stun_overlay = new Animator("stunned overlay", 5);
   boolean freeze_rotation = true;
   float show_scale = 1., orientation;
   float size=42. * show_scale;                      //ATTENTION A CHANGER AUSSI DANS HALF_MAX_SIZE_MOB (pour la grid)
@@ -57,6 +58,8 @@ class Mob{
       sprites_names.append(type+" bloon");
       if(camo)  sprites_names.append("camo overlay");
     }
+    if(type.equals("ZOMG"))  sprites_names.append("ZOMG nose");
+    
     for(String sprite_name : sprites_names){
       sprites.add(new Animator(sprite_name, 1));
     }
@@ -98,6 +101,11 @@ class Mob{
         }
         else  image(all_sprites, x+pos_aff[4]*show_scale, y+pos_aff[5]*show_scale, pos_aff[2]*show_scale, pos_aff[3]*show_scale, pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
       }
+      if(is_stunned){
+        int[] pos_aff = stun_overlay.get_pos();
+        image(all_sprites, x+pos_aff[4]*show_scale*1.5, y+pos_aff[5]*show_scale*1.5, pos_aff[2]*show_scale*1.5, pos_aff[3]*show_scale*1.5, pos_aff[0], pos_aff[1], pos_aff[0]+pos_aff[2], pos_aff[1]+pos_aff[3]);
+        stun_overlay.update(false);
+      }
     }
   }
   
@@ -136,8 +144,10 @@ class Mob{
       case "BAD":
         return 35760+layers;
       // attention après faudra faire un N - layers pour les bloons a plusieurs layers
+      default:
+        println(type+"IS NOT A PROPER MOB TYPE");
+        return 1;
     }
-    return 1;    //pasque il faut bien return qqch
   }
    
   void init_param_mob(){
@@ -204,7 +214,7 @@ class Mob{
         enfants.append("rainbow");
         break;
       case "MOAB":
-        layers=200;
+        layers=int(200 * round.health_multiplier);
         speed=base_speed;
         enfants.append("ceramic");
         enfants.append("ceramic");
@@ -214,7 +224,7 @@ class Mob{
         show_scale = .6;
         break;
       case "BFB":
-        layers=700;
+        layers=int(700 * round.health_multiplier);
         speed=base_speed * 0.25;
         enfants.append("MOAB");
         enfants.append("MOAB");
@@ -224,7 +234,7 @@ class Mob{
         show_scale = .6;
         break;
       case "ZOMG":
-        layers=4000;
+        layers=int(4000 * round.health_multiplier);
         speed=base_speed * 0.18;
         enfants.append("BFB");
         enfants.append("BFB");

@@ -1,37 +1,50 @@
-//police de charactère ravie ?, BerlinSansFB-Reg-48, Chiller-Regular-48, ForteMT-48, GoudyStout-48, MaturaMTScriptCapitals-48, ShowcardGothic-Reg-48, SnapITC-Regular-48
+/*************************************************************************/
+//ENTIEREMENT DEVELOPPE PAR : Alexandre GAUTIER
+//CONTACT : alexandre.gautier@student-cs.fr
+//
+static final float VERSION = 1.0;
+//MIS A JOUR LE : 11/10/2021
+//
+//Le concept du jeu ainsi que l'immense majorité des graphismes
+//sont la propriété de NinjaKiwi.
+//A travers ce projet, j'ai voulu recréer moi même Bloons Tower Defense 5.
+/*************************************************************************/
 
+//reste à faire : napalm, visu napalm (+root ?), full moabs skins, menu difficulte
 
-//reste à faire : napalm, visu napalm + stun (root ?), sprites spike factory, shooting offset, menu principal
-
-
-boolean auto_pass_levels=true;
+boolean auto_pass_levels=false;
 boolean god_mode=false;
 
 float FAKE_TIME_ELAPSED;//à chaque frame c'est une constante
 
-PImage background, all_sprites, bloons_sprites, ability_sprites, coin_sprite, coeur_sprite;
+PImage background, all_sprites, ability_sprites;
 
-ArrayList<Mob> enemis=new ArrayList<Mob>();
-ArrayList<Projectile> projectiles=new ArrayList<Projectile>();
-ArrayList<Laser> lasers=new ArrayList<Laser>();
-ArrayList<Tower> towers=new ArrayList<Tower>();
-ArrayList<Pop_animation> pop_animations=new ArrayList<Pop_animation>();
-ArrayList<Explosion> explosions = new ArrayList<Explosion>();
-ArrayList<Spikes> spikes = new ArrayList<Spikes>();
-ArrayList<Ability> abilities = new ArrayList<Ability>();
-ArrayList<Banana> bananas = new ArrayList<Banana>();
+ArrayList<Mob> enemis;
+ArrayList<Projectile> projectiles;
+ArrayList<Laser> lasers;
+ArrayList<Tower> towers;
+ArrayList<Pop_animation> pop_animations;
+ArrayList<Explosion> explosions;
+ArrayList<Spikes> spikes;
+ArrayList<Ability> abilities;
+ArrayList<Banana> bananas;
 
 Spatial_grid grid = new Spatial_grid(HALF_MAX_SIZE_MOB);
 
-Map map = new Map(2);
-Joueur joueur= new Joueur(200, 650);
-Rounds round= new Rounds();
+Game game;
+Map map;
+Joueur joueur;
+Rounds round;
 Info_panel info_panel;
 Tower_panel tower_panel;
+
 Upgrades upgrades = new Upgrades();
+
 Stat_manager stat_manager;
 Lost_menu lost_menu;
 Stat_menu stat_menu;
+Main_menu main_menu;
+Map_menu map_menu;
 
 HashMap<String,Integer> force_list = new HashMap<String,Integer>();
 HashMap<String,Integer> intervall_multiplier = new HashMap<String,Integer>();
@@ -40,122 +53,16 @@ HashMap<String,int[]> pos_coins_sprites = new HashMap<String,int[]>();
 PFont font, font_18px, font_32px, font_huge;
 
 
-void load_sprites(){
-  coin_sprite = loadImage("coin_sprite.png");
-  coeur_sprite = loadImage("coeur_sprite.png");
-  background=loadImage("map_3.png");
-  all_sprites=loadImage("sprites_all.png");
-  ability_sprites=loadImage("ability_sprites.png");
-  
-  String[] lines = loadStrings("pos_sprites.txt");
-    
-  int space_index, offset_index;
-  int separateur_index;
-  String name;
-  int dx, dy, x, y, offset_x, offset_y;
-  int half, quarter, eigth, hor_mirror, vert_mirror;
-  
-  int nb_sprites = 0;
-  
-  for(String ligne : lines){
-    space_index = ligne.indexOf(" : ");
-    offset_index = ligne.indexOf(" offset ");
-    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter"); eigth = ligne.indexOf(" eigth"); hor_mirror = ligne.indexOf(" horizontal mirror"); vert_mirror = ligne.indexOf(" vertical mirror");
-    println(ligne);
-      if(space_index!=-1){
-        name = ligne.substring(0, space_index);
-        separateur_index = ligne.indexOf('*', space_index);
-        dx=int(ligne.substring(space_index+3, separateur_index));
-        space_index=ligne.indexOf(" a ", separateur_index);
-        dy=int(ligne.substring(separateur_index+1, space_index));
-        separateur_index = ligne.indexOf(", ", space_index);
-        x=int(ligne.substring(space_index+3, separateur_index));
-        if(offset_index == -1){
-          int end = ligne.length();
-          if(half>-1)  end = half;
-          else if(quarter>-1)  end = quarter;
-          else if(eigth>-1)  end = eigth;
-          else if(hor_mirror>-1)  end = hor_mirror;
-          else if(vert_mirror>-1)  end = vert_mirror;
-          y=int(ligne.substring(separateur_index+2, end));
-          offset_x=0;
-          offset_y=0;
-        }
-        else{
-          y=int(ligne.substring(separateur_index+2, offset_index));
-          separateur_index = ligne.indexOf(';');
-          offset_x = int(ligne.substring(offset_index+8, separateur_index));
-          int end = ligne.length();
-          if(half>-1)  end = half;
-          else if(quarter>-1)  end = quarter;
-          else if(eigth>-1)  end = eigth;
-          else if(hor_mirror>-1)  end = hor_mirror;
-          else if(vert_mirror>-1)  end = vert_mirror;
-          offset_y = int(ligne.substring(separateur_index+2, end));
-        }
-        int last_param = half>-1 ? 1:0 + 2*(quarter>-1 ? 1:0) + 3*(eigth>-1 ? 1:0) + 4*(hor_mirror>-1 ? 1:0) + 5*(vert_mirror>-1 ? 1:0);  //vaut 1 si half, 2 si quarter et 3 si eigth
-        pos_coins_sprites.put(name, new int[] {x, y, dx, dy, offset_x, offset_y, last_param});
-        nb_sprites++;
-     }
-  }
-  
-  println(nb_sprites, "sprites repertories");
-  
-  bloons_sprites=loadImage("bloons_sprites_transp.png");
-  String[] y_ordre = {"zebra", "lead", "white", "black", "pink", "yellow", "green", "blue", "red"};
-  String[] x_ordre = {"", " regrowth", " camo", " camo regrowth"};
-  
-  //pour les normaux, la box est de 24x32 avec un offset de 13, 9 a chaque fois
-  // regrow : 33x34 avec offset de 9, 8
-  // pour white and black normaux/camos seulement : 16x20 avec offset de 17, 14
-  // pour céramique : 29x38 avec offset de 10, 6
-  // pour passer de l'un à l'autre selon y ajouter 0, 50
-  // pour passer de l'un à l'autre selon x ajouter 50, 0
-  
-  
-  for(int a=0; a<y_ordre.length; a++){
-    for(int b=0; b<x_ordre.length; b++){
-      name = y_ordre[a] + x_ordre[b];
-      
-      if( (x_ordre[b].equals("") || x_ordre[b].equals(" camo")) && (y_ordre[a].equals("white") || y_ordre[a].equals("black"))){
-        pos_coins_sprites.put(name, new int[] {50*b + 17, 50*a + 14, 16, 20});
-      }
-      else if(x_ordre[b].equals("") || x_ordre[b].equals(" camo")){
-        pos_coins_sprites.put(name, new int[] {50*b + 13, 50*a + 9, 24, 32});
-      }
-      else{
-        pos_coins_sprites.put(name, new int[] {50*b + 9, 50*a + 8, 33, 34});
-      }
-      
-    }
-  }
-}
-
-ArrayList<int[]> get_sprites_pos(StringList sprites_names){
-  ArrayList<int[]> pos = new ArrayList<int[]>();
-  for(String sprite_name : sprites_names){
-    if(pos_coins_sprites.containsKey(sprite_name)){
-      pos.add(pos_coins_sprites.get(sprite_name));
-    }
-    else  println("couldn't find pos of ", sprite_name);
-  }
-  return pos;
-}
-
-
 void setup(){
   load_sprites();
-  tower_panel = new Tower_panel(875, 0, 1000, 750, false);    //ne pas le mettre avant car quand tower panel crée ses boutons il a besoin des sprites
-  info_panel = new Info_panel();
-  stat_manager = new Stat_manager();  //ne pas le mettre en dehors de setup car appel un fichier et avant setup, le path n'est pas défini
   imageMode(CENTER);
   frameRate(60);
   surface.setSize(1000, 750);
   surface.setLocation(300, 100);
+  surface.setTitle("Bloons Tower Defense 5 more or less"); 
   
   StringList bloons_names = new StringList("red", "blue", "green", "yellow", "pink", "black", "white", "lead", "zebra", "rainbow", "ceramic", "MOAB", "BFB", "ZOMG");
   int black_seen = 0;
-  int mult = 1;
   for(int i = 0; i<bloons_names.size(); i++){
     force_list.put(bloons_names.get(i), i+1-black_seen);
     if(i<=6)  intervall_multiplier.put(bloons_names.get(i), 1);
@@ -170,174 +77,252 @@ void setup(){
   ellipseMode(CENTER);
   rectMode(CORNERS);
   
-  /*randomSeed(1111);
-  
+  /*randomSeed(1111);                //pour tester la diff avec ou sans la spatial grid    résultats : pour 100 iter autour de 5400, 5550, 5300 //on passe à 4500 ! (avec tout l'affichage en prime)
   for(int i = 0; i<10000; i++){
     Mob temp = new Mob("red", false, false, random(map.longueur_map));
-    //temp.avancement = ;
     enemis.add(temp);
   }
-  
-  for(int i =0; i<100; i++){
-    towers.add(new Dart_monkey("dart monkey", random(875), random(650)));
-  }
+  for(int i =0; i<100; i++)  towers.add(new Dart_monkey("dart monkey", random(875), random(650)));
   noLoop();*/
-  
-  println(grid.n_cell_x, grid.n_cell_y);
-  
+    
   font = createFont("FONT.TTF", 12); font_18px = createFont("FONT.TTF", 18);  font_32px = createFont("FONT.TTF", 32); 
   
+  stat_manager = new Stat_manager();  //ne pas le mettre en dehors de setup car appel un fichier et avant setup, le path n'est pas défini
   lost_menu = new Lost_menu();  
-  stat_menu = new Stat_menu(25, 25, 975, 725);
-  
-  
-  textFont(font);
+  stat_menu = new Stat_menu(25, 25, 975, 675);
+  main_menu = new Main_menu();
+  map_menu = new Map_menu(50, 100, 950, 600);
+  main_menu.init();
+  game = new Game();
 }
 
 
 void draw(){ 
-  //float t = millis();    //résultats autour de 5400, 5550, 5300 //on passe & 4500 !
-  //for(int iter=0; iter<100; iter++){
-  
-  if(stat_menu.active){
-    stat_menu.core();
+  if(stat_menu.active)        stat_menu.core();
+  else if(map_menu.active)    map_menu.core();
+  else if(main_menu.active)   main_menu.core();
+  else if(lost_menu.active)   lost_menu.core();
+  else  game.core();
+}
+
+class Game{
+  String difficulty;
+  int map_number;
+  boolean game_just_saved=false;
+
+
+  boolean init(boolean use_save, String difficulty, int map_number){
+    background=loadImage("map_"+str(map_number)+".png");
+    this.difficulty = difficulty;
+    this.map_number = map_number;
+    
+    game_just_saved = use_save;
+    god_mode = false;
+    
+    FAKE_TIME_ELAPSED=0.;
+    
+    enemis=new ArrayList<Mob>();
+    projectiles=new ArrayList<Projectile>();
+    lasers=new ArrayList<Laser>();
+    towers=new ArrayList<Tower>();
+    pop_animations=new ArrayList<Pop_animation>();
+    explosions = new ArrayList<Explosion>();
+    spikes = new ArrayList<Spikes>();
+    abilities = new ArrayList<Ability>();
+    bananas = new ArrayList<Banana>();
+    
+    grid = new Spatial_grid(HALF_MAX_SIZE_MOB);
+    
+    map = new Map(this.map_number);
+    joueur= new Joueur(200, 650);
+    round= new Rounds();
+    info_panel= new Info_panel();
+    tower_panel = new Tower_panel(875, 0, 1000, 750, false);
+    
+    auto_pass_levels = false;
+    
+    if(use_save) return load_game();
+    textFont(font);
+    return true;
   }
-  else if(lost_menu.active){
-    lost_menu.core();
-    if(lost_menu.ended()){
-      //gravity.mult(-1);  //faut pas oublier de la remettre normale
-      gravity = new PVector(0, .1);
-      lost_menu.active = false;
-      if(lost_menu.go_to_menu){
-        stat_menu.active = true;
-        stat_menu.screen = get();
-        //menu_principal.active = true;
-      }
-      else  init_new_game();
+  
+  void core(){
+    
+    if(keyPressed && key == '$')  god_mode = true;
+    if(keyPressed && key == ')')  save_game();
+    
+    if(god_mode){
+      joueur.vies=100;
+      joueur.argent=max(joueur.argent, 1000000);
     }
-  }
-  else  game();
+    else if(joueur.vies<=0){
+      stat_manager.increment_stat("Games lost", "overview");
+      stat_manager.save_all();
+      lost_menu.init();
+      return;
+    }
+    
+    FAKE_TIME_ELAPSED = get_fake_time_elapsed(FAKE_TIME_ELAPSED);    //ATTENTION : NE PAS COMPTER LE TEMPS ENTRE LES ROUNDS
+    image(background, 875/2, 650/2);  
+    //map.show();
+        
+    round.update();
+    round.spawn();
+    
+    grid.reset_pop_counter();
+    
+    for (int i = enemis.size() - 1; i >= 0; i--){    //a faire avant les proj
+      enemis.get(i).core(i);
+    }
   
-  //}
-  //float t_end = millis();
-  //println(t_end - t);
-}
+    map.hide();
+    
+    //On update tous les spikes    (avant les tours sinon ca se met par dessus le phoenix et tout)
+    int nb_spikes = spikes.size();
+    for (int i = nb_spikes - 1; i >= 0; i--){
+      //spikes.get(i).verif_damage_type();
+      spikes.get(i).core(i, nb_spikes);
+    }
+  
+    for(Tower tour : towers)  tour.core();
 
-void init_new_game(){
-  FAKE_TIME_ELAPSED=0.;
-  
-  enemis=new ArrayList<Mob>();
-  projectiles=new ArrayList<Projectile>();
-  lasers=new ArrayList<Laser>();
-  towers=new ArrayList<Tower>();
-  pop_animations=new ArrayList<Pop_animation>();
-  explosions = new ArrayList<Explosion>();
-  spikes = new ArrayList<Spikes>();
-  abilities = new ArrayList<Ability>();
-  bananas = new ArrayList<Banana>();
-  
-  grid = new Spatial_grid(HALF_MAX_SIZE_MOB);
-  
-  map = new Map(2);
-  joueur= new Joueur(200, 650);
-  round= new Rounds();
-  info_panel= new Info_panel();
-  tower_panel = new Tower_panel(875, 0, 1000, 750, false);
-  
-  textFont(font);
-}
+    for (int i = lasers.size() - 1; i >= 0; i--)   lasers.get(i).core();
+    
+    int nb_proj = projectiles.size();
+    for (int i = nb_proj - 1; i >= 0; i--){
+      //projectiles.get(i).verif_damage_type();
+      projectiles.get(i).core(i, nb_proj);
+    }
+    
+    for(int i=bananas.size()-1; i>=0; i--)      bananas.get(i).core();
+    
+    for (int i = pop_animations.size() - 1; i >= 0; i--)  pop_animations.get(i).core();
+    
+    for (int i = explosions.size() - 1; i >= 0; i--)  explosions.get(i).core();
 
-void game(){
-  
-  if(keyPressed && key == '$')      god_mode = true;
-  
-  if(god_mode){
-    joueur.vies=100;
-    joueur.argent=max(joueur.argent, 1000000);
+    
+    textAlign(CENTER, CENTER);
+    for(Ability abi : abilities) abi.core();    
+    
+    tower_panel.interact();
+    if(main_menu.active)   return;    //si on appuie sur le home button ca change la police sinon
+    joueur.show_fps();
+    joueur.interactions();
+    joueur.select_existing_tower();
+    joueur.show_selected_tower_range();
+    
+    tower_panel.show();    //permet d'afficher la selected_tower en dessous du tower panel
+    
+    info_panel.interact(joueur.selected_tower);
+    info_panel.show(joueur.selected_tower);    
   }
-  else if(joueur.vies<=0){
-    stat_manager.increment_stat("Games lost", "overview");
-    stat_manager.save_all();
-    lost_menu.init();
-    return;
+  
+  void save_game(){
+    String[] save = new String[]{};
+    save = append(save, str(VERSION)+";"+str(map_number)+";"+difficulty+";"+str(round.round_number)+";"+str(joueur.argent)+";"+str(joueur.vies)+";"+str(joueur.game_pop_count)+";");
+    for(Tower tour : towers){
+      if(tour.summoner!=null)  continue;
+      String ligne = tour.type;
+      ligne+=";"+str(tour.x)+";"+str(tour.y)+";"+tour.priority+";"+str(tour.path_1_progression)+";"+str(tour.path_2_progression)+";"+str(tour.pop_count)+";";
+      if(tour.linked_ability != null){
+        ligne += str(tour.linked_ability.get_remaining_cd_of_tower(tour))+";";
+      }
+      save = append(save, ligne);
+    }
+    saveStrings("/data/save.txt", save);
   }
-  joueur.vies-=10;
   
-  FAKE_TIME_ELAPSED = get_fake_time_elapsed(FAKE_TIME_ELAPSED);    //ATTENTION : NE PAS COMPTER LE TEMPS ENTRE LES ROUNDS
-  background(255);    //fond blanc A ENLEVER DES QUE LES PANNEAUX ONT UN SPRITE
-  image(background, 875/2, 650/2);  
-  //map.show();
-  stat_manager.display("overview", width/2, 0, 15);
-  
-  //if(enemis.size() != grid.get_nb_enemis_stored())  println(round.round_number, enemis.size(), grid.get_nb_enemis_stored());
-  
-  round.update();
-  round.spawn();
-  
-  grid.reset_pop_counter();
-  
-  //On update tous les enemis
-  for (int i = enemis.size() - 1; i >= 0; i--){    //a faire avant les proj
-    enemis.get(i).core(i);
+  boolean load_game(){
+    String[] lines = loadStrings("save.txt");
+    if(lines == null){
+      println("NO SAVE.TXT FILE DETECTED");
+      return false;
+    }
+    if(lines.length==0){
+      println("SAVE.TXT FILE EXISTS BUT IS EMPTY");
+      return false;
+    }
+    String infos = lines[0];
+    int sep = infos.indexOf(";");
+    if(float(infos.substring(0,  sep)) != VERSION){
+      println("LA VERSION DU JEU A ETE CHANGEE : INCOMPATIBLE");
+      return false;
+    }
+    infos = infos.substring(sep+1, infos.length());
+    sep = infos.indexOf(";");
+    int loaded_map_number = int(infos.substring(0, sep));
+    infos = infos.substring(sep+1, infos.length());
+    sep = infos.indexOf(";");
+    String loaded_difficulty = infos.substring(0, sep);
+    infos = infos.substring(sep+1, infos.length());
+    sep = infos.indexOf(";");
+    int loaded_round_number = int(infos.substring(0, sep));
+    infos = infos.substring(sep+1, infos.length());
+    sep = infos.indexOf(";");
+    int loaded_argent = int(infos.substring(0, sep));
+    infos = infos.substring(sep+1, infos.length());
+    sep = infos.indexOf(";");
+    int loaded_vies = int(infos.substring(0, sep));
+    infos = infos.substring(sep+1, infos.length());
+    sep = infos.indexOf(";");
+    int loaded_pop_count = int(infos.substring(0, sep));
+    
+    joueur.argent = loaded_argent;
+    joueur.vies = loaded_vies;
+    joueur.game_pop_count = loaded_pop_count;
+    round.round_number = loaded_round_number;
+    difficulty = loaded_difficulty;
+    this.map_number = loaded_map_number;
+    map = new Map(this.map_number);  //sinon ca foire avec les set_on_track_pos();
+    background=loadImage("map_"+str(map_number)+".png");
+    
+    
+    for(int i=1; i<lines.length; i++){
+      String ligne = lines[i];
+      sep = ligne.indexOf(";");
+      String type = ligne.substring(0, sep);
+      ligne = ligne.substring(sep+1, ligne.length());
+      sep = ligne.indexOf(";");
+      float x = float(ligne.substring(0, sep));
+      ligne = ligne.substring(sep+1, ligne.length());
+      sep = ligne.indexOf(";");
+      float y = float(ligne.substring(0, sep));
+      ligne = ligne.substring(sep+1, ligne.length());
+      sep = ligne.indexOf(";");
+      String priority = ligne.substring(0, sep);
+      ligne = ligne.substring(sep+1, ligne.length());
+      sep = ligne.indexOf(";");
+      int path_1_progression = int(ligne.substring(0, sep));
+      ligne = ligne.substring(sep+1, ligne.length());
+      sep = ligne.indexOf(";");
+      int path_2_progression = int(ligne.substring(0, sep));
+      ligne = ligne.substring(sep+1, ligne.length());
+      sep = ligne.indexOf(";");
+      int pop_count = int(ligne.substring(0, sep));
+      ligne = ligne.substring(sep+1, ligne.length());
+      sep = ligne.indexOf(";");
+      float ability_remaining_cd = 0.;
+      if(sep>-1){  //la tour a une ability
+        ability_remaining_cd = float(ligne.substring(0, sep));
+      }
+      println(ability_remaining_cd);
+      
+      Tower tour = get_new_tower(type, x, y);
+      tour.set_on_track_pos();
+      tour.priority = priority;
+      tour.pop_count = pop_count;
+      for(int k=0; k<path_1_progression; k++){
+        upgrades.apply_upgrade(tour, 1, true, ability_remaining_cd);
+      }
+      for(int k=0; k<path_2_progression; k++){
+        upgrades.apply_upgrade(tour, 2, true, ability_remaining_cd);
+      }
+      towers.add(tour);      
+    }
+    
+    return true;
   }
 
-  map.hide();
-  
-  //On update tous les spikes    (avant les tours sinon ca se met par dessus le phoenix et tout)
-  int nb_spikes = spikes.size();
-  for (int i = nb_spikes - 1; i >= 0; i--){
-    //spikes.get(i).verif_damage_type();
-    spikes.get(i).core(i, nb_spikes);
-  }
-
-  for(Tower tour : towers){
-    tour.core();
-  }
-  
-  //On affiche tous les lasers
-  for (int i = lasers.size() - 1; i >= 0; i--){
-    lasers.get(i).core();
-  }
-  
-  //On update tous les projectiles tirés
-  int nb_proj = projectiles.size();
-  for (int i = nb_proj - 1; i >= 0; i--){
-    //projectiles.get(i).verif_damage_type();
-    projectiles.get(i).core(i, nb_proj);
-  }
-  
-  for(int i=bananas.size()-1; i>=0; i--){
-    bananas.get(i).core();
-  }
-  
-  
-  //On affiche toutes les pop_animations
-  for (int i = pop_animations.size() - 1; i >= 0; i--){
-    pop_animations.get(i).core();
-  }
-  
-  //On affiche toutes les explosions
-  for (int i = explosions.size() - 1; i >= 0; i--){
-    explosions.get(i).core();
-  }
-  
-  
-  textAlign(CENTER, CENTER);
-  for(Ability abi : abilities){
-    abi.core();
-  }
-  
-  
-  tower_panel.interact();
-  joueur.show_fps();
-  joueur.interactions();
-  joueur.select_existing_tower();
-  joueur.show_selected_tower_range();
-  
-  tower_panel.show();    //permet d'afficher la selected_tower en dessous du tower panel
-  
-  info_panel.interact(joueur.selected_tower);
-  info_panel.show(joueur.selected_tower);
 }
 
 
@@ -400,4 +385,63 @@ float[] find_intersection_cercles(float cercle1_x, float cercle1_y, float cercle
   float y2 = N - x2*(cercle1_x - cercle2_x)/(cercle1_y - cercle2_y);
   
   return new float[] {x, y, x2, y2};
+}
+
+void load_sprites(){
+  all_sprites=loadImage("sprites_all.png");
+  ability_sprites=loadImage("ability_sprites.png");
+  
+  String[] lines = loadStrings("pos_sprites.txt");
+    
+  int space_index, offset_index, separateur_index;
+  String name;
+  int dx, dy, x, y, offset_x, offset_y;
+  int half, quarter, eigth, hor_mirror, vert_mirror;
+  
+  int nb_sprites = 0;
+  
+  for(String ligne : lines){
+    space_index = ligne.indexOf(" : ");
+    offset_index = ligne.indexOf(" offset ");
+    half = ligne.indexOf(" half"); quarter = ligne.indexOf(" quarter"); eigth = ligne.indexOf(" eigth"); hor_mirror = ligne.indexOf(" horizontal mirror"); vert_mirror = ligne.indexOf(" vertical mirror");
+    //println(ligne);
+      if(space_index!=-1){
+        name = ligne.substring(0, space_index);
+        separateur_index = ligne.indexOf('*', space_index);
+        dx=int(ligne.substring(space_index+3, separateur_index));
+        space_index=ligne.indexOf(" a ", separateur_index);
+        dy=int(ligne.substring(separateur_index+1, space_index));
+        separateur_index = ligne.indexOf(", ", space_index);
+        x=int(ligne.substring(space_index+3, separateur_index));
+        int end = max(max(half, quarter, eigth), hor_mirror, vert_mirror);
+        if(end<0)  end = ligne.length();
+        if(offset_index == -1){
+          y=int(ligne.substring(separateur_index+2, end));
+          offset_x=0;
+          offset_y=0;
+        }
+        else{
+          y=int(ligne.substring(separateur_index+2, offset_index));
+          separateur_index = ligne.indexOf(';');
+          offset_x = int(ligne.substring(offset_index+8, separateur_index));
+          offset_y = int(ligne.substring(separateur_index+2, end));
+        }
+        int last_param = half>-1 ? 1:0 + 2*(quarter>-1 ? 1:0) + 3*(eigth>-1 ? 1:0) + 4*(hor_mirror>-1 ? 1:0) + 5*(vert_mirror>-1 ? 1:0);  //vaut 1 si half, 2 si quarter et 3 si eigth
+        pos_coins_sprites.put(name, new int[] {x, y, dx, dy, offset_x, offset_y, last_param});
+        nb_sprites++;
+     }
+  }
+  
+  println(nb_sprites, "sprites repertories");
+}
+
+ArrayList<int[]> get_sprites_pos(StringList sprites_names){
+  ArrayList<int[]> pos = new ArrayList<int[]>();
+  for(String sprite_name : sprites_names){
+    if(pos_coins_sprites.containsKey(sprite_name)){
+      pos.add(pos_coins_sprites.get(sprite_name));
+    }
+    else  println("couldn't find pos of ", sprite_name);
+  }
+  return pos;
 }

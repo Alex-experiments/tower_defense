@@ -1,11 +1,8 @@
 class Spikes{
   
-  //a optimiser grandement
-
-  float x, y;
-  float destination_x, destination_y;
+  float x, y, destination_x, destination_y;
   int damage, pierce;
-  static final float rayon=20.;  //si on le modifie, le modifier aussi dans joueur -> place tower
+  static final float rayon=30.;
   float speed, direction, initial_speed = 10.;
   String type, damage_type;
   float landing_time;       
@@ -14,16 +11,14 @@ class Spikes{
   float total_distance;
   boolean deplacement_fini=false;
   boolean is_from_spike_storm = false;
-  
-  boolean touche_enfonce = false;
-  
+    
   int dmg_done_this_frame;
 
   StringList stronger_against = new StringList();;    //certains spikes ont de meilleurs dégats selon le type d'enemis. (pas pris en compte dans explosion)
   int stronger_against_damage;
   
   String sprite_name;
-  
+    
   Spikes(Tower fired_from_tower, float destination_x, float destination_y, String spike_type){
     this.fired_from_tower=fired_from_tower;
     this.x=fired_from_tower.x;
@@ -75,16 +70,16 @@ class Spikes{
     if(!deplacement_fini){
       for(int i=0; i<joueur.game_speed; i++){    //on itère plusieurs fois pour faire des petits pas et ne pas dépasser de trop la destination
         float dist = distance(x, y, destination_x, destination_y);
-        speed=(0.5-initial_speed)*(total_distance-dist)/total_distance+initial_speed;
+        speed=(.5-initial_speed)*(total_distance-dist)/total_distance+initial_speed;
         //on commence à s = init_s et on arrive a s=0.5 lors de l'arrivée
         x+=speed*cos(direction);
         y+=speed*sin(direction);
-        if(distance(x, y, destination_x, destination_y) < speed){
+        if(distance(x, y, destination_x, destination_y) <= speed){
           x=destination_x;
           y=destination_y;
           deplacement_fini=true;
           landing_time = FAKE_TIME_ELAPSED;
-          break;
+          if(i<joueur.game_speed-1)  kill();  //pasque en *8 une frame ca peut déjà suffir à ce qu'un ballon passe de touchable à plus touchable
         }
       }
     }
@@ -96,10 +91,10 @@ class Spikes{
     dmg_done_this_frame=0;
     //on fait des degats aux enemis    
     
-    ArrayList<Mob> enemis_to_look_at = grid.get_enemis_to_look_at(x, y, rayon);
+    ArrayList<Mob> enemis_to_look_at = grid.get_enemis_to_look_at(x, y, rayon + (joueur.game_speed>=4 ? 20:0));    //on compense le fait que les ballons bougent plus vite (leur hitbox se téléporte)
     for (int i = enemis_to_look_at.size() - 1; i >= 0; i--){
       Mob mob = enemis_to_look_at.get(i);
-      if(can_detect(mob, true) && pierce>0 && distance(mob.x, mob.y, x, y) < rayon+ mob.size/2){
+      if(can_detect(mob, true) && distance(mob.x, mob.y, x, y) < rayon + (joueur.game_speed>=4 ? 20:0) + mob.size/2){
         
         if(is_from_spike_storm)    duration = 10.;  //un spike storm ne dure que 5sec, mais si il touche un enemi, il dure 5sec de plus
 
@@ -107,6 +102,7 @@ class Spikes{
         pierce--;
         if(pierce<=0)  break;
       }
+      //else println(distance(mob.x, mob.y, x, y), rayon, rayon + mob.size/2);
     }
     
     fired_from_tower.add_pop_count(dmg_done_this_frame);

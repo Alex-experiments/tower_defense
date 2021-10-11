@@ -30,7 +30,7 @@ class Cercle{
   float longueur(){
     float angle_total;
     
-    if(sens=="trigo"){
+    if(sens.equals("trigo")){
       angle_total = (angle_fin - angle_dep) % (2*PI);
     }
     else{
@@ -43,7 +43,7 @@ class Cercle{
   float[] get_pos(float avancement){
     
     int correc=1;
-    if(sens=="horaire")  correc=-1;
+    if(sens.equals("horaire"))  correc=-1;
     
     return new float[] {centre_x + radius * cos(correc * avancement/radius + angle_dep), centre_y - radius * sin(correc * avancement/radius + angle_dep)};
   }

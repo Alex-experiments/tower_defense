@@ -40,13 +40,28 @@ class Stat_manager{
   void load_all(){
     String[] lines = loadStrings("stats.txt");
     if(lines == null){
+      println("NO STATS.TXT FILE DETECTED, CREATING ONE");
       init_all();
       save_all();
       return;
     }
     
+    float v = float(lines[0]);
+    
+    if(v != VERSION){
+      println("LA VERSION DU JEU A ETE CHANGEE : RESET DES STATS");
+      init_all();
+      save_all();
+      return;
+    }
+    
+    boolean first_line = true;
     for(String line : lines){
       boolean found = false;
+      if(first_line){  //sert juste à regarder la version
+        first_line = false;
+        continue;
+      }
       for(StringList stats_type : stats_types){
         for(String type : stats_type){
           if(line.indexOf(type)>-1){
@@ -63,6 +78,7 @@ class Stat_manager{
   
   void save_all(){
     String[] save = new String[]{};
+    save = append(save, str(VERSION));
     for(Stat s : stats){
       save = append(save, s.get_save_string());
     }
@@ -87,10 +103,13 @@ class Stat{
   Stat(String name){
     this.name = name;
     if(ability_names.hasValue(name)){
-      stats_names = new StringList("Used", "Bought", "Bloons popped");    //reste a faire bloons popped
-      needs_suffix = new boolean[] {true,   true,     false};
+      stats_names = new StringList("Used", "Bought");//, "Bloons popped");    //reste a faire bloons popped
+      needs_suffix = new boolean[] {true,   true};//,     false};
       
-      if(name.equals("supply drop"))  stats_names.set(2, "Money collected");
+      if(name.equals("supply drop")){
+        stats_names.append("Money collected");
+        needs_suffix = new boolean[] {true,   true,     false};
+      }
       
     }
     else if(tower_names.hasValue(name)){

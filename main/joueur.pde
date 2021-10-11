@@ -6,7 +6,7 @@ class Joueur{
   Tower selected_tower;
   
   float game_speed=1;
-  float max_game_speed=16;
+  float max_game_speed=8;
   
   float sell_percent=0.8;
   
@@ -62,18 +62,7 @@ class Joueur{
   }
   
   void place_tower(Tower tour){
-    if(tour instanceof Spike_factory){      //il calculer ses pos atteignables
-      tour.on_track_pos = new ArrayList<float[]>();
-      int pas = 5;
-      
-      for(float a=tour.x-tour.range; a<=tour.x+tour.range; a+=pas){
-        for(float b=tour.y-tour.range; b<=tour.y+tour.range; b+=pas){
-          if(map.is_on_track(a, b, 0) && distance_sqred(a, b, tour.x, tour.y) <= tour.range*tour.range){
-            tour.on_track_pos.add(new float[] {a, b});
-          }
-        }
-      }
-    } 
+    tour.set_on_track_pos();
     towers.add(tour);
     pay(tour.price);
     stat_manager.increment_stat("Placed", tour.type);

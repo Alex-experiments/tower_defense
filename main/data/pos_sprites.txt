@@ -13,6 +13,9 @@
 // all tower skins
 
 
+coeur sprite : 25*22 a 320, 150
+piece sprite : 26*25 a 346, 150
+
 //ABILITIES
 super monkey fan club ability icon : 40*40 a 0, 0
 blade maelstrom ability icon : 40*40 a 40, 0
@@ -23,7 +26,7 @@ spike storm ability icon : 40*40 a 200, 0
 summon phoenix ability icon : 40*40 a 240, 0
 sabotage supply lines ability icon : 40*40 a 280, 0
 
-
+//BLOONS
 red bloon : 42*56 a 320, 10
 blue bloon : 42*56 a 363, 10
 green bloon : 42*56 a 406, 10
@@ -62,11 +65,18 @@ frozen overlay : 47*59 a 948, 1446
 camo regrowth overlay : 61*53 a 1158, 609
 regrowth glue overlay : 63*41 a 208, 1531
 regrowth frozen overlay : 67*62 a 602, 1022
-//rentrer off
+//rentrer off frozen glue
+
+stunned overlay : 27*17 a 848, 1227
+stunned overlay_2 : 24*13 a 934, 604
+stunned overlay_3 : 30*20 a 960, 599
+stunned overlay_4 : 18*18 a 878, 1224
 
 MOAB bloon : 55*220 a 911, 1136 offset 0; 20 horizontal mirror
 BFB bloon : 78*307 a 1770, 663 offset 0; 20 horizontal mirror
 ZOMG bloon : 82*306 a 1607, 661 offset 0; 20 horizontal mirror
+ZOMG nose : 95*45 a 903, 976 offset 0; -142
+
 
 
 
@@ -301,18 +311,21 @@ sniper monkey silencieux shooting : 8*10 a 518, 498 offset -10; -55
 sniper monkey grand silencieux : 11*20 a 1547, 940 offset -10; -66
 sniper monkey grand silencieux shooting : 11*20 a 1547, 940 offset -10; -61
 
-boomerang shooter body : 57*59 a 419, 1554
-boomerang shooter red body : 57*59 a 912, 1022
-boomerang shooter purple body : 57*59 a 853, 1121
-boomerang shooter white suit : 29*48 a 759, 1511 offset 0; -7 half
-boomerang shooter triangle : 30*19 a 757, 1604 offset 0; -1
-boomerang shooter triple triangle : 38*31 a 1618, 1157 offset 0; -4
-boomerang shooter circle : 35*19 a 1429, 913 offset 0; -3
-boomerang shooter triple circle : 34*24 a 1447, 1479
-boomerang shooter cross : 30*26 a 1234, 1821 offset 0; -4
-boomerang shooter bionic arm : 27*50 a 1373, 1354 offset 26; -26
-boomerang shooter bionic arm shooting : 27*47 a 1893, 1274 offset 26; -24
-boomerang shooter bionic eye : 19*20 a 1759, 1697 offset 10; -20
+boomerang thrower body : 57*59 a 419, 1554
+boomerang thrower red body : 57*59 a 912, 1022
+boomerang thrower purple body : 57*59 a 853, 1121
+boomerang thrower white suit : 29*48 a 759, 1511 offset 0; -7 half
+boomerang thrower triangle : 30*19 a 757, 1604 offset 0; -1
+boomerang thrower triple triangle : 38*31 a 1618, 1157 offset 0; -4
+boomerang thrower circle : 35*19 a 1429, 913 offset 0; -3
+boomerang thrower triple circle : 34*24 a 1447, 1479
+boomerang thrower cross : 30*26 a 1234, 1821 offset 0; -4
+boomerang thrower bionic arm : 27*50 a 1373, 1354 offset 26; -26
+boomerang thrower bionic arm shooting : 27*47 a 1893, 1274 offset 26; -24
+boomerang thrower bionic eye : 19*20 a 1759, 1697 offset 10; -20
+boomerang thrower red hot boomerang resting : 38*22 a 1657, 1118 offset 26; -42
+boomerang thrower red hot glaive resting : 53*55 a 1138, 1091 offset 26; -40
+
 
 ninja monkey red body : 58*58 a 790, 1131 offset -1; 0
 ninja monkey black body : 58*59 a 640, 1256 offset -1; 0
@@ -355,8 +368,9 @@ dartling gun red hat : 47*35 a 1352, 1058 offset 0; 40
 dartling gun ray of doom hat : 46*36 a 996, 1448 offset 0; 42
 dartling gun hat target : 14*21 a 879, 1827 offset 0; 40 half
 dartling gun barrels : 14*61 a 905, 910 offset 0; -33 half
+dartling gun barrels shooting : 14*61 a 879, 1765 offset 0; -33 half
 dartling gun rocket storm barrels : 20*11 a 1647, 115 offset 0; -59 half
-//UNKNOW BARRELS : 20*11 a 1005, 758 half
+dartling gun rocket storm barrels shooting : 20*11 a 1005, 758 offset 0; -59 half
 dartling gun basic gun : 26*74 a 1592, 1607 offset 0; -19 half
 dartling gun blue gun : 26*74 a 1621, 1022 offset 0; -19 half
 dartling gun purple gun : 26*74 a 1705, 1494 offset 0; -19 half
@@ -365,7 +379,7 @@ dartling gun rocket storm gun : 33*72 a 1482, 1448 offset 0; -18 half
 dartling gun laser canon gun : 26*55 a 1443, 1781 offset 0; -9 half
 dartling gun ray of doom gun : 26*101 a 1832, 1356 offset 0; -32 half
 
-
+spike factory white body : 35*68 a 1887, 952 half
 spike factory green body : 35*68 a 1254, 1611 half
 spike factory red body : 35*68 a 1098, 1771 half
 spike factory blue body : 35*68 a 1482, 1379 half
@@ -405,18 +419,21 @@ spike factory side gear : 25*25 a 1888, 1359 offset -18; 0 horizontal mirror
 spike factory side gear shooting : 25*25 a 1619, 1636 offset -18; 0 horizontal mirror
 spike factory top gear : 25*25 a 1888, 1359 offset 0; -18 vertical mirror
 spike factory top gear shooting : 25*25 a 1619, 1636 offset 0; -18 vertical mirror
-
+spike factory tuyaux : 20*31 a 1608, 1808 offset -30; 0 horizontal mirror
 
 spike factory sortie : 20*38 a 1766, 1621 half
 spike factory sortie shooting : 20*38 a 1881, 1507 half
 
-spike factory diaphragme_2 : 34*34 a 976, 1781
-spike factory diaphragme_3 : 34*34 a 1851, 915
-spike factory diaphragme_4 : 34*34 a 1691, 1076
+spike factory diaphragme : 34*34 a 976, 1781
+spike factory diaphragme shooting : 34*34 a 1851, 915
+spike factory diaphragme shooting_2 : 34*34 a 1691, 1076
+spike factory diaphragme shooting_3 : 34*34 a 1807, 1104
+spike factory diaphragme shooting_4 : 34*34 a 1691, 1076
+spike factory diaphragme shooting_5 : 34*34 a 1851, 915
 
 
-spike factory separateur : 44*44 a 1304, 1024
-spike factory tuyaux : 20*31 a 1608, 1808
+unknown spike factory separateur : 44*44 a 1304, 1024
+
 
 
 super monkey body : 33*52 a 1644, 1285 half

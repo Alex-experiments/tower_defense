@@ -12,7 +12,7 @@ class Ability{
   
   String ability_name;
   
-  Ability(Tower enabled_by_tower, float cooldown_duration, float duration, String ability_name, String ability_descr){
+  Ability(Tower enabled_by_tower, float cooldown_duration, float duration, String ability_name, String ability_descr, boolean loading_ability){
     this.cooldown_duration = cooldown_duration;
     this.duration = duration;
     this.show_slot = abilities.size();    //l'instance est crée juste avant d'etre ajoutée à la liste abilities
@@ -21,10 +21,11 @@ class Ability{
     this.bouton = new Button((40+spacing)*show_slot, 610, 40+(40+spacing)*show_slot, 650, "", '²');
     bouton.pos_aff = pos_coins_sprites.get(ability_name+" ability icon");
     bouton.descr = ability_name.toUpperCase()+"\n"+ability_descr;
-    println(ability_name);
     bouton.width_descr = 200;
-    stat_manager.increment_stat("Bought", ability_name);
-    stat_manager.increment_stat("Abilities bought", "overview");
+    if(!loading_ability){
+      stat_manager.increment_stat("Bought", ability_name);
+      stat_manager.increment_stat("Abilities bought", "overview");
+    }
   }
   
   public void core(){
@@ -53,6 +54,13 @@ class Ability{
     set_smallest_cd();
   }
   
+  public void initial_cd(Tower tour, float init_cd){
+    uses_available--;
+    tour.ability_cooldown_timer = FAKE_TIME_ELAPSED - cooldown_duration + init_cd;
+    towers_in_cd.add(tour);
+    set_smallest_cd();
+  }
+  
   private Tower get_tour_to_use(){
     //on doit d'abord déterminer de quelle tour l'effet part :
     Tower tour_used=null;
@@ -63,6 +71,11 @@ class Ability{
       }
     }
     return tour_used;
+  }
+  
+  public float get_remaining_cd_of_tower(Tower tour){      //ne gère pas le cd global
+    if(!towers_in_cd.contains(tour))  return 0.;
+    else return cooldown_duration - (FAKE_TIME_ELAPSED - tour.ability_cooldown_timer);
   }
   
   
@@ -132,7 +145,7 @@ class Ability{
   
   private void show(){
     
-    this.bouton.show_ability();
+    this.bouton.show_ability(1.);
     if(this.uses_available==0){
       String cd;
       bouton.show_cooldown(cooldown_duration - FAKE_TIME_ELAPSED + smallest_cd, cooldown_duration);
@@ -164,8 +177,8 @@ class Ability{
   
   private void update_show_slot(int place_in_list){
     show_slot = place_in_list;
-    bouton.top_left_x = 48*show_slot;
-    bouton.bottom_right_x = 48*(show_slot+1);
+    bouton.top_left_x = (40+spacing)*show_slot;
+    bouton.bottom_right_x = 40+(40+spacing)*show_slot;
   }
   
   
@@ -180,8 +193,8 @@ class Super_monkey_fan_club extends Ability{
   //maintenir cette liste va permettre de les garder en mémoire et de maintenir à jour les summoner associé à chaque appel de use()
   //ainsi le ability_casted_by_tour associé à un super monkey fan sera toujours à jour
   
-  Super_monkey_fan_club(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "super monkey fan club", "Converts up to 10 nearby dart monkeys into Super Monkeys for 15 seconds.");
+  Super_monkey_fan_club(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 50., 15., "super monkey fan club", "Converts up to 10 nearby dart monkeys into Super Monkeys for 15 seconds.", loading_ability);
   }
   
   ArrayList<Tower> get_closest_dart_monkeys(int number, Tower tour_used, boolean get_already_impacted_towers){
@@ -276,8 +289,8 @@ class Blade_maelstrom extends Ability{
   //Blade Maelstrom rapidly shoots two streams of blades, which spiral outwards.
   //Each of the blades have unlimited pierce
   
-  Blade_maelstrom(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "blade maelstrom", "Covers the area in an unstoppable storm of blades.");
+  Blade_maelstrom(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 20., 6., "blade maelstrom", "Covers the area in an unstoppable storm of blades.", loading_ability);
   }
   
   void use(Tower tour_used){
@@ -300,8 +313,8 @@ class Blade_maelstrom extends Ability{
 class Turbo_charge extends Ability{
   //increases the firing speed of the tower by 5x (hypersonic) for 10 seconds.
     
-  Turbo_charge(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "turbo charge", "Increases attack speed to hypersonic for 10 seconds.");
+  Turbo_charge(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 45., 10., "turbo charge", "Increases attack speed to hypersonic for 10 seconds.", loading_ability);
   }
 
   void use(Tower tour_used){
@@ -325,8 +338,8 @@ class Turbo_charge extends Ability{
 
 class Supply_drop extends Ability{
 
-  Supply_drop(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "supply drop", "Drops a crate giving between $500 and $1500.");
+  Supply_drop(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 60., 0., "supply drop", "Drops a crate giving between $500 and $1500.", loading_ability);
     initial_cd(enabled_by_tower);
   }
   
@@ -341,8 +354,8 @@ class Rocket_storm extends Ability{
   //normalement on tire sur les 100 ballons les plus proches, mais moins gourmant de demander les 100 premiers ballons de la liste
   static final float time_beetween_shoots = 2.;
 
-  Rocket_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "rocket storm", "Rocket Storm shoots out a missile towards the first 100 bloons on screen.");
+  Rocket_storm(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 30., 10, "rocket storm", "Rocket Storm shoots out a missile towards the first 100 bloons on screen.", loading_ability);
   }
   
   void use(Tower tour_used){
@@ -367,8 +380,8 @@ class Spike_storm extends Ability{
   //Lays a thick carpet of spikes over the whole track. Spikes last 5 seconds unless reacted upon, in which the spikes will get an extra 5 seconds to pop a bloon.
   //on va dire 200 spikes sur le terrain
   
-  Spike_storm(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "spike storm", "Lays a thick carpet of spikes over the whole track. Spikes last 5 seconds (10 if reacted upon).");
+  Spike_storm(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 60., 0., "spike storm", "Lays a thick carpet of spikes over the whole track. Spikes last 5 seconds (10 if reacted upon).", loading_ability);
   }
   
   void use(Tower tour_used){
@@ -381,8 +394,8 @@ class Spike_storm extends Ability{
 
 class Summon_phoenix extends Ability{
 
-  Summon_phoenix(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "summon phoenix", "Creates a super powerful flying phoenix that flies around wreaking bloon havoc for 20 seconds.");
+  Summon_phoenix(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 60., 20., "summon phoenix", "Creates a super powerful flying phoenix that flies around wreaking bloon havoc for 20 seconds.", loading_ability);
   }
   
   void use(Tower tour_used){
@@ -403,8 +416,8 @@ class Summon_phoenix extends Ability{
 
 class Sabotage_supply_lines extends Ability{
   
-  Sabotage_supply_lines(Tower enabled_by_tower, float cooldown_duration, float duration){
-    super(enabled_by_tower, cooldown_duration, duration, "sabotage supply lines", "Sabotage the bloons supply lines for 15 seconds. During the sabotage, all bloons are crippled to half speed.");
+  Sabotage_supply_lines(Tower enabled_by_tower, boolean loading_ability){
+    super(enabled_by_tower, 60., 15., "sabotage supply lines", "Sabotage the bloons supply lines for 15 seconds. During the sabotage, all bloons are crippled to half speed.", loading_ability);
   }
   
   void use(Tower tour_used){

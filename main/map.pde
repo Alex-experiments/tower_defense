@@ -31,13 +31,13 @@ class Map{
     int compteur_nb_cercle=0;
     
     for(int i=0; i<directions.length; i++){
-      if(directions[i]=="droite")  coords_x.append(coords_x.get(coords_x.size()-1)+longueurs[i]);      //on est obligé d'utiliser size() car on ajoute un element a coords_x que lorsqu'on va a droite ou a gauche
-      if(directions[i]=="gauche")  coords_x.append(coords_x.get(coords_x.size()-1)-longueurs[i]);
-      if(directions[i]=="bas")     coords_y.append(coords_y.get(coords_y.size()-1)+longueurs[i]);
-      if(directions[i]=="haut")    coords_y.append(coords_y.get(coords_y.size()-1)-longueurs[i]);
+      if(directions[i].equals("droite"))  coords_x.append(coords_x.get(coords_x.size()-1)+longueurs[i]);      //on est obligé d'utiliser size() car on ajoute un element a coords_x que lorsqu'on va a droite ou a gauche
+      else if(directions[i].equals("gauche"))  coords_x.append(coords_x.get(coords_x.size()-1)-longueurs[i]);
+      else if(directions[i].equals("bas"))     coords_y.append(coords_y.get(coords_y.size()-1)+longueurs[i]);
+      else if(directions[i].equals("haut"))    coords_y.append(coords_y.get(coords_y.size()-1)-longueurs[i]);
       
       
-      if(directions[i]=="cercle"){
+      if(directions[i].equals("cercle")){
         longueur_map+=liste_cercles.get(compteur_nb_cercle).longueur();
         compteur_nb_cercle++;
       }
@@ -107,7 +107,7 @@ class Map{
         
       
       default :
-        println("NO MAP NUMBER SPECIFIED");
+        println("MAP NUMBER SPECIFIED NOT KNOWN");
         break;
     }
   }
@@ -122,24 +122,21 @@ class Map{
     for(int i=0; i<directions.length; i++){
       String dir=directions[i];
       float len=longueurs[i];
-      if(dir=="cercle"){
-        len=liste_cercles.get(compteur_nb_cercle).longueur();
-        
-      }
+      if(dir.equals("cercle"))  len=liste_cercles.get(compteur_nb_cercle).longueur();
       
       
       if(t<=longueur_cumulee+len){
-        if(dir=="bas")     return new float[] {x, y+t-longueur_cumulee};
-        if(dir=="haut")    return new float[] {x, y-t+longueur_cumulee};
-        if(dir=="droite")  return new float[] {x+t-longueur_cumulee, y};
-        if(dir=="gauche")  return new float[] {x-t+longueur_cumulee, y};
-        if(dir=="cercle")  return liste_cercles.get(compteur_nb_cercle).get_pos(t-longueur_cumulee);
+        if(dir.equals("bas"))     return new float[] {x, y+t-longueur_cumulee};
+        if(dir.equals("haut"))    return new float[] {x, y-t+longueur_cumulee};
+        if(dir.equals("droite"))  return new float[] {x+t-longueur_cumulee, y};
+        if(dir.equals("gauche"))  return new float[] {x-t+longueur_cumulee, y};
+        if(dir.equals("cercle"))  return liste_cercles.get(compteur_nb_cercle).get_pos(t-longueur_cumulee);
       }
-      if(dir=="bas")     y+=len;
-      if(dir=="haut")    y-=len;
-      if(dir=="droite")  x+=len;
-      if(dir=="gauche")  x-=len;
-      if(dir=="cercle"){
+      if(dir.equals("bas"))    y+=len;
+      else if(dir.equals("haut"))    y-=len;
+      else if(dir.equals("droite"))  x+=len;
+      else if(dir.equals("gauche"))  x-=len;
+      else if(dir.equals("cercle")){
         Cercle temp = liste_cercles.get(compteur_nb_cercle);
         float[] pos_finale = temp.get_pos(len);
         x=pos_finale[0];
@@ -161,12 +158,12 @@ class Map{
     int compteur_nb_cercle = 0;
     
     for(int i=0; i<pos_extremales.size()-1; i++){
-      if(directions[i]=="cercle"){
+      if(directions[i].equals("cercle")){
         Cercle temp=liste_cercles.get(compteur_nb_cercle);
         
         float angle_dep = temp.angle_dep;    //arc trace dans le sens horaire avec des angles qui sont les opposés des miens
         float angle_fin = temp.angle_fin;    //et il ne veut pas tracer un arc de PI à PI/2 -> il faut faire de PI à 3*PI/2
-        if(temp.sens=="trigo"){
+        if(temp.sens.equals("trigo")){
           angle_dep = temp.angle_fin;
           angle_fin = temp.angle_dep;
         }
@@ -210,12 +207,12 @@ class Map{
     for(int i=0; i<directions.length; i++){
       String dir=directions[i];
       float len=longueurs[i];
-      if(dir=="bas")     y+=len;
-      if(dir=="haut")    y-=len;
-      if(dir=="droite")  x+=len;
-      if(dir=="gauche")  x-=len;
+      if(dir.equals("bas"))     y+=len;
+      else if(dir.equals("haut"))    y-=len;
+      else if(dir.equals("droite"))  x+=len;
+      else if(dir.equals("gauche"))  x-=len;
       
-      if(dir=="cercle"){
+      else if(dir.equals("cercle")){
         Cercle temp = liste_cercles.get(compteur_nb_cercle);
         float[] pos_finale = temp.get_pos(temp.longueur());
         x=pos_finale[0];
@@ -236,7 +233,7 @@ class Map{
      
     for(int i=0; i<pos_extremales.size()-1; i++){        //on regarde si on est pas sur le chemin
     
-      if(directions[i] != "cercle"){            //le chemin à cet endroit la est une droite
+      if(!directions[i].equals("cercle")){            //le chemin à cet endroit la est une droite
         myLine.x1=pos_extremales.get(i)[0];
         myLine.y1=pos_extremales.get(i)[1];
         myLine.x2=pos_extremales.get(i+1)[0];
@@ -259,12 +256,12 @@ class Map{
           
           //ici on vérifie si on est strictement dans l'arc de cercle
           if(angle_debut>angle_fin){
-            if(temp.sens=="horaire" && angle_fin<=angle && angle<=angle_debut)    return true;
-            if(temp.sens=="trigo" && (angle>=angle_debut || angle<=angle_fin))    return true;
+            if(temp.sens.equals("horaire") && angle_fin<=angle && angle<=angle_debut)    return true;
+            if(temp.sens.equals("trigo") && (angle>=angle_debut || angle<=angle_fin))    return true;
           }
           else{
-            if(temp.sens=="trigo" && angle_debut<=angle && angle<=angle_fin)      return true;
-            if(temp.sens=="horaire" && (angle>=angle_fin || angle<=angle_debut))  return true;
+            if(temp.sens.equals("trigo") && angle_debut<=angle && angle<=angle_fin)      return true;
+            if(temp.sens.equals("horaire") && (angle>=angle_fin || angle<=angle_debut))  return true;
           }
           
           //mais il reste encore à vérifier si l'on est pas juste a coté de l'arc de cercle et cela se vérifie va la distance aux points extremaux

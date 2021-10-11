@@ -11,13 +11,10 @@ class Lost_menu extends Menu_pancarte{
   
   int round_number;
   
-  boolean freeze = false, active = false, choice_made=false, go_to_menu = false, go_replay = false, transition = false;
+  boolean freeze = false, active = false, choice_made=false, go_to_menu = false, go_replay = false, transition = false, mouse_still_pressed = true;
   
   Point top_left;
   
-  Lost_menu(){
-    super();
-  }
   
   void init(){
     points = new ArrayList<Point>();
@@ -25,10 +22,10 @@ class Lost_menu extends Menu_pancarte{
     ropes_extremity_links = new IntList();
     buttons_top_left_corner = new ArrayList<Point>();
     
-    active = true; freeze = false; choice_made=false; go_to_menu = false; go_replay = false; transition = false;
+    active = true; freeze = false; choice_made=false; go_to_menu = false; go_replay = false; transition = false; mouse_still_pressed = true;
     bg = get();
     round_number = round.round_number;
-    create_pancarte(1, 348, -350, 200, 304, 150);
+    create_pancarte(1, 348, -350, 200, 304, 150, 600);
     h=150;
     w = 305;
     top_left = links.get(ropes_extremity_links.get(1)).ptA;
@@ -39,6 +36,7 @@ class Lost_menu extends Menu_pancarte{
     replay.associated_image = loadImage("replay button.png");
     textAlign(CENTER, CENTER);
     textFont(font_32px);
+    
   }
   
   void core(){
@@ -48,16 +46,21 @@ class Lost_menu extends Menu_pancarte{
         for(int i = 0; i<5; i++)  update();
         freeze = PVector.sub(top_left.pos, top_left.prev_pos).mag()<.004;
       }
-      //else println("freeze");
     }
     else for(int i = 0; i<3; i++) update();
-    top_left = links.get(ropes_extremity_links.get(1)).ptA;
     x = top_left.pos.x; y = top_left.pos.y;
     update_pos_boutons();
-    if(!choice_made) interact();
+    if(!choice_made && !mouse_still_pressed) interact();
+    if(!mousePressed)  mouse_still_pressed = false;
     image(panneau, x+5+w/2, y+32+h/2);
     show();
     show_chain();
+    if(ended()){
+      gravity = new PVector(0, .1);    //pour la remettre_normale
+      active = false;
+      if(go_to_menu)  main_menu.init();
+      else game.init(false, game.difficulty, game.map_number);
+    }
   }
   
   void interact(){
@@ -124,7 +127,7 @@ class Menu_pancarte{
     }
   }
 
-  void create_pancarte(int nb_box, float x, float y, float distance_inter_box, int width_box, int height_box){ 
+  void create_pancarte(int nb_box, float x, float y, float distance_inter_box, int width_box, int height_box, int points_per_rope){ 
     
     float angle_offset = random(QUARTER_PI, HALF_PI);
     if(random(0., 1.)<.5)  angle_offset*=-1;
@@ -133,8 +136,8 @@ class Menu_pancarte{
       float x2 = x + distance_inter_box*cos(angle_offset + HALF_PI);
       float y2 = y + distance_inter_box*sin(angle_offset + HALF_PI);
       
-      create_rope(600, x, y, x2, y2, i==0);
-      create_rope(600, x+width_box, y, x2+width_box, y2, i==0);
+      create_rope(points_per_rope, x, y, x2, y2, i==0);
+      create_rope(points_per_rope, x+width_box, y, x2+width_box, y2, i==0);
       
       x = x2;
       y = y2 + height_box;
@@ -181,6 +184,19 @@ class Menu_pancarte{
     links.add(new Link(top_right, bot_left));
     links.add(new Link(top_right, bot_right));
     links.add(new Link(bot_left, bot_right));
+  }
+  
+  void cut_rope(int rope_number){
+    int index1 = ropes_extremity_links.get(rope_number*2), index2 = ropes_extremity_links.get(rope_number*2+1);
+    int middle_index = int((index1+index2)/2);
+    links.remove(middle_index);
+    for(int i=0; i<ropes_extremity_links.size(); i++){
+      int link_index = ropes_extremity_links.get(i);
+      if(link_index>=middle_index) ropes_extremity_links.set(i, link_index-1);  //tout se décale de 1 car on vient de supprimer un lien
+    }
+    ropes_extremity_links.set(rope_number*2+1, middle_index-1);
+    ropes_extremity_links.append(middle_index);
+    ropes_extremity_links.append(index2-2);
   }
   
   void show_chain(){

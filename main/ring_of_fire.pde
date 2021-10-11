@@ -43,6 +43,22 @@ class Ring_of_fire extends Projectile{
     }
     popMatrix();
   }
+  
+  void kill(){  //AVEC LA GRID MAP ON EST OBLIGE D OVERRIDE (sinon on regarde pas tous les bloons qu'on peut tapper)
+    dmg_done_this_frame=0;
+    //on fait des degats aux enemis
+   
+     ArrayList<Mob> enemis_to_look_at = grid.get_enemis_to_look_at(fired_from_tower.x, fired_from_tower.y, ray+epaisseur/2.); //c'est ca le truc qui change
+    for (int i = enemis_to_look_at.size() - 1; i >= 0; i--){
+      Mob mob = enemis_to_look_at.get(i);
+      if(can_detect(mob, fired_from_tower.detects_camo) && pierce>0 && collision(new float[] {mob.x, mob.y}, mob.size) && !already_dmged_mobs.contains(mob) && !mob.hurted_by_during_frame.contains(this)){//si on a pas déjà tappé ce mob (ou ses parents) durant les dernieres frames
+        hit(mob);
+        if(pierce<=0)  break;
+      }
+    }
+        
+    fired_from_tower.add_pop_count(dmg_done_this_frame);
+  }
  
   boolean collision(float[] pos_mob, float size_mob){  //on prend ces params pour override
     

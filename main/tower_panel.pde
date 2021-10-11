@@ -2,7 +2,7 @@ class Tower_panel{
 
   Button dart_monkey, wizard_monkey, sniper_monkey, tack_shooter, dartling_gun, boomerang_thrower, ninja_monkey, spike_factory;
   
-  Button unselect_tower, speed_button;
+  Button unselect_tower, speed_button, next_round_button, home_button, auto_pass_button, save_button;
   
   ArrayList<Button> buttons;
   
@@ -10,6 +10,8 @@ class Tower_panel{
   
   PImage bg = loadImage("tower_panel_bg.png");
   boolean for_stat_menu;
+  
+  int[] pos_aff_piece, pos_aff_coeur;
   
   
   
@@ -20,16 +22,18 @@ class Tower_panel{
     this.bottom_right_y=bottom_right_y;
     this.for_stat_menu = for_stat_menu;
     instantiate_all_buttons();
+    pos_aff_piece = pos_coins_sprites.get("piece sprite");
+    pos_aff_coeur = pos_coins_sprites.get("coeur sprite");
   }
   
   void show_infos(){
     //appelée depuis joueur.show_infos()
     fill(0, 102, 153);
     textAlign(LEFT, TOP);
-    image(coin_sprite, 893, 18);
+    image(all_sprites, 893, 18, pos_aff_piece[2], pos_aff_piece[3], pos_aff_piece[0], pos_aff_piece[1], pos_aff_piece[0]+pos_aff_piece[2], pos_aff_piece[1]+pos_aff_piece[3]);
     textFont(font_18px);
     outline_text(str(joueur.argent), 910, 8, color(0), color(255), 1); 
-    image(coeur_sprite, 893, 48);
+    image(all_sprites, 893, 48, pos_aff_coeur[2], pos_aff_coeur[3], pos_aff_coeur[0], pos_aff_coeur[1], pos_aff_coeur[0]+pos_aff_coeur[2], pos_aff_coeur[1]+pos_aff_coeur[3]);
     outline_text(str(max(0, joueur.vies)), 910, 38, color(0), color(255), 1); 
     textFont(font);
   }
@@ -42,17 +46,39 @@ class Tower_panel{
     
     if(!for_stat_menu){
       image(bg, (top_left_x+bottom_right_x)/2, (top_left_y+bottom_right_y)/2);
-    
       update_clickability();
+      textAlign(CENTER, CENTER);
     }
+
     
     for(Button button : buttons){
       //ce bouton n'est pas dans la liste si for_stat_menu == true
       if(button == unselect_tower && joueur.placing_tower != null)   unselect_tower.show_image_from_pos_aff(unselect_tower.mouse_on_button()? 1.1 : 1);
+      else if(button == speed_button){
+        if(!round.waiting_next_round)  button.show();
+      }
+      else if(button == next_round_button){
+        if(round.waiting_next_round){
+          button.show();
+          textFont(font_18px);
+          outline_text("GO", 938, 610, color(0), color(255), 1);
+          textFont(font);
+        }
+      }
       else if(button != unselect_tower)  button.show();
     }
     
-    if(!for_stat_menu)    show_infos();
+    if(!for_stat_menu){
+      home_button.show();
+      home_button.show_associated_image();
+      auto_pass_button.show();
+      auto_pass_button.show_associated_image();
+      save_button.show();
+      if(!game.game_just_saved)  save_button.show_associated_image();
+      else  outline_text("GAME SAVED!", (save_button.top_left_x+save_button.bottom_right_x)/2, (save_button.top_left_y+save_button.bottom_right_y)/2, color(0), color(50, 255, 30), 1);
+      show_infos();
+    }
+      
   }
   
   void update_clickability(){
@@ -67,10 +93,13 @@ class Tower_panel{
     for(Button button : buttons){
       if(button.is_cliqued()){
         if(button == speed_button){
-          joueur.game_speed*=2;
-          if(joueur.game_speed>joueur.max_game_speed)  joueur.game_speed=1;
-          speed_button.text = "speed : "+str(int(joueur.game_speed));
+          if(!round.waiting_next_round){
+            joueur.game_speed*=2;
+            if(joueur.game_speed>joueur.max_game_speed)  joueur.game_speed=1;
+            speed_button.text = "speed : "+str(int(joueur.game_speed));
+          }
         }
+        else if(button == next_round_button) continue;
         else if(button == unselect_tower)  tower_type = "";
         else  tower_type = button.associated_tower.type;
       }
@@ -79,6 +108,30 @@ class Tower_panel{
     if(tower_type != null){
       if(tower_type.equals(""))  joueur.placing_tower = null;
       else joueur.placing_tower = get_new_tower(tower_type, mouseX, mouseY);
+    }
+    
+    if(!for_stat_menu){
+      if(home_button.is_cliqued()){
+        stat_manager.save_all();
+        main_menu.init();
+      }
+      if(auto_pass_button.is_cliqued()){
+        if(auto_pass_levels){
+          auto_pass_levels = false;
+          auto_pass_button.associated_image = loadImage("pass_icon.png");
+          auto_pass_button.descr = "Enable rounds auto pass";
+        }
+        else{
+          auto_pass_levels = true;
+          auto_pass_button.associated_image = loadImage("pass_activated_icon.png");
+          auto_pass_button.descr = "Disable rounds auto pass";
+        }
+      }
+      if(save_button.is_cliqued()){
+        game.save_game();
+        save_button.unclickable = true;
+        game.game_just_saved = true;
+      }
     }
     
   }
@@ -100,8 +153,7 @@ class Tower_panel{
     for(Button button : buttons){
       if(button.selected)  return button.associated_tower.type;
     }
-    return "NO TOWER NAME FOUND : PROBLEM";
-    
+    return "NO TOWER NAME FOUND : PROBLEM NO BUTTON SELECTED";
   }
   
   void instantiate_all_buttons(){
@@ -186,6 +238,29 @@ class Tower_panel{
     
     speed_button = new Button(875, 650-80, 1000, 650, "speed : "+str(int(joueur.game_speed)), '*');
     buttons.add(speed_button);
+    
+    next_round_button = new Button(875, 650-80, 1000, 650, "", char(-1));
+    next_round_button.use_shortcut_key = false;
+    buttons.add(next_round_button);
+    
+    home_button = new Button(875+20, 700, 875+60, 740, "", char(-1));
+    home_button.use_shortcut_key = false;
+    home_button.associated_image = loadImage("home_icon.png");
+    home_button.descr = "Go back to main menu";
+    home_button.width_descr = 100;
+    
+    
+    auto_pass_button = new Button(1000-60, 700, 1000-20, 740, "", 'ù');
+    auto_pass_button.associated_image = loadImage("pass_icon.png");
+    auto_pass_button.descr = "Enable rounds auto pass";
+    auto_pass_button.width_descr = 100;
+    
+    save_button = new Button(875, 665, 1000, 694, "", char(-1));
+    save_button.use_shortcut_key = false;
+    save_button.associated_image = loadImage("save_icon.png");
+    save_button.descr = "Save game";
+    save_button.width_descr = 100;
+    
   }
 }
 

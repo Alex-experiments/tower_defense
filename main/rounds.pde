@@ -3,16 +3,17 @@ class Rounds{
   //In Bloons TD 5, the speed multiplier can be calculated by this formula: max(6.6 * (waveNumber - 85) / (200 - 85),1)
   // voir part RAMPING https://bloons.fandom.com/wiki/Bloon : ya aussi la vie des mobs
   
-  int round_number=45;
+  int round_number=0;
   boolean finished;
   float initial_intervall=0.865, intervall;
   ArrayList<Mob> spawn_list=new ArrayList<Mob>();  
   boolean waiting_next_round=true;
   float last_spawn_time;
+  
+  float speed_multiplier = 1, health_multiplier;
     
   boolean spawn_at_half_speed = false;
-  int nb_of_sabotage_in_use = 0;
-  
+  int nb_of_sabotage_in_use = 0;  
 
   void init_intervall_time(){
     intervall = initial_intervall * (1- 2*atan((round_number-1.)/10.)/PI);
@@ -382,20 +383,42 @@ class Rounds{
      
      default:
        println("default round");
-       //add_bloons(1, "MOAB");
-       add_bloons(round_number-25, "black", true, false);
-       //add_bloons(1, "black", true, false);
+       int round_rbe = 60000 + 5000*(round_number-85);
+       float r;
+       while(round_rbe > 0){
+         r = random(1.);
+         if(r<.2){
+           add_bloons(15, "ceramic");
+           round_rbe -= 5* spawn_list.get(spawn_list.size()-1).get_RBE();
+         }
+         else if(r<.4){
+           add_bloons(3, "MOAB");
+           round_rbe -= 3* spawn_list.get(spawn_list.size()-1).get_RBE();
+         }
+         else if(r<.7){
+           add_bloons(1, "BFB");
+           round_rbe -= 1* spawn_list.get(spawn_list.size()-1).get_RBE();
+         }
+         else{
+           add_bloons(1, "ZOMG");
+           round_rbe -= 1* spawn_list.get(spawn_list.size()-1).get_RBE(); 
+         }
+       }
        break;
      
     }
   }
  
   void update(){
-    if(waiting_next_round){    
-      if(keyPressed && key==ENTER || auto_pass_levels){
+    if(waiting_next_round){
+      if(tower_panel.next_round_button.is_cliqued() || keyPressed && key==ENTER || auto_pass_levels){
+        tower_panel.speed_button.enfonce = true;
         waiting_next_round=false;
+        tower_panel.save_button.unclickable = true;
         if(round_number == 0)  stat_manager.increment_stat("Games started", "overview");
         round_number++;
+        speed_multiplier = max(6.6 * (round_number - 85) / (200 - 85),1);
+        if(round_number > 85)  health_multiplier += .15;
         init_spawn_list();
         init_intervall_time();
         last_spawn_time=FAKE_TIME_ELAPSED;
@@ -411,12 +434,14 @@ class Rounds{
       }
       return;
     }                
-    if(spawn_list.size()==0 && enemis.size()==0){     //round cleared
+    if(spawn_list.size()==0 && enemis.size()==0){     //round just cleared
       spikes = new ArrayList<Spikes>();
       joueur.gain(round_number+99);
       stat_manager.increment_stat("Rounds cleared", "overview");
       stat_manager.save_all();
       waiting_next_round=true;
+      tower_panel.save_button.unclickable = false;
+      game.game_just_saved = false;
       joueur.game_speed=1;      //on reset la vitesse a 1
       tower_panel.speed_button.text = "speed : "+str(1);    //sinon pas encore init
     }

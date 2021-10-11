@@ -24,11 +24,13 @@ class Upgrades{
     }
   }
   
-  
-  
   void apply_upgrade(Tower tour, int path_to_upgrade){
+    apply_upgrade(tour, path_to_upgrade, false, 0);
+  }
+  
+  void apply_upgrade(Tower tour, int path_to_upgrade, boolean loading_tower, float ability_remaining_cd){
     
-    if(path_to_upgrade==1 && !can_purchase_1 || path_to_upgrade==2 && !can_purchase_2)  return;
+    if(!loading_tower && (path_to_upgrade==1 && !can_purchase_1 || path_to_upgrade==2 && !can_purchase_2))  return;
     
     
     if(tour.type.equals("dart monkey")){
@@ -89,12 +91,14 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Super_monkey_fan_club(tour, 50., 15.));
+              abilities.add(new Super_monkey_fan_club(tour, loading_tower));
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             
             break;          
@@ -156,12 +160,14 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Blade_maelstrom(tour, 20., 6.));    //ca dure moins de 6 sec mais c'est pas grave on gère le cas avec le nb de frame dans continue_use
+              abilities.add(new Blade_maelstrom(tour, loading_tower));    //ca dure moins de 6 sec mais c'est pas grave on gère le cas avec le nb de frame dans continue_use
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             break;          
         }
@@ -204,13 +210,15 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
-                abi.initial_cd(tour);    //cette abilité a un cd initial
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
+                else abi.initial_cd(tour);    //cette abilité a un cd initial
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Supply_drop(tour, 60., 0.));
+              abilities.add(new Supply_drop(tour, loading_tower));
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             break;       
         }
@@ -304,12 +312,14 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Turbo_charge(tour, 45., 10.));
+              abilities.add(new Turbo_charge(tour, loading_tower));
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             break;          
         }
@@ -373,12 +383,14 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Rocket_storm(tour, 30., 10.));
+              abilities.add(new Rocket_storm(tour, loading_tower));
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             break;          
         }
@@ -447,12 +459,14 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Summon_phoenix(tour, 60., 20.));
+              abilities.add(new Summon_phoenix(tour, loading_tower));
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             break;          
         }
@@ -517,12 +531,14 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Sabotage_supply_lines(tour, 60., 15.));
+              abilities.add(new Sabotage_supply_lines(tour, loading_tower));
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             break;
         }
@@ -575,12 +591,14 @@ class Upgrades{
                 abi.towers_having_this_ability.add(tour);
                 abi.add_one_use(true);
                 tour.linked_ability = abi;
+                if(loading_tower && ability_remaining_cd>0)  abi.initial_cd(tour, ability_remaining_cd);
                 break;
               }
             }
             if( !already_have_one){
-              abilities.add(new Spike_storm(tour, 60., 0.));
+              abilities.add(new Spike_storm(tour, loading_tower));
               tour.linked_ability = abilities.get(abilities.size()-1);
+              if(loading_tower && ability_remaining_cd>0)  tour.linked_ability.initial_cd(tour, ability_remaining_cd);
             }
             break;
         }
@@ -592,16 +610,21 @@ class Upgrades{
     if(path_to_upgrade==1){
       tour.price+=price_1;
       tour.path_1_progression++;
-      joueur.pay(price_1);
-      stat_manager.increment_stat("Upgrade "+str(tour.path_1_progression)+"/x bought", tour.type);
+      if(!loading_tower){
+        joueur.pay(price_1);
+        stat_manager.increment_stat("Upgrade "+str(tour.path_1_progression)+"/x bought", tour.type);
+      }
     }
     else{
       tour.price+=price_2;
       tour.path_2_progression++;
-      joueur.pay(price_2);
-      stat_manager.increment_stat("Upgrade x/"+str(tour.path_2_progression)+" bought", tour.type);
+      if(!loading_tower){
+        joueur.pay(price_2);
+        stat_manager.increment_stat("Upgrade x/"+str(tour.path_2_progression)+" bought", tour.type);
+      }
     }
     tour.set_anim();
+    if(loading_tower)  return;
     stat_manager.increment_stat("Upgraded", tour.type);
     stat_manager.increment_stat("Upgrades bought", "overview");
     

@@ -3,4 +3,6 @@ D'abord : aller dans bloon_coloring, changer la couleur du ballon que l'on veut 
 Ensuite, prendre l'image obtenue, l'ouvrir avec pdn,
 prendre le template de bloon blanc déjà dispo le mettre en calque 2.
 
-Il suffit ensuite de passer les propriétées du calque 2 en Mode de fusion : multiplicatif
+Il suffit ensuite de passer les propriétées du calque 2 en Mode de fusion : multiplicatif et fusionner les calques!
+
+Ne pas oublier ensuite d'ajouter les reflets
