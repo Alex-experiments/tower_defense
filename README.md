@@ -1,3 +1,5 @@
+Game and assets owned by Ninja Kiwi
+
 RACCOURCIS : 
 
 Lancer le nouveau round : Entrée
