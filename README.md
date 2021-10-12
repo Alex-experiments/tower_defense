@@ -1,4 +1,4 @@
-Game and assets owned by Ninja Kiwi
+Game concept, title and assets owned by Ninja Kiwi
 
 RACCOURCIS : 
 
