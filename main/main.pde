@@ -3,15 +3,19 @@
 //CONTACT : alexandre.gautier@student-cs.fr
 //
 static final float VERSION = 1.0;
-//MIS A JOUR LE : 11/10/2021
+//MIS A JOUR LE : 12/10/2021
 //
 //Le concept du jeu ainsi que l'immense majorité des graphismes
 //sont la propriété de NinjaKiwi.
 //A travers ce projet, j'ai voulu recréer moi même Bloons Tower Defense 5.
 /*************************************************************************/
 
-//reste à faire : napalm, visu napalm (+root ?), full moabs skins, menu difficulte
+//reste à faire : napalm, visu napalm (+root ?), full moabs skins, difficulty menu
 
+// changes : dartling gun locked on right click, speed doesn't reset when auto pass activated, towers can be placed closer to path
+
+
+//these things should go into the Game class but for more readability I put them out there
 boolean auto_pass_levels=false;
 boolean god_mode=false;
 

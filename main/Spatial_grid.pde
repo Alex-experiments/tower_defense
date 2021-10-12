@@ -1,3 +1,7 @@
+//With the same seed, 10 000 red bloons and 100 dart monkey randomly placed on the map,
+//The spatial grid allowed the running time of 100 complete iterations of what's inside the draw() loop in ~4.5 sec compared to ~5.5 without it.
+//This is a significant improvement considering that all the other functions have been called too (and sprites have been "displayed" in the buffer)
+
 class Spatial_grid{
   int cell_dim, n_cell_x, n_cell_y;
   

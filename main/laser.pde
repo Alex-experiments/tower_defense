@@ -26,7 +26,7 @@ class Laser{
   }
   
   void core(){
-    if(FAKE_TIME_ELAPSED - fired_time > DURATION){
+    if(round.waiting_next_round || FAKE_TIME_ELAPSED - fired_time > DURATION){
       lasers.remove(this);
       return;
     }

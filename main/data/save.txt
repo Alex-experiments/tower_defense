@@ -1,0 +1,6 @@
+1.0;2;normal;3;1013503;100;60;
+ninja monkey;694.0;462.0;first;0;4;0;0.0;
+tack shooter;649.0;106.0;first;0;4;34;0.0;
+wizard monkey;717.0;291.0;first;0;4;7;15.076893;
+dartling gun;683.0;581.0;first;0;0;0;
+spike factory;784.0;429.0;first;0;4;12;15.076893;

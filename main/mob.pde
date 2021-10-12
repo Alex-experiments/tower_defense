@@ -1,4 +1,4 @@
-static final int HALF_MAX_SIZE_MOB = ceil(42*1./2);  
+static final int HALF_MAX_SIZE_MOB = ceil(42*1./2);  //for the spatial grid size
 
 class Mob{
   float x, y, px, py;

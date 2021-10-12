@@ -19,6 +19,72 @@ class Rounds{
     intervall = initial_intervall * (1- 2*atan((round_number-1.)/10.)/PI);
   }
   
+  void update(){
+    if(waiting_next_round){
+      if(tower_panel.next_round_button.is_cliqued() || keyPressed && key==ENTER || auto_pass_levels){
+        tower_panel.speed_button.enfonce = true;
+        waiting_next_round=false;
+        tower_panel.save_button.unclickable = true;
+        if(round_number == 0)  stat_manager.increment_stat("Games started", "overview");
+        round_number++;
+        speed_multiplier = max(6.6 * (round_number - 85) / (200 - 85),1);
+        if(round_number > 85)  health_multiplier += .15;
+        init_spawn_list();
+        init_intervall_time();
+        last_spawn_time=FAKE_TIME_ELAPSED;
+        for(Tower tour : towers){    //on reset les attaques de toutes les tours pour pas que auto_pass désaventage le joueur
+          for(int i=0; i<tour.time_before_next_attack_list.size(); i++){
+            tour.time_before_next_attack_list.set(i, 0);
+          }
+          //il faut pas que le nouveau round commence avec des spawns lents
+          if(tour.linked_ability instanceof Sabotage_supply_lines && tour.ability_use_time>=0)  tour.linked_ability.end_effect(tour);  //on end effect que si l'abilite est active
+          //sinon ca fais nb_sabo_actif -- ce qu'on veut pas
+        }
+        println("let's go for round ", round_number);
+      }
+      return;
+    }                
+    if(spawn_list.size()==0 && enemis.size()==0){     //round just cleared
+      spikes = new ArrayList<Spikes>();
+      joueur.gain(round_number+99);
+      stat_manager.increment_stat("Rounds cleared", "overview");
+      stat_manager.save_all();
+      waiting_next_round=true;
+      tower_panel.save_button.unclickable = false;
+      game.game_just_saved = false;
+      if(!auto_pass_levels){
+        joueur.game_speed=1;      //on reset la vitesse a 1
+        tower_panel.speed_button.text = "speed : "+str(1);    //sinon pas encore init
+      }
+    }
+  }
+  
+  void spawn(){
+    int decalage=0;
+    while(spawn_list.size()>0 && FAKE_TIME_ELAPSED-last_spawn_time > intervall){    //le while est la si jamais on doit spawn plusieurs enemis a la meme frame
+      Mob mob = spawn_list.get(0);
+      mob.avancement -= decalage*mob.speed;
+      mob.update_pos();
+      mob.add_to_grid();
+      if(spawn_at_half_speed)  mob.speed /= 2.;
+      enemis.add(mob);
+      spawn_list.remove(0);
+      last_spawn_time+=intervall * intervall_multiplier.get(mob.type);
+      decalage++;
+    }
+  }
+  
+  void add_bloons(int number, String type, boolean regrowth, boolean camo){
+    for(int i=0; i<number; i++){
+      spawn_list.add(new Mob(type, regrowth, camo, 0));
+    }
+  }
+  
+  void add_bloons(int number, String type){
+    add_bloons(number, type, false, false);
+  }
+  
+  
   void init_spawn_list(){
     switch(round_number){
       case 1:
@@ -407,69 +473,5 @@ class Rounds{
        break;
      
     }
-  }
- 
-  void update(){
-    if(waiting_next_round){
-      if(tower_panel.next_round_button.is_cliqued() || keyPressed && key==ENTER || auto_pass_levels){
-        tower_panel.speed_button.enfonce = true;
-        waiting_next_round=false;
-        tower_panel.save_button.unclickable = true;
-        if(round_number == 0)  stat_manager.increment_stat("Games started", "overview");
-        round_number++;
-        speed_multiplier = max(6.6 * (round_number - 85) / (200 - 85),1);
-        if(round_number > 85)  health_multiplier += .15;
-        init_spawn_list();
-        init_intervall_time();
-        last_spawn_time=FAKE_TIME_ELAPSED;
-        for(Tower tour : towers){    //on reset les attaques de toutes les tours pour pas que auto_pass désaventage le joueur
-          for(int i=0; i<tour.time_before_next_attack_list.size(); i++){
-            tour.time_before_next_attack_list.set(i, 0);
-          }
-          //il faut pas que le nouveau round commence avec des spawns lents
-          if(tour.linked_ability instanceof Sabotage_supply_lines && tour.ability_use_time>=0)  tour.linked_ability.end_effect(tour);  //on end effect que si l'abilite est active
-          //sinon ca fais nb_sabo_actif -- ce qu'on veut pas
-        }
-        println("let's go for round ", round_number);
-      }
-      return;
-    }                
-    if(spawn_list.size()==0 && enemis.size()==0){     //round just cleared
-      spikes = new ArrayList<Spikes>();
-      joueur.gain(round_number+99);
-      stat_manager.increment_stat("Rounds cleared", "overview");
-      stat_manager.save_all();
-      waiting_next_round=true;
-      tower_panel.save_button.unclickable = false;
-      game.game_just_saved = false;
-      joueur.game_speed=1;      //on reset la vitesse a 1
-      tower_panel.speed_button.text = "speed : "+str(1);    //sinon pas encore init
-    }
-  }
-  
-  void spawn(){
-    int decalage=0;
-    while(spawn_list.size()>0 && FAKE_TIME_ELAPSED-last_spawn_time > intervall){    //le while est la si jamais on doit spawn plusieurs enemis a la meme frame
-      Mob mob = spawn_list.get(0);
-      mob.avancement -= decalage*mob.speed;
-      mob.update_pos();
-      mob.add_to_grid();
-      if(spawn_at_half_speed)  mob.speed /= 2.;
-      enemis.add(mob);
-      spawn_list.remove(0);
-      last_spawn_time+=intervall * intervall_multiplier.get(mob.type);
-      decalage++;
-    }
-  }
-  
-  void add_bloons(int number, String type, boolean regrowth, boolean camo){
-    for(int i=0; i<number; i++){
-      spawn_list.add(new Mob(type, regrowth, camo, 0));
-    }
-  }
-  
-  void add_bloons(int number, String type){
-    add_bloons(number, type, false, false);
-  }
-  
+  }  
 }

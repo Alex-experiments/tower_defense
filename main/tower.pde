@@ -425,11 +425,13 @@ class Dartling_gun extends Tower{
     
     if(round.waiting_next_round)  return;      //sinon lance un projectile parasite
     
-    float direction = atan2(mouseY-y, mouseX-x);
+    float direction;
+    if(joueur.right_clic_activated) direction = atan2(joueur.last_right_clic_y-y, joueur.last_right_clic_x-x);
+    else direction = atan2(mouseY-y, mouseX-x);
     orientation = direction+HALF_PI;
     
     if(path_1_progression == 4){
-      associated_ray.core();
+      associated_ray.core(direction);
       return;    //on a deja un ray_of_doom
     }
     

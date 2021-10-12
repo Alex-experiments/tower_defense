@@ -20,10 +20,9 @@ class Ray_of_doom{
     this.fired_from_tower = fired_from_tower;
   }
   
-  public void core(){
-    if(round.waiting_next_round)  return;
+  public void core(float direction){
     for(int i=0; i<joueur.game_speed; i++){
-      renew();
+      renew(direction);
       if(dmg_this_frame)  kill();
       dmg_this_frame = !dmg_this_frame;
     }
@@ -31,8 +30,8 @@ class Ray_of_doom{
     show();
   }
   
-  private void renew(){
-    direction = atan2(mouseY-y, mouseX-x);
+  private void renew(float direction){
+    this.direction = direction;
     pierce = INIT_PIERCE;
     already_dmged_mobs = new ArrayList<Mob>();
   }

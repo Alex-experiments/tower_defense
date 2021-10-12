@@ -1,14 +1,13 @@
 class Joueur{
-  int vies;
-  int argent;
-  int game_pop_count;
-  Tower placing_tower=null;
-  Tower selected_tower;
+  int vies, argent, game_pop_count;
+  Tower placing_tower=null, selected_tower;
   
-  float game_speed=1;
-  float max_game_speed=8;
+  float game_speed=1, max_game_speed=8;
   
   float sell_percent=0.8;
+  
+  float last_right_clic_x, last_right_clic_y;
+  boolean right_clic_activated = false, right_clic_enfonce = false;
   
   
   Joueur(int vies_depart, int argent_depart){
@@ -38,6 +37,16 @@ class Joueur{
   }
 
   void interactions(){
+    if(mousePressed && mouseButton == RIGHT){
+      if(!right_clic_enfonce){
+        right_clic_activated = !right_clic_activated;
+        right_clic_enfonce = true;
+        last_right_clic_x = mouseX;
+        last_right_clic_y = mouseY;
+      }
+    }
+    else right_clic_enfonce = false;
+    
     boolean can_place_tower= mouseX>=0 && mouseX<tower_panel.top_left_x && mouseY>=0 && mouseY<info_panel.top_left_y;      //il faut pas que le curseur soit hors map    //a changer ici aussi
     if(can_place_tower && placing_tower!=null){    //si on a selectionné une tour
             
@@ -52,7 +61,7 @@ class Joueur{
       }
       
       //on regarde si on a pas assez d'argent ou si la hitbox rencontre le chemin
-      if(can_place_tower && (argent<placing_tower.price || map.is_on_track(placing_tower.x, placing_tower.y, placing_tower.size)))  can_place_tower=false;
+      if(can_place_tower && (argent<placing_tower.price || map.is_on_track(placing_tower.x, placing_tower.y, placing_tower.size*3/4)))  can_place_tower=false;
       
       placing_tower.show();
       placing_tower.show_range(can_place_tower);
