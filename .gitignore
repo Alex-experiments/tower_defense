@@ -1,0 +1,3 @@
+**/*.txt
+**/*.pdn
+!main/data/pos_sprites.txt
